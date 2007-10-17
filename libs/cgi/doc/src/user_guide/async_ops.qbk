@@ -1,0 +1,23 @@
+[section:async Asynchronous Operations]
+
+Asynchronous functionality is inherited from __boost_asio__, which uses __IoService__s to manage I/O operations. Each program that uses an asynchronous __protocol__ requires a single __ProtocolService__ to service all requests in the program. Amongst other things, the ProtocolService uses an underlying IoService to run asynchronous operations.
+
+The asynchronous operations provided by the library are:
+
+* Async-I/O: free functions __async_read__ and __async_write__, and member functions __async_read_some__ and __async_write_some__;
+
+* Async __accepting__ of requests;
+
+* Async __loading__ of request meta-data.
+
+Using asynchronous operations takes a bit of getting used to, but after overcoming the initial Conceptual hurdles, use of the library should be relatively straight-forward.
+
+
+
+[endsect]
+
+[section Io Service]
+
+[/ link to the asio IoService concept docs; mention *briefly* what they are for; explain how the protocol services use an IoServiceProvider, linking to relevant examples in the examples section.]
+
+[endsect]

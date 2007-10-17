@@ -1,0 +1,36 @@
+#             Copyright (c) 2007 Darren Garvey
+#
+# Distributed under the Boost Software License, Version 1.0.
+#     (See accompanying file LICENSE_1_0.txt or copy 
+#        at http://www.boost.org/LICENSE_1_0.txt)
+
+import os ;
+
+project boost/cgi/example/cgi
+  : build-dir ../../../../bin.v2
+  ;
+
+local BOOST_ROOT = [ os.environ BOOST_ROOT ] ;
+
+
+exe ecgi
+  :
+    main.cpp
+  :
+    <include>$(BOOST_ROOT)
+    <include>../../../../
+    <library>../../util/system//boost_system
+    #<library>l:/usr/local/lib/libboost_system.a
+    <define>BOOST_ALL_NO_LIB=1
+    <define>_CRT_SECURE_NO_DEPRECIATE=1
+    <toolset>gcc:<linkflags>-lpthread
+  ;
+
+# uncomment this if you want to test the example on your machine
+#install _
+#  : ecgi
+#  : # this is where the compiled executable will be copied
+#    # set this to your server's /cgi-bin/
+#    <location>/var/www/cgi-bin
+#  ;
+

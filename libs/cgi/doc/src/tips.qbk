@@ -1,0 +1,10 @@
+
+[section:tips Tips]
+
+[section Making your programs less dependent on a protocol type]
+
+Since you have to be explicit when making a request, one simple way to make your programs *almost* protocol-independent
+
+[endsect]
+
+[endsect]

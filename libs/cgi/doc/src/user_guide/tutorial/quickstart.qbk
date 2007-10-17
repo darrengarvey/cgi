@@ -1,0 +1,22 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section:quickstart Quickstart: 'Scripting']
+
+CGI is a simple protocol: you read __POST__ data from `stdin`, other data from environment variables (ie. via [@http://tinyurl.com/3cqrd5 `::getenv()`]) and write your output to `stdout`. This section introduces the '__CGI__' interface, which offers a subset of the library's functionality. This is not essential reading, but it is recommended that you at least scan through it as the techniques still apply to the rest of the library. Afterwards, if you wish to scale your program to __FastCGI__ or __SCGI__, or just provide a custom logging layer or asynchronous read/writes (with vanilla CGI) then the rest of the tutorial will show you how to.
+
+[h3 10 minute intro]
+
+The following example can be found [@../../src/user_guide/tutorial/10_min_intro.cpp here].
+
+[import 10_min_intro.cpp]
+
+[main]
+
+That's all quite simple, right?
+
+[endsect]

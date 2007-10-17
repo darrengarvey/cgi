@@ -1,0 +1,30 @@
+# These tests should compile without error
+
+import testing ;
+
+test-suite compile_test_suite
+  :
+    # connections
+    [ compile stdio_connection.cpp       ]
+    [ compile async_stdio_connection.cpp ]
+    [ compile tcp_connection.cpp         ]
+    
+    # services
+    [ compile acgi_service.cpp           ]
+#   [ compile fcgi_service.cpp           ]
+
+    # requests
+    [ compile cgi_request.cpp            ]
+    [ compile acgi_request.cpp           ]
+
+    # response
+    [ compile response.cpp               ]
+    
+    # misc tests
+    [ compile cgi_header_check.cpp       ]
+    [ compile is_async_test.cpp          ]
+  :
+    <toolset>msvc:<define>_CRT_SECURE_NO_DEPRECIATE=1
+    <toolset>msvc:<define>_CRT_NONSTDC_NO_DEPRECATE=1
+    <toolset>msvc:<define>_SCL_SECURE_NO_DEPRECATE=1
+  ;

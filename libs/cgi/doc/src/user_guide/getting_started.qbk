@@ -1,0 +1,24 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section:getting_started Getting Started Guide]
+
+[tip Have you read __reading_the_docs__?]
+
+This section of the documentation is probably best read before the __tutorial__. In a nutshell, this is a quick and dirty run-through of how to get and install the library and configure your server. Following that is a short example of a CGI program and one of a FastCGI program, just to highlight the features of the library.
+
+Don't worry if you don't understand these examples, as the __tutorial__ that follows this section explains everything.
+
+[/include downloading.qbk]
+
+[/include installing.qbk]
+
+[/include cgi_example.qbk]
+
+[/include fastcgi_example.qbk]
+
+[endsect]

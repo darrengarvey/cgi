@@ -1,0 +1,11 @@
+# These tests should run without error
+# (currently not here)
+
+import testing ;
+
+test-suite run_test_suite
+  :
+    #[ run [ glob *.cpp ] ]
+    
+    [ run cookie.cpp ]
+  ;

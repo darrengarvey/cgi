@@ -1,0 +1,44 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section:intro Introduction]
+
+``
+#include <boost/cgi/cgi.hpp>
+using namespace cgi;
+
+int main(int, char**)
+{
+  request req;
+  response resp;
+
+  resp<< "Hello there, Universe. "
+      << "Oh wait, it's just you, " << req.form_("name")
+      << ", isn't it?!";
+  resp.send(req);
+}
+``
+
+This CGI library reasonably high-level library for web programming. Herein the controller portion of the Model-View-Controller idiom is implemented. The intricacies of dealing with the widely varying specifications of CGI, FastCGI and SCGI are abstracted into three main parts:
+
+* Accepting,
+
+* Loading, and
+
+* Handling.
+
+Sometimes all a problem calls for is a thin interface to request data and '''I/O''' streams, without any need to be hyper-efficient: in other words, like a short CGI script that you can with [@http://tinyurl.com/2ss4ae perl], [@http://tinyurl.com/39b37l python], [@http://tinyurl.com/3yg4m8 php], etc. To allow this, the library and documentation are split into two parts: 'scripting' and 'everything else'. The code excerpt above is an example of a 'script' which, as you can see, skips the 'accepting' and 'loading' stages.
+
+If a program's purpose is to serve the wider world, it should be written with scalability in mind. When it comes to heavily used web applications CGI has an inherent limitation: there must be a complete heavyweight process ['for every request].
+
+The __FastCGI__ and __SCGI__ protocols are essentially reworkings of CGI which remove this restriction. They offer other advantages too, the support of which - of widely varying quality and completeness ([-more [link __server_support__ here]]) - comes for most HTTP servers. These protocols add an extra layer to your CGI programs, as you now must manage the request queue.
+
+In return for the added complexity, your programs become complete servers, capable of handling arbitrary numbers of requests during each invocation (assuming they don't crash!). This gives you the freedom to keep database connections open between requests, or cache ready-parsed responses, for example. Processing of a client request can even be continued in the case of the client crashing - the `response` can then be stored and given to them when they return - saving precious CPU cycles.
+
+It might sound like a handful but, fortunately, management of the request queue can be largely isolated from the handling of each request. That means that after you have set up a 'server' (ie. something that gathers requests), requests can be handled in the same way as they would be with a conventional CGI program.
+
+[endsect]

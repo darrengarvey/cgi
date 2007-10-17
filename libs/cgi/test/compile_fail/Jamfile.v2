@@ -1,0 +1,6 @@
+# These tests should fail to compile
+# (currently none)
+
+test-suite compile_fail_test_suite
+  :
+  ;

@@ -1,0 +1,108 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[library CGI
+    [quickbook 1.4]
+    [version 0.01]
+    [id boost.cgi]
+    [dirname the_document_dir]
+    [copyright 2007 Darren Garvey]
+    [purpose Thoughts about CGI implementation]
+    [authors [Garvey, Darren]]
+    [license
+        Distributed under the Boost Software License, Version 1.0.
+        (See accompanying file LICENSE_1_0.txt or copy at
+        [@http://www.boost.org/LICENSE_1_0.txt])
+    ]
+]
+
+[def __this__    ["FSCGI"]] [/ name of the library]
+
+[def __cgi__     [@http://en.wikipedia.org/wiki/Common_Gateway_Interface CGI]]
+[def __scgi__    [@http://en.wikipedia.org/wiki/Simple_Common_Gateway_Interface SCGI]]
+[def __fcgi__    [@http://en.wikipedia.org/wiki/FastCGI FastCGI]]
+
+[def __FastCGI__ [link boost.cgi.reference.protocols.fcgi FastCGI]]
+[def __SCGI__    [link boost.cgi.reference.protocols.scgi SCGI]]
+
+[def __boost__   [@http://boost.org/ Boost]]
+[def __asio__    [@http://asio.sourceforge.net Boost.Asio]]
+
+[def __reading_the_docs__   [link boost.cgi.intro.reading_the_docs reading the docs]]
+[def __naming_conventions__ [link boost.cgi.intro.naming_conventions naming conventions]]
+
+[def __tutorial__           [link boost.cgi.tutorial tutorial]]
+[def __reference__          [link /doc/html/cgi/reference.html reference]]
+
+[def __GET__  `GET` ]
+[def __POST__ `POST`]
+[def __HEAD__ `HEAD`]
+[def __PUT__  `PUT` ]
+
+
+[def __Service__ [@http://asio.sourceforge.net/boost_asio_0_3_8/libs/asio/doc/html/boost_asio/reference/Service.html Service]]
+
+[/def __boost_thread__ #link#to#boost#thread#docs#]
+[/def __IoService__ #link#to#io#service#docs#]
+[/def __protocol__ #link#to#protocol#section# boost.user_guide.protocols]
+[/def __ProtocolService__ boost.reference.concepts.protocol_service]
+[/def __io_service__ #link#to#doxygen#reference#]
+[/def __async_write__]
+[/     __async_read__]
+[/     __async_write_some__]
+[/     __async_read_some__]
+
+[/ 'ug' is the id of the User's Guide section]
+[/ 'gs' is the id of the Getting Started section, which is in the User's Guide]
+[/ 'tut' is the id of the Tutorial, which is in the User's Guide]
+
+[def __headers__   boost.cgi.ug.gs.headers]
+[def __accepting__ boost.cgi.ug.tutorial.accepting]
+[def __loading__   boost.cgi.ug.tutorial.loading]
+
+[/def __hog__ []]
+[template rfc[number]
+[@http://www.ietf.com/rfc/rfc[number] RFC[number]]
+]
+
+[important
+This manual does [*not] document a library that is a part of __Boost__. The major part of it has been developed this summer as part of the Google Summer of Code, '[@http://code.google.com/soc GSoC07]'. Everything from here on in is alpha-grade, some bits more than others; [link boost.cgi.preface.comments_and_support comments and bug reports] are welcome.
+
+These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sourceforge], or at [@http://svn.boost.org/svn/boost/browser/sandbox/SOC/2007/cgi svn.boost.org]. For free!
+]
+
+[include preface.qbk]
+
+[include:intro introduction.qbk]
+
+[section:gs Getting Started]
+
+This section of the documentation is probably best read before the [link __tutorial__ tutorial]. In a nutshell, this is a quick and dirty run-through of how to get and install the library [-and configure your server].
+
+[include:building user_guide/building.qbk]
+
+[include:server_config user_guide/server_configuration.qbk]
+
+[include:headers user_guide/headers.qbk]
+
+[endsect]
+
+[include:tutorial user_guide/tutorial.qbk]
+
+[include:protocols user_guide/protocols.qbk]
+
+[include:examples user_guide/examples.qbk]
+
+[/include:ug user_guide.qbk]
+
+[xinclude ../cgi_dox.boostbook]
+
+[include:future future_development.qbk]
+
+[include:server_support user_guide/server_support.qbk]
+
+[/include acknowledgements.qbk]

@@ -1,0 +1,44 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section:meta_data Request Meta-data]
+
+[note
+A request [*must] be [link __loading__ loaded] before the meta-data can be accessed. The ['only] exception to this rule is calling `meta_env()` on CGI and aCGI request objects. These are (essentially) equivalent to a call to `::getenv()` and will always work. However, exploit this 'feature' cautiously as it will render a program unsuitable for use with the more scalable protocols on offer.
+]
+
+There are five member functions of `basic_request<>` that provide access to the meta-data associated to that request. These are:
+
+[/
+[table Meta-data accessor functions
+[[Function name] [Arguement(s)] [Return value]]
+]
+]
+
+* `std::string meta_env(const std::string& name)`
+  Takes the name of the environment variable wanted and returns the value associated with it.
+
+* `std::string meta_get(const std::string& name)`
+  Takes the name of the CGI GET variable and returns the value associated with it (if any).
+
+* `std::string meta_post(const std::string& name, bool greedy = true)`
+  Takes the name of the CGI POST variable and returns the value associated with it (if any). If `greedy == true` - which it is by default - then more data is read from the request if required until all of the POST data (ie. stdin) has been read.
+
+* `std::string meta_cookie(const std::string& name)`
+  Takes the name of the cookie variable and returns the value associated with it (if any).
+
+* `std::string meta_var(const std::String& name, bool greedy = true)`
+
+[note should this return a `std::pair<std::string, cgi::meta_type>` instead, where a `cgi::meta_type` is one of `get`, `post`, `env`, or `cookie`?]
+
+  Takes the name of [*any] meta-variable and returns the value associated with it (if any). If `greedy == true` - which it is by default - then more data is read from the request if required until either the requested variable is found or all of the POST data has been read, which ever comes first.
+
+[warning
+It is generally accepted that a CGI program should pay attention to where meta-data has come from.[footnote citations w.r.t. XSS and GET/POST/COOKIE ambiguities] In other words, since `meta_var` removes such distinctions, its use should be limited to places where origin of the variable doesn't matter. For example, a language setting (like `"hl=en"`, as Google uses) could come from anywhere and doing so is not an issue.
+]
+
+[endsect]

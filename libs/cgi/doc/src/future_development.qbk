@@ -1,0 +1,137 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section:future Future Development]
+
+[h4 Iostream functionality.]
+
+Streamed IO, likely to be similar to Boost.Asio's `basic_socket_stream<>` is required.
+
+[h4 SCGI support.]
+
+Due to configuration issues, this isn't functional yet.
+
+[h4 FastCGI support.]
+
+FastCGI support is essential to any modern CGI library. There is currently ['no] known FastCGI library for C or C++ that aims to implement the complete [@http://www.fastcgi.com/devkit/doc/fcgi-spec.html FastCGI 1.0] specification. Providing support for multiplexing FastCGI daemons is one of this library's major goals.
+
+There are a couple of issues that have yet to be worked out, but in general the new framework is known to 'fit' with all the details of FastCGI and should lend itself to an efficient implementation.
+
+[h4 Access to error output streams]
+
+CGI, SCGI and FastCGI all make provisions for some sort of error outputting, according to the following table:
+
+[table
+ [[Protocol][Native error reporting capabilities]]
+ [[CGI] [Single error output stream (`std::cout`)]]
+ [[SCGI] [A single output stream is shared between requests: Boost.CGI will guarantee thread-safe access to it.]]
+ [[FastCGI] [Error stream per request. Inherently thread-safe.]]
+]
+
+Even though the server is not obliged to do anything with this output, it is generally dumped into the default server error log. This can be invaluable for debugging.
+
+Access to the above streams will be implemented as a __Service__, which can be switched on or off at runtime. Output can be sent either to stdout, stderr, or both simultaneously. If this isn't enough, a user can add their own custom service layer, which can manipulate the data as it is read/written in any way they wish (such as logging to a database, url-encoding/filtering data, or playing an April Fool's prank on your website visitors).
+
+[h4 Session handling.]
+
+Access to persistent session data is a very useful stop-gap to using a complete RDBMS to store/retrieve data. In some cases, such as when an object is supposed to stay in active memory, a RDBMS will not be sufficient, so session management fits in nicely. A templated `basic_session<>` will be provided so various session-storage methods can be used. Boost.Interprocess is an ideal default, while Boost.UUID can be used to generate unique session identifiers.
+
+[h4 Having `meta_*` functions return a `cgi::param` type instead of `std::string`]
+
+An advantage to this approach, for the functions that look up request meta-data, is that multiple values can be easily extracted from the same key, when they exist. Currently, a user must get the complete map of meta-data and use that themselves. [-Since environment meta-data can't be uniformly retrieved as a `cgi::map_type&` (since they are actually process-level environment variables, accessible only through `::getenv()`) this can be awkward.]
+
+Another advantage is that a macro can be provided to turn on/off implicit conversion to `std::string`, which is in essence a form of tainting, akin to perl's taint mode.
+
+Yet another possibility, is that a member function `as<>` can be provided as a shortcut to `boost::lexical_cast<>`. This could greatly improve readability of web programs, where lexical casting is very common and may make programs overly verbose.
+
+Compare:
+``
+cgi::request req;
+cgi::response resp;
+
+cgi::map::iterator iter = req.form_().find("number");
+if (iter != cgi::map::iterator::end())
+{
+  rep<< "You picked no numbers...";
+}
+else
+{
+  int sum(0);
+  resp<< "Your numbers are: ";
+  for(; iter != cgi::map::iterator::end(); ++iter)
+  {
+    resp<< iter->second << " ";
+    sum +=  boost::lexical_cast<int>(iter->second);
+  }
+
+  resp<< std::endl
+      << "Your numbers add up to: " << sum;
+}
+
+rep.send(req);
+``
+to:
+``
+cgi::request req;
+cgi::response resp;
+
+cgi::param parm = req.form_("number");
+if (parm.empty())
+{
+  resp<< "You picked no numbers...";
+}
+else
+{
+  int sum(0);
+  for(; parm != parm.end(); ++parm)
+  {
+    resp<< parm << " ";
+    sum += parm.as<int>());
+  }
+
+  resp<< std::endl
+      << "Your numbers add up to: " << sum;
+}
+
+resp.send(req);
+``
+
+[h4 Concept Documentation]
+
+Even though this library introduces very few new concepts, they are not currently documented. Links to Boost.Asio's concept documentation is also required (essentially as part of a reworking of the doxygen reference section).
+
+[h4 Support for environment Passed on Command Line]
+
+See section 4.4 of [@http://www.ietf.org/rfc/rfc3875].
+
+[h4 Support for Multi-part POST Forms]
+
+
+
+[h4 `operator[]` Overloading]
+
+What is currently:
+``
+request req;
+std::string a( req.form_("a") );
+map& forms = req.form_();
+``
+could become:
+``
+request req;
+std::string a(req[form_, "a"]);
+map& forms = req[form_];
+a = req[form_]["a"]; // better to the above, plus is more 'standard'
+``
+
+[/h4 Removing aCGI/CGI Divide]
+
+[/h4 Support for wide characters]
+
+[/The library generally works on octets, but there should be some way to ]
+
+[endsect]

@@ -1,0 +1,16 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[/def __fastcgi_support__]
+
+[section Server Support]
+
+This is an incomplete table of what server's there are and what level of support they provide. Any further (verifiable) information that can be provided would be helpful.
+
+[*Alternative] - Just link to a page from Wikipedia with this information.
+
+[endsect]

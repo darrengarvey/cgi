@@ -1,0 +1,16 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section Server Configuration]
+
+[note
+Setting up server's for use with the library can be tricky, especially when using FastCGI. Concise links to guides on other sites is probably the way this section will go, perhaps with some basic outlines of ways to test it.
+]
+
+[*Under construction]
+
+[endsect]

@@ -1,0 +1,186 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section:loading Loading Requests]
+
+After a request has been accepted, it should also be 'loaded'. Before being loaded the request is in an undefined state and it is unsafe to access any data associated with the request - although you may still read/write with the request. For CGI, the request's constructor calls load implicitly (this is optional behaviour [footnote You may pass `false` to the request's constructor. Note that the constructor options will become more explicit in the future.]), in most other situations, one of the following functions are used:
+
+[table
+  [[Function signature] [Purpose]]
+  [
+    [`void basic_request<>::load(bool parse_stdin = true)`]
+    [Loads the request meta-data into internal `cgi::map`s.
+
+    If `parse_stdin == true`, which it is by default, CGI POST data is also read and parsed. If an error occurs, an exception is thrown.]
+  ]
+  [
+    [`boost::system::error_code&
+    basic_request<>::load(boost::system::error_code& ec, bool parse_stdin = true)`]
+    [Loads the request meta-data into internal `cgi::map`s.
+
+    If `parse_stdin == true`, which it is by default, CGI POST data is also read and parsed. If an error occurs, ec is set to the value of the error such that `!ec == false`.]
+  ]
+  [
+    [`void basic_request<>::async_load(bool parse_stdin, Handler handler)`]
+    [Asynchronously loads the request meta-data into interal `cgi::map`s. `handler` must be a model of __Handler__ and will be invoked when the loading has completed. The function always returns immediately.]
+  ]
+] [/table]
+
+What the call does is acquire the request environment data as necessary and parse the CGI __GET__ and `"HTTP_COOKIE"` variables. Also, if `parse_stdin == true` and the request method is POST, the CGI __POST__ data will be read and parsed.
+
+[h5 CGI example]
+
+``
+#include <boost/cgi/cgi.hpp>
+
+int main()
+{
+  using namespace cgi::cgi;
+
+  // Delay loading the request data
+  request req(false);
+
+  // ...
+
+  // Load the request now (including parsing stdin)
+  boost::system::error_code& ec;
+  req.load(ec);
+
+  if (!ec)
+  {
+    // The request loaded ok (and is valid)
+  }
+
+  return 0;
+}
+``
+
+[h5 Synchronous SCGI example]
+
+``
+#include <boost/cgi/scgi.hpp>
+
+int main()
+{
+  using namespace cgi::scgi;
+
+  // Create a ProtocolService
+  service service;
+
+  // Create an acceptor
+  acceptor acceptor(service);
+
+  // Make an empty request
+  request req(service);
+
+  boost::system::error_code ec;
+  // Accept a request
+  acceptor.accept(req, ec);
+
+  if (!ec)
+  {
+    // A request was accepted ok, now parse all variables, including POST data
+    req.load(true);
+  }
+
+  return 0;
+}
+``
+
+[h5 Asynchronous SCGI example]
+
+``
+#include <boost/cgi/scgi.hpp>
+#include <boost/bind.hpp>
+#include <boost/thread.hpp>
+#include <boost/system/error_code.hpp>
+#include <boost/enable_shared_from_this.hpp>
+
+using namespace cgi::scgi;
+
+void sub_main(request::pointer req)
+{
+  // handle the request in here, as you would any type of CGI request
+}
+
+class Server
+  : public ``[@http://www.boost.org/libs/smart_ptr/enable_shared_from_this.html `boost::enable_shared_from_this`]``
+{
+public:
+  Server(service& _srv)
+    : service_(_srv)
+    , acceptor_(_srv)
+  {
+    async_accept();
+  }
+
+  void async_accept()
+  {
+    request::pointer new_request(request::create(service_));
+    acceptor_.async_accept(new_request
+                          , boost::bind(&Server::handle_accept
+                                       , shared_from_this()
+                                       , new_request
+                                       , boost::arg<1>));
+  }
+
+  void handle_accept(request::pointer request, boost::system::error_code& ec)
+  {
+    if (!ec)
+    {
+      // request was accepted ok; load it asynchronously (parsing POST data)
+      request->async_load(true, boost::bind(&Server::handle_load
+                                           , shared_from_this()
+                                           , request
+                                           , boost::arg<1>));
+    }
+  }
+
+  void handle_load(request::pointer request, boost::system::error_code& ec)
+  {
+    if (!ec)
+    {
+      // The request loaded ok;
+      // handle it asynchronously and accept another request.
+      service_.post(boost::bind(&sub_main, request));
+
+      async_accept();
+    }
+  }
+private:
+  service& service_;
+  acceptor acceptor_;
+};
+
+int main()
+{
+  // Create a ProtocolService
+  service _service;
+
+  // Create a server to accept and load requests
+  server _server(_service);
+
+  // Create 5 background threads to run async operations *and* calls to
+  // `sub_main` that are invoked through `service::post()`. Essentially this
+  // means the program can handle at least 5 simultaneous requests: if
+  // asynchronous reads/writes are used then more requests may be being handled
+  // at any one time.
+  boost::thread_group threads;
+  for(int i=5; i; i--)
+  {
+    threads.create_thread(boost::bind(&service::run, _service));
+  }
+
+  // Make sure the program doesn't return until all threads are finished
+  // working.
+  threads.join_all();
+
+  return 0;
+}
+``
+
+[endsect]

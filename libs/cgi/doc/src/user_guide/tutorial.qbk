@@ -1,0 +1,43 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section Tutorial]
+
+As mentioned in the [link __intro__ introduction], there are two ways of using this library: for 'scripting' and for 'everything else'.
+
+The thing that differentiates 'scripts' from everything else is the [link __ProtocolService__ ProtocolService] (this is similar in use to an [link __asio_io_service__ `io_service`] for those familiar with __asio__).
+
+Except for when using CGI synchronously, a typical program will have two fundamental parts:
+
+[/handling a client request generally involves the following stages:]
+
+[h4 Gathering requests]
+
+* [link __accepting__ Accepting] requests;
+
+* [link __loading__ Loading] and parsing request meta-data;
+
+[h4 Handling requests]
+
+* [link __meta_data__ Accessing the data] associated with a request;
+
+* [link __writing__ Writing] a response;
+
+* [link __wrapping_up__ Wrapping up];
+
+[include tutorial/quickstart.qbk]
+
+[include:requests tutorial/requests.qbk]
+
+[include:accepting tutorial/accepting.qbk]
+
+[include:loading tutorial/loading.qbk]
+
+[include:wrapping_up wrapping_up.qbk]
+
+
+[endsect]

@@ -1,0 +1,24 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section Request Objects]
+
+The class [classref cgi::basic_request `cgi::basic_request<>`] is the main entry point to the library. The following `typedef`s are provided for typical usage:
+``
+cgi::request // CGI -- note: this would be cgi::cgi::request fully-qualified
+acgi::request // aCGI
+fcgi::request // FastCGI
+scgi::request // SCGI
+``
+
+The `cgi::request` is a bit different to the other types, in that it doesn't need to be constructed with a __ProtocolService__. This simplification makes it ideal for, and its use is detailed in, the  '[link __scripting__ scripting]' quickstart. The other request types, however, have a distinct advantage in that they provide you with asynchronous functions.
+
+[include:data variables.qbk]
+
+[/link ]
+
+[endsect]

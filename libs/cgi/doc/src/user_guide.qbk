@@ -1,0 +1,27 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section:gs Getting Started]
+
+This section of the documentation is probably best read before the [link __tutorial__ tutorial]. In a nutshell, this is a quick and dirty run-through of how to get and install the library [-and configure your server].
+
+[include:building user_guide/building.qbk]
+
+[include:server_config user_guide/server_configuration.qbk]
+
+[include:headers user_guide/headers.qbk]
+
+[endsect]
+
+[/include:protocols user_guide/protocols.qbk]
+
+[/include:tutorial user_guide/tutorial.qbk]
+
+[/include:examples user_guide/examples.qbk]
+
+
+[/endsect]

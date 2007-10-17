@@ -1,0 +1,23 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section `basic_request<>`: Request Objects]
+
+The template class `basic_request<>` is the most useful class in the library.
+
+There are `typedef`s for typical usage, following usual __naming_styles__:
+
+[table Request typedefs
+ [[Protocol] [`typedef`     ]]
+ [[CGI     ] [`cgi_request` ]]
+ [[aCGI    ] [`acgi_request`]]
+ [[FastCGI ] [`fcgi_request`]]
+ [[SCGI    ] [`scgi_request`]]
+]
+
+
+[endsect]

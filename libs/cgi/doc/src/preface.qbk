@@ -1,0 +1,68 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section Preface]
+
+[: [*['All science is either Physics, or stamp collecting.]]
+
+-- Ernest Rutherford.]
+
+[h3 Overview]
+
+Boost.CGI is a library for writing CGI programs in Standard C++. It can be used to write anything from simple 'admin scripts' to full-fledged, scalable applications. This library rests on top of and should appear familiar to users of Boost.Asio, a cross-platform networking library in boost-style C++. Currently the __cgi__, [-__scgi__ and __fcgi__] protocols are supported, within a framework that should allow code to be reused with as-yet-unwritten protocols without any real modification.
+
+[h3 Motivation]
+
+C++ isn't the language of choice for many CGI programmers, although it is a powerful one and can be used to produce maintainable and uncompromisingly efficient applications with any feature possible in any other language.
+
+A complete discussion about the benefits of CGI programming in C++ is beyond the scope of this document, but here is a short list:
+
+* Having a binary application is inherently more secure than scripting languages in the situation where an error causes the application, rather than the output to be returned to the client. See http://www.w3.org/Security/Faq/wwwsf4.html for more.
+
+* C++ has a very large and professional user base, providing a wealth of expertise and experience.
+
+* Billions of lines of C++ code can be reused to reduce development/testing times.
+
+* In places where RAD (rapid application development) is of the utmost importance, scripting languages can still be used, for instance by using [link __boost_python__ Boost.Python] - though it could be argued that C++ and RAD are not mutually exclusive.
+
+* C++ is ['fast]. You can rest assured that the language will never be a bottleneck in your applications.
+
+* C++ rarely misses out on access to new technologies: for instance, if a new RDBMS came out tomorrow, it would almost certainly ship with a C/C++ API. The same would not be true for most other languages.
+
+* Web applications can benefit from an enforced modular design.[footnote For an example design choice, see [@http://www.google.co.uk/search?hl=en&rlz=1B3GGGL_enGB234GB235&q=model+view+controller&btnG=Search&meta= Model-View-Controller].] C++'s flexibility with regard to object-oriented design patterns is highly-regarded and well documented.
+
+With web applications becoming increasingly complex and responsive (ie. asynchronous, vis-à-vis AJAX) all the while being required to scale boundlessly - the benefits of C++ begin to show.
+
+The generally poor support for CGI programming for C++ - most libraries are either unmaintained, or don't take advantage of modern C++ capabilities - has driven the development of this library. [-moremoremore]
+
+[h3 How to use this manual]
+
+[note
+At the moment, the Boost [@http://www.boost.org/more/lib_guide.htm#Guidelines style guidelines] aren't honoured properly or consistently. Please ignore this for now, as the ambiguity is intentional and is simple enough to rectify.
+]
+
+Start with the introduction, then the tutorial. You can skip the 'scripting' section, as that is a quickstart and the information in it is repeated throughout the rest of the manual. The doxygen header reference is very ugly for now and is going to be heavily reworked and reorganised.
+
+[h4 Naming Conventions]
+
+[h5 Macros]
+
+Macros are prefixed with `BOOST_CGI_*` .
+
+[h5 Code snippets]
+
+As you are probably used to, it is assumed that code snippets in this manual have the correct `#include`s and "`using namespace cgi;`" prepended to them. Information about the correct headers to include can be found [link __headers__ here].
+
+[h3 Comments and Support]
+
+Use cases, example requests, puzzles and problems should be sent to the mailing list:
+
+''' &#99;&#103;&#105;-&#116;&#97;&#108;&#107;&#32;&#64;&#32;&#108;&#105;&#115;&#116;&#115;&#46;&#115;&#102;&#32;&#92;&#46;\&#32;n&#101;&#116;'''
+
+or thereabouts.
+
+[endsect]

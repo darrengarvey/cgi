@@ -1,0 +1,31 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section Handling Requests]
+
+Except for when using CGI synchronously, handling a client request generally involves the following stages:
+
+# [link __accepting__ Accepting] requests;
+
+# [link __loading__ Loading] request meta-data;
+
+# Using the [link __meta_data__ meta-data];
+
+# [link __writing__ Writing] a reply;
+
+# [link boost.cgi.user_guide.handling_requests.wrapping_up Wrapping up];
+
+
+[include accepting.qbk]
+
+[include loading.qbk]
+
+[include meta_data.qbk]
+
+[include wrapping_up.qbk]
+
+[endsect]

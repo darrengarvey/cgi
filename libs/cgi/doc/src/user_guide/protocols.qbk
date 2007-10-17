@@ -1,0 +1,123 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[/ cgi.user_guide.protocols.qbk CGI Protocols]
+
+[section:protocols Supported Protocols]
+
+The protocols supported by this library are CGI (synchronous and asynchronous), FastCGI (aka. FCGI) and SCGI (aka. SimpleCGI).
+
+[note
+Synchronous and asynchronous CGI support are considered distinct within the library for now (*more*), so the latter is referred to explicitly as aCGI. SimpleCGI is generally shortened to SCGI while FastCGI is used verbatim.
+]
+
+Purely to illustrate what each protocol offers, consider this list:
+
+* CGI is for short programs that won't be run very often, or those that will be used by only a very small number of clients, such as admin 'scripts'. Here, having a long-running process might be wasteful.
+
+* aCGI is for programs similar to the above that might block on I/O, wasting CPU time; CPU-intensive programs that use database and/or other IO extensively, such as a regression-testing framework, are a good target for aCGI. In these cases, a long-running process that keeps open file handles might be wasteful.
+
+* FastCGI is especially targetted to programs that are likely to serve lots of clients. Asynchronous operations come 'for free' with FastCGI. On some platforms however - even 10 years after the specification was published [footnote See [@http://www.fastcgi.com/devkit/doc/fcgi-spec.html FastCGI 1.0], published 29 April 1996] - FastCGI support in many servers is sub-standard (see __server_support__).
+
+* SCGI is essential where server-side support for FastCGI is either buggy (as it is with Apache + mod_fastcgi: use mod_fcgid instead if possible) or missing. 
+
+[section:comparison Feature Comparison]
+
+[table
+    [[Feature                     ] [Protocol                     ]]
+    [[                            ] [CGI] [aCGI] [FastCGI] [SCGI  ]]
+    [[Requires __ProtocolService__] [No ] [Yes ] [Yes    ] [Yes   ]]
+    [[Is natively asynchronous    ] [No ] [No  ] [Yes    ] [Yes   ]]
+    [[Has native error stream     ] [Yes] [Yes ] [Yes    ] [Shared]]
+]
+
+[endsect] [/ comparison]
+
+
+
+[section:cgi CGI and aCGI]
+
+The distinction between CGI and aCGI is that aCGI uses __asio__'s `io_service` to perform asynchronous operations - whereas CGI does not provide such operations - and is also more complicated to setup. A distinction has been made with the sole purpose of lowering the entry barrier to the library and to provide a means of migrating programs over to use this library. There is also currently a small speed gain to be had by not constructing an `io_service` when it isn't needed.
+
+[h4 Differences Between CGI and aCGI Programs]
+
+    ['See also: __hello_world__]
+
+The two skeleton programs below illustrate the main differences between a `cgi::acgi::request` and a `cgi::cgi::request`:
+
+``
+#include <cgi/cgi.hpp>
+
+using namespace cgi::cgi;
+
+int main()
+{
+    request req;
+
+    // use the request here
+
+    return 0;
+}
+``
+compares to:
+``
+#include <cgi/acgi.hpp>
+#include <boost/ref.hpp>
+#include <boost/thread.hpp> // see __boost_thread__
+
+using namespace cgi::acgi;
+
+int main()
+{
+    // a __Service__ is needed to handle asynchronous operations
+    service srv;
+
+    // create a background thread for async operations to be run in
+    boost::thread thread(boost::bind(&service::run, boost::ref(srv)));
+
+    // create a request from the cgi_service
+    request req(srv);
+
+    // use the request here
+    // ...
+
+    // finally, make sure the async operations complete by 'joining' the other thread
+    thread.join();
+
+    return 0;
+}
+``
+
+[endsect]
+
+[section:fcgi FastCGI]
+
+FastCGI is a binary protocol that works very differently to CGI ['internally] and has many advantages. In bullet-point form, FastCGI programs:
+
+* Are servers in themselves: they can persist indefinitely and can - at least in principle - handle any number of simultaneous requests. This can be used to great effect to all but eliminate program initialisation time, which usually prove to be a major bottleneck in short-run applications (such as AJAX scripts);
+
+* Communicate with an HTTP server with TCP sockets __ref_pipe_support__. FastCGI daemons can run under different user id's to the server, have different access privileges or even run in remote locations.
+
+[h4 How it Works]
+
+Data is transported over TCP sockets or pipes (not implemented yet) in packets prepended with information about the packet. Packets belong to a particular request or are 'admin' requests that are handled by the library internally. Data is returned to the HTTP server in similar packets. This frees the program from handling requests sequentially, as data from any request can come in at any time, so a well-structured program can avoid being compromised by a dropped connection or a slow client, for instance.
+
+[endsect] [/ fcgi]
+
+[section:scgi SCGI (SimpleCGI)]
+
+SCGI is a more recent protocol than FastCGI and is essentially a halfway house between CGI and the more complex FastCGI. It has become popular as support for it is generally more consistent and widely available than FastCGI, due in part to its simplicity.
+
+[h4 How it Works]
+
+SCGI uses a connection-per-request approach. Environment data is sent first and the CGI POST data follows. All data sent back to the server over the connection is forwarded as is to the client. The connection is closed after the request has been handled.
+
+Although far less optimized than FastCGI, SCGI is still a significant step up from CGI.
+
+[endsect] [/ scgi]
+
+[endsect] [/ protocols]
