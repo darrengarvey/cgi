@@ -29,9 +29,17 @@ namespace cgi {
    typedef acgi_request request;
    //typedef acgi_service service;
    //typedef acgi_acceptor acceptor;
-   using namespace cgi;
+   using namespace ::cgi; // **FIXME** this line must go.
+   using namespace ::cgi::common; // import common namespace elements.
 
  } // namespace acgi
 } // namespace cgi
+
+/// Dump acgi stuff into the boost namespace
+namespace boost {
+ namespace acgi {
+   using namespace ::cgi::acgi;
+ } // namespace acgi
+} // namespace boost
 
 #endif // CGI_ACGI_HPP_INCLUDED__

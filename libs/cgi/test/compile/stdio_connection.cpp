@@ -2,7 +2,7 @@
 
 int main()
 {
-  cgi::stdio_connection conn;
+  cgi::common::connection::stdio conn;
 
   return 0;
 }

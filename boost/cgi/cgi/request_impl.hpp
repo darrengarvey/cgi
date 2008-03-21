@@ -15,6 +15,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "boost/cgi/http/status_code.hpp"
+#include "boost/cgi/basic_client.hpp"
 #include "boost/cgi/connections/stdio.hpp"
 #include "boost/cgi/role_type.hpp"
 #include "boost/cgi/status_type.hpp"
@@ -37,9 +38,12 @@ namespace cgi {
    * restricted but if someone really wants to copy the data, then they can.
    */
   class cgi_request_impl
-    : public cgi_request_impl_base<stdio_connection>
+    : public cgi_request_impl_base<common::stdio_connection>
   {
   public:
+    //typedef stdio_connection client_type;
+    typedef ::cgi::common::basic_client<common::stdio_connection, tags::cgi> client_type;
+
     /// Constructor
     /**
      * Since this request type is synchronous, there is no need for an

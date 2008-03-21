@@ -1,0 +1,29 @@
+#             Copyright (c) 2007 Darren Garvey
+#
+# Distributed under the Boost Software License, Version 1.0.
+#     (See accompanying file LICENSE_1_0.txt or copy 
+#        at http://www.boost.org/LICENSE_1_0.txt)
+
+exe cgi_echo
+  : main.cpp
+    /boost/thread/
+    /boost/regex/
+  ;
+
+local LOCATION = $(cgi-bin) ;
+if ! $(LOCATION)
+{
+  LOCATION = . ;
+}
+
+
+# Our install rule (builds binaries and copies them to <location>)
+install install
+ : cgi_echo
+ :
+ :
+ <location>$(LOCATION)
+ ;
+
+# Only install example if you use `bjam install' or equivalent
+explicit install ;

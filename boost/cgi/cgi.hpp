@@ -10,8 +10,8 @@
 #define CGI_CGI_HPP_INCLUDED__
 
 // Include all cgi-related headers only.
-#include "boost/cgi/request.hpp"
-#include "boost/cgi/service.hpp"
+#include "boost/cgi/cgi/request.hpp"
+#include "boost/cgi/cgi/service.hpp"
 
 // Include headers common to all protocols
 #include "boost/cgi/detail/common_headers.hpp"
@@ -22,5 +22,14 @@ namespace cgi {
   //typedef cgi::cgi_service service; // to be added
   
 } // namespace cgi
+
+/// Dump acgi stuff into the boost namespace
+namespace boost {
+ namespace cgi {
+   using namespace ::cgi::cgi;
+   using namespace ::cgi;
+   using namespace ::cgi::common;
+ } // namespace acgi
+} // namespace boost
 
 #endif // CGI_CGI_HPP_INCLUDED__

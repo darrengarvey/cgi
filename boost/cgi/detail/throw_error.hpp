@@ -10,16 +10,19 @@
 #define CGI_THROW_ERROR_HPP_INCLUDED__
 
 #include <boost/system/error_code.hpp>
-//#include <boost/system/system_error.hpp>
+#include <boost/system/system_error.hpp>
+#include <boost/throw_exception.hpp>
 
 namespace cgi {
  namespace detail {
 
-   void throw_error(boost::system::error_code& ec)
+   inline void throw_error(const boost::system::error_code& ec)
    {
      if(ec)
-       throw ec;
-//     throw boost::system::system_error(ec);
+     {
+       boost::system::system_error err(ec);
+       boost::throw_exception(err);
+     }
    }
 
  } // namespace detail

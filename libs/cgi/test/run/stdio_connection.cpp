@@ -4,7 +4,7 @@
 
 int main()
 {
-  cgi::stdio_connection conn;
+  cgi::common::connection::stdio conn;
 
   boost::system::error_code ec;
 

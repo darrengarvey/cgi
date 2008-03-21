@@ -9,15 +9,20 @@
 #ifndef CGI_IO_SERVICE_PROVIDER_HPP_INCLUDED__
 #define CGI_IO_SERVICE_PROVIDER_HPP_INCLUDED__
 
-#include <list>
-#include <boost/ref.hpp>
-#include <boost/bind.hpp>
-#include <boost/thread.hpp>
-#include <boost/shared_ptr.hpp>
+#if _MSC_VER > 1020
+#pragma once
+#endif
+
+#include "boost/cgi/detail/push_options.hpp"
+
+//#include <list>
+//#include <boost/ref.hpp>
+//#include <boost/bind.hpp>
+//#include <boost/thread.hpp>
+//#include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
 #include "boost/cgi/io_service.hpp"
-#include "boost/cgi/detail/push_options.hpp"
 #include "boost/cgi/io_service_provider_fwd.hpp"
 
 
@@ -53,7 +58,8 @@ namespace cgi {
     {
     }
 
-    cgi::io_service& get_io_service()
+    ::cgi::io_service&
+      get_io_service()
     {
       return io_service_;
     }
@@ -73,7 +79,7 @@ namespace cgi {
       io_service_.reset();
     }
   private:
-    cgi::io_service io_service_;
+    ::cgi::io_service io_service_;
   };
 
 

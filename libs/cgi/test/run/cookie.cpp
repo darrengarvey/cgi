@@ -5,7 +5,7 @@
  * - Verify it works with other string types (std::wstring is probably enough)
  */
 
-#define BOOST_TEST_MAIN
+#define BOOST_TEST_MODULE cookie_test
 #include <boost/test/unit_test.hpp>
 
 #include <sstream>
@@ -18,7 +18,9 @@ BOOST_AUTO_TEST_CASE( cookie_constructor_delete )
   // delete the cookie. ie. set its value to NULL and give it a date
   // in the past
   using namespace cgi;
+  using namespace std;
 
+  string ex("Fri, 05-Jun-1989 15:30:00 GMT");
   cookie ck("unwanted_cookie_name");
   
   BOOST_CHECK(ck.name      == "unwanted_cookie_name");
@@ -26,7 +28,7 @@ BOOST_AUTO_TEST_CASE( cookie_constructor_delete )
   BOOST_CHECK(ck.path      == "/");
   // this one could be more robust (by using a generic RFC2616 date parser)
   // see: http://www.apps.ietf.org/rfc/rfc2616.html#sec-3.3
-  BOOST_CHECK(ck.data      == "Fri, 05 Jun 1989 15:30:00 GMT");
+  BOOST_CHECK_EQUAL(ck.expires, ex);
   BOOST_CHECK(ck.domain    == "");
   BOOST_CHECK(ck.secure    == false);
   BOOST_CHECK(ck.http_only == false);
@@ -36,8 +38,11 @@ BOOST_AUTO_TEST_CASE( cookie_constructor_full )
 {
   // Check the full version of the constructor works (simple test)
   using namespace cgi;
+  using namespace std;
 
-  cookie ck("name", "value", "Wed, 03-Oct-2007 16:26:06 GMT"
+  string ex("Wed, 03-Oct-2007 16:26:06 GMT");
+
+  cookie ck("name", "value", ex
            , "/cookie", "example.com", false, true);
 
   BOOST_CHECK(ck.name      == "name");
@@ -45,7 +50,7 @@ BOOST_AUTO_TEST_CASE( cookie_constructor_full )
   BOOST_CHECK(ck.path      == "/cookie");
   // this one could be more robust (by using a generic RFC2616 date parser)
   // see: http://www.apps.ietf.org/rfc/rfc2616.html#sec-3.3
-  BOOST_CHECK(ck.data      == "Wed, 03-Oct-2007 16:26:06 GMT");
+  BOOST_CHECK_EQUAL(ck.expires, ex);
   BOOST_CHECK(ck.domain    == "example.com");
   BOOST_CHECK(ck.secure    == false);
   BOOST_CHECK(ck.http_only == true);
@@ -80,9 +85,11 @@ BOOST_AUTO_TEST_CASE( cookie_stream_operator )
   cookie_content = "name=value; expires=Wed, 03-Oct-2007 16:26:06 GMT;"
                    " path=/cookie; domain=example.com; secure; HttpOnly";
 
-  cookie ck("name", "value", "Wed, 03-Oct-2007 16:26:06 GMT"
-           , "/cookie", "example.com", true, true);
-  oss.clear();
-  oss<< ck;
-  BOOST_CHECK(oss.str() == cookie_content);  
+  cookie ck2("name", "value", "Wed, 03-Oct-2007 16:26:06 GMT"
+            , "/cookie", "example.com", true, true);
+  oss.str("");
+  BOOST_CHECK(oss.str() == "");
+  oss<< ck2;
+  string ostr(oss.str());
+  BOOST_CHECK_EQUAL(ostr, cookie_content);  
 }

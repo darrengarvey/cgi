@@ -1,4 +1,66 @@
 import os ;
+import modules ;
 
 path-constant BOOST_ROOT : [ os.environ BOOST_ROOT ] ;
 path-constant BOOST_BUILD_PATH : [ os.environ BOOST_BUILD_PATH ] ;
+
+path-constant PROJECT_ROOT : . ;
+
+path-constant top : . ;
+path-constant include-dir : /usr/local/include ;
+path-constant boost-root : [ os.environ BOOST_ROOT ] ;
+
+# A relative path to boost (for documentation stuff)
+path-constant boost-root-relative : $(top)/../../../../boost/trunk/ ;
+
+
+#############################################################################
+# Rule so we can extract install bin directories easily
+#
+# User can pass either:
+# 
+# --cgi-bin=/path/to/cgi-bin (equally with fcgi-bin / scgi-bin)
+# 
+# on the bjam command line OR set the environment variable:
+# 
+# BOOST_CGI_BIN_PATH (equally with BOOST_FCGI_BIN_PATH / BOOST_SCGI_BIN_PATH)
+#
+# Note that the command line will override the environment variable!
+#############################################################################
+local rule get-bin-dir ( bin-name : envvar )
+{
+  local bin-dir = [ MATCH "^--$(bin-name)=(.*)" : [ modules.peek : ARGV ] ] ;
+  if $(bin-dir)
+  {
+    return $(bin-dir) ;
+  }
+  else
+  {
+    bin-dir = [ os.environ $(envvar) ] ;
+    if $(bin-dir)
+    {
+      return $(bin-dir) ;
+    }
+    return $(top)/$(bin-name) ;
+  }
+}
+
+path-constant cgi-bin  : [ get-bin-dir "cgi-bin" : "BOOST_CGI_BIN_PATH" ] ; 
+path-constant fcgi-bin : [ get-bin-dir "fcgi-bin" : "BOOST_FCGI_BIN_PATH" ] ;
+path-constant scgi-bin : [ get-bin-dir "scgi-bin" : "BOOST_SCGI_BIN_PATH" ] ;
+
+
+use-project /boost/ : $(boost-root) ;
+use-project /boost/cgi/ : $(top)/libs/cgi/build ;
+
+
+project cgi
+  : build-dir
+      $(top)/bin.v2
+  : requirements
+      <include>$(boost-root)
+      <include>$(top)
+      #<include>C:\cc\src\ctemplate\windows
+      <define>_CRT_SECURE_NO_WARNINGS
+      <define>_SCL_SECURE_NO_WARNINGS
+  ;

@@ -19,8 +19,10 @@
 #include "boost/cgi/io_service_provider.hpp"
 #include "boost/cgi/basic_request_fwd.hpp"
 #include "boost/cgi/detail/protocol_traits.hpp"
+#include "boost/cgi/basic_protocol_service_fwd.hpp"
 
 namespace cgi {
+ namespace common {
 
   /// Basic Protocol Service
   /**
@@ -131,13 +133,11 @@ namespace cgi {
     /// A strand is used for guaranteeing handlers are dispatched sequentially
     //boost::asio::strand strand_;
 
+    /// A std::set of all the requests.
     set_type request_set_;
+    /// A std::queue of the waiting (ie. not-being-handled) requests.
     queue_type request_queue_;
 
-    //gateway_type gateway_;
-
-    //friend class basic_gateway<protocol_type>;//gateway_type;
-    //friend class basic_acceptor<protocol_type>;//class acceptor_type;
 #if BOOST_WORKAROUND(BOOST_MSVC, BOOST_TESTED_AT(1400))
     friend typename traits::request_type;//typename request_type;
 #else
@@ -146,6 +146,7 @@ namespace cgi {
     //friend class request_type;
   };
 
+ } // namespace common
 } // namespace cgi
 
 #endif // CGI_BASIC_PROTOCOL_SERVICE_HPP_INCLUDED__

@@ -12,8 +12,13 @@
 #include <boost/asio/streambuf.hpp>
 
 namespace cgi {
+ namespace common {
 
   using boost::asio::streambuf;
+
+ } // namespace common
+
+   using common::streambuf;
 
 } // namespace cgi
 

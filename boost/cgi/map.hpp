@@ -13,9 +13,11 @@
 #include <string>
 
 namespace cgi {
+ namespace common {
 
   typedef std::map<std::string,std::string>    map;
 
+ } // namespace common
 } // namespace cgi
 
 #endif // CGI_MAP_HPP_INCLUDED__

@@ -40,13 +40,17 @@ namespace cgi {
   class cgi_request_impl_base
   {
   public:
-    typedef ::cgi::map                         map_type;
+    typedef ::cgi::common::map                         map_type;
     typedef Connection                         connection_type;
+    typedef 
+      common::basic_client<Connection, tags::acgi>     client_type;
     typedef typename connection_type::pointer  conn_ptr;
 
     /// Constructor
     cgi_request_impl_base()
       : stdin_parsed_(false)
+      , stdin_data_read_(false)
+      , stdin_bytes_left_(-1)
       , http_status_(http::ok)
       , request_status_(unloaded)
     {
@@ -57,12 +61,12 @@ namespace cgi {
     map_type& post_vars()            { return post_vars_;      }
     map_type& cookie_vars()          { return cookie_vars_;    }
 
-    bool& stdin_parsed()              { return stdin_parsed_;   }
+    bool stdin_parsed()              { return stdin_parsed_;   }
     http::status_code& http_status() { return http_status_;    }
     status_type& status()            { return request_status_; }
 
     conn_ptr& connection()           { return connection_;     }
-    std::string& null_str()          { return null_str_;       }
+    //std::string& null_str()          { return null_str_;       }
 
   protected:
     //conn_ptr connection() { return connection_; }
@@ -74,48 +78,17 @@ namespace cgi {
     map_type post_vars_;
     map_type cookie_vars_;
 
+  public:
     bool stdin_parsed_;
+    bool stdin_data_read_;
+    std::size_t stdin_bytes_left_;
+  protected:
 
     http::status_code http_status_;
     status_type request_status_;
 
     conn_ptr connection_;
-
-    std::string null_str_;
   };
-
-  //template<> inline const std::string&
-  //cgi_request_impl::var<tags::ENV>(const std::string& name)
-  //{
-  //  return ::getenv(name.c_str());
-  //}
-
-  /// Get a request map of all the environment meta-variables (slow)
-  /**
-   * -- NOT IMPLEMENTED FOR NOW --
-   *
-   * In the case of a CGI request, the environment meta-data is usually stored
-   * in the process environment, which means there is no direct access to all
-   * of them as a map_type&. In other words, this function call will have to
-   * load all of the variables into memory and then return the map
-   */
-  //template<> inline cgi_request_impl::map_type&
-  //cgi_request_impl::var<tags::ENV>()
-  //{
-  //  throw std::logic_error("Can't get all environment vars as a map_type&");
-  //}
-
-  //template<> inline cgi_request_impl::map_type&
-  //cgi_request_impl::var<tags::HTTP>() { return http_map_; }
-
-  //template<> inline cgi_request_impl::map_type&
-  //cgi_request_impl::var<tags::COOKIE>() { return cookie_map_; }
-
-  //template<> inline cgi_request_impl::map_type&
-  //cgi_request_impl::var<tags::GET>() { return get_map_; }
-
-  //template<> inline cgi_request_impl::map_type&
-  //cgi_request_impl::var<tags::POST>() { return post_map_; }
 
 } // namespace cgi
 

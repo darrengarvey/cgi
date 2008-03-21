@@ -9,16 +9,11 @@
 #ifndef CGI_HPP_INCLUDED__
 #define CGI_HPP_INCLUDED__
 
-// #include all headers except for cgi/cgi.hpp, cgi/fcgi.hpp, cgi/scgi.hpp
+// #include all headers
 
-#include "cgi/basic_request.hpp"
-#include "cgi/response.hpp"
-#include "cgi/map.hpp"
-#include "cgi/basic_protocol_service.hpp"
-#include "cgi/cookie.hpp"
-#include "cgi/header.hpp"
-#include "cgi/io_service.hpp"
-#include "cgi/basic_connection.hpp"
-#include "cgi/io_service_provider.hpp"
+#include "boost/cgi/cgi.hpp"
+#include "boost/cgi/acgi.hpp"
+#include "boost/cgi/fcgi.hpp"
+#include "boost/cgi/scgi.hpp"
 
 #endif // CGI_HPP_INCLUDED__

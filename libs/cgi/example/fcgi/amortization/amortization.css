@@ -1,0 +1,94 @@
+body,  table, input, select, textarea, .text {
+	font-family: Arial, Helvetica, sans-serif;	
+	font-size: 12px;	
+	color: #333333; 		
+}
+body {
+	background-color: #CCCCCC;
+}
+h1 {
+	font-family: Georgia, Times New Roman; 						
+	font-weight: bold; 						
+	font-size: 20px; 						
+	font-style: normal;
+	color: #4274B7; 								
+	border-bottom-color: #B1AFA2; 					
+}
+hr {
+	color: #B1AFA2;								
+}
+.ssl {
+	border: 1px solid #B1AFA2;					
+}
+a{
+	color: #315688;							
+}
+.color1 {
+	background-color: #BFA280;
+}
+.color2 {
+	background-color: #BFA280;
+}
+.nav {
+	background-color: #89A8E0;
+}
+.top_nav {
+	background-color: #4274B7;
+}
+.right_nav {
+	background-color: #FFFFFF;
+}
+.main_cell {
+	background-color: #FFFFFF;			
+}
+.td1 {
+	background-color: #F0EAE1;
+    padding: 0cm .1cm; 
+	font-weight: normal; 
+	color: #000000;
+}
+.td2 {
+	background-color: #FFFFFF;
+    padding: 0cm .1cm; 
+	font-weight: normal; 
+	color: #000000;
+}
+.row1 {
+	background-color: #F0EAE1;
+    padding: 0cm .1cm; 
+	font-weight: normal; 
+	color: #000000;
+    text-align: right
+}
+.row2 {
+	background-color: #FFFFFF;
+    padding: 0cm .1cm; 
+	font-weight: normal; 
+	color: #000000;
+    text-align: right
+}
+.tblbase {
+	background-color: #B1AFA2; 
+}
+.tblhead {
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #315688;
+}
+
+.header a {
+	background-color: #315688;
+	color: #FFFFFF;
+}
+.header a:hover {
+	background-color: #4274B7;
+	color: #FFFFFF;
+}
+.button a {
+	background-color: #BFA280;
+	color: #FFFFFF;
+}
+.button a:hover {
+	background-color: #666666;
+	color: #FFFFFF;
+}

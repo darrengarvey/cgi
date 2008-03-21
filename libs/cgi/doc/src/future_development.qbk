@@ -27,8 +27,8 @@ CGI, SCGI and FastCGI all make provisions for some sort of error outputting, acc
 
 [table
  [[Protocol][Native error reporting capabilities]]
- [[CGI] [Single error output stream (`std::cout`)]]
- [[SCGI] [A single output stream is shared between requests: Boost.CGI will guarantee thread-safe access to it.]]
+ [[CGI] [Single error output stream (`std::cerr`)]]
+ [[SCGI] [A single output stream (`std::cerr`) is shared between requests: Boost.CGI will guarantee thread-safe access to it.]]
  [[FastCGI] [Error stream per request. Inherently thread-safe.]]
 ]
 
@@ -38,11 +38,11 @@ Access to the above streams will be implemented as a __Service__, which can be s
 
 [h4 Session handling.]
 
-Access to persistent session data is a very useful stop-gap to using a complete RDBMS to store/retrieve data. In some cases, such as when an object is supposed to stay in active memory, a RDBMS will not be sufficient, so session management fits in nicely. A templated `basic_session<>` will be provided so various session-storage methods can be used. Boost.Interprocess is an ideal default, while Boost.UUID can be used to generate unique session identifiers.
+Access to persistent session data is a very useful stop-gap to using a complete RDBMS to store/retrieve data. In some cases, such as when an object is supposed to stay in active memory, a RDBMS will not be efficient, so session management fits in nicely. A templated `basic_session<>` will be provided so various session-storage methods can be used. Boost.Interprocess is an ideal default, while Boost.UUID can be used to generate unique session identifiers.
 
-[h4 Having `meta_*` functions return a `cgi::param` type instead of `std::string`]
+[h4 Having request variable functions return a `cgi::param` type instead of `std::string`]
 
-An advantage to this approach, for the functions that look up request meta-data, is that multiple values can be easily extracted from the same key, when they exist. Currently, a user must get the complete map of meta-data and use that themselves. [-Since environment meta-data can't be uniformly retrieved as a `cgi::map_type&` (since they are actually process-level environment variables, accessible only through `::getenv()`) this can be awkward.]
+An advantage to this approach, for the functions that look up request data, is that multiple values can be easily extracted from the same key, when they exist. Currently, a user must get the complete map of data and use that themselves.
 
 Another advantage is that a macro can be provided to turn on/off implicit conversion to `std::string`, which is in essence a form of tainting, akin to perl's taint mode.
 

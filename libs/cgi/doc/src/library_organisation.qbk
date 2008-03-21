@@ -1,0 +1,24 @@
+
+[section Library Organisation]
+
+* All of the library's header files are in the directory `BOOST_ROOT/boost/cgi/`.
+
+* There are some convenience headers included to make your life easier:
+  * `BOOST_ROOT/boost/cgi.hpp` - includes ['all] headers related to this library.
+  * `BOOST_ROOT/boost/cgi/cgi.hpp` - includes CGI-specific headers, plus common headers.
+  * `BOOST_ROOT/boost/cgi/scgi.hpp` - includes SCGI-specific headers, plus common headers.
+  * `BOOST_ROOT/boost/cgi/fcgi.hpp` - includes FastCGI-specific headers, plus common headers.
+
+* CGI-specific bits are kept in the `BOOST_ROOT/boost/cgi/cgi/` directory. The same applies for the other protocols (eg. FastCGI -> `BOOST_ROOT/boost/cgi/fcgi/`).
+
+* Three namespaces are dumped into the `boost` namespace, these are:
+  * `boost::cgi`
+  * `boost::scgi`
+  * `boost::fcgi`
+
+[note
+Shared components and types live in the namespace `boost::cgi::common`, but are brought into the three namespaces above, where necessary and/or relevant. You should never have to use `boost::cgi::common::*` in your code; if you find you do, kindly [link __bugs__ report it] as a bug.
+]
+
+[endsect][/ library_organisation]
+

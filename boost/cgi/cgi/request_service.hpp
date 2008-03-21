@@ -13,10 +13,10 @@
 #include <map>
 #include <boost/system/error_code.hpp>
 
-#include "request_impl.hpp"
-#include "../detail/cgi_service_impl_base.hpp"
-#include "../detail/extract_params.hpp"
-#include "../connections/stdio.hpp"
+#include "boost/cgi/cgi/request_impl.hpp"
+#include "boost/cgi/detail/cgi_service_impl_base.hpp"
+#include "boost/cgi/detail/extract_params.hpp"
+#include "boost/cgi/connections/stdio.hpp"
 
 namespace cgi {
 
@@ -26,7 +26,7 @@ namespace cgi {
   class cgi_request_service
    : public cgi_service_impl_base<cgi_request_impl>
   {
-    typedef ::cgi::map         map_type;
+    typedef ::cgi::common::map         map_type;
   public:
     typedef cgi_request_impl   impl_type;
     typedef tags::cgi          protocol_type;
@@ -45,7 +45,9 @@ namespace cgi {
 
     void construct(implementation_type& impl)
     {
-      impl.connection() = implementation_type::connection_type::create();
+      impl.client_.set_connection(
+        implementation_type::connection_type::create()
+      );
     }
 
     void destroy(implementation_type& impl)

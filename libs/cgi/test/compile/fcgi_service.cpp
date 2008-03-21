@@ -1,8 +1,8 @@
-#include "boost/cgi/fcgi/fcgi_service.hpp"
+#include "boost/cgi/fcgi/service.hpp"
 
 int main()
 {
-  cgi::fcgi_service s;
+  cgi::fcgi::service s;
 
   return 0;
 }

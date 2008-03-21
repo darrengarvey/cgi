@@ -16,6 +16,7 @@
 #include "basic_protocol_service_fwd.hpp"
 
 namespace cgi {
+ namespace common {
 
   template<typename RequestService
           , typename ProtocolService
@@ -23,6 +24,7 @@ namespace cgi {
           , typename Allocator = std::allocator<char> >
   class basic_request;
 
+ } // namespace common
 } // namespace cgi
 
 #endif // CGI_BASIC_REQUEST_FWD_HPP_INCLUDED__

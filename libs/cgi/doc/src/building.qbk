@@ -27,7 +27,7 @@ Boost.CGI is a header-only library (for now), but it relies on [link __boost_sys
     [Boost.Jam - `bjam`]
     [No]
     [
-Download 'boost-jam' (precomiled versions are highly recommended) and make it accessible by putting it somewhere pointed to by your system's PATH.
+Download 'boost-jam' (precompiled versions are highly recommended) and make it accessible by putting it somewhere pointed to by your system's PATH.
     ]
   ]
   [
@@ -38,7 +38,7 @@ Download 'boost-jam' (precomiled versions are highly recommended) and make it ac
 
 * Set the environment variable BOOST_ROOT on your system to the download location.
 
-* Go to the directory BOOST_ROOT and invoke `bjam` (see above). This should finish without any fails.
+* Go to the directory BOOST_ROOT and invoke `bjam --with-system install` (see above). This should finish without any fails.
     ]
   ]
   [
@@ -52,7 +52,7 @@ These are built by going to the libs/cgi/doc directory and invoking `bjam` (see 
     [Unit tests]
     [Yes]
     [
-Tests can be run by going to the libs/cgi/test directory and invoking `bjam` (see above). Boost.CGI aims to be cross-platform, but not all platforms are available for testing. If any tests fail, problems can be reported to [link __reporting_problems__ here].
+Tests can be run by going to the libs/cgi/test directory and invoking `bjam` (see above). Boost.CGI aims to be cross-platform, but not all platforms are available for testing. If any tests fail, problems can be reported to [link __reporting_problems__ here], please.
     ]
   ]
   [

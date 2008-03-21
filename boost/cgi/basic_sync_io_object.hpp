@@ -12,6 +12,7 @@
 #include <boost/noncopyable.hpp>
 
 namespace cgi {
+ namespace common {
 
   /// basic_io_object alternative when an io_service isn't used
   template<typename Service>
@@ -19,25 +20,26 @@ namespace cgi {
     : private boost::noncopyable
   {
   public:
-    typedef Service                        service_type;
-    typedef typename Service::impl_type    impl_type;
+    typedef Service                                  service_type;
+    typedef typename Service::implementation_type    implementation_type;
 
   protected:
     explicit basic_sync_io_object()
     {
       std::cerr<< "Hello";
-      service.construct(impl);
+      service.construct(implementation);
     }
 
     ~basic_sync_io_object()
     {
-      service.destroy(impl);
+      service.destroy(implementation);
     }
 
     service_type service;
-    impl_type impl;
+    implementation_type implementation;
   };
 
+ } // namespace common
 } // namespace cgi
 
 #endif // CGI_BASIC_SYNC_IO_OBJECT_HPP_INCLUDED__

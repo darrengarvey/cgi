@@ -1,0 +1,15 @@
+
+# These are some helper variables, which will need to be checked against
+# user-supplied variables (ie. using modules.peek, I think)
+
+project boost/cgi
+  : usage-requirements
+      <include>$(top)
+      <include>$(boost-root)
+      <library>/boost/thread/
+      <library>/boost/system/
+      <define>_CRT_SECURE_NO_WARNINGS
+      <define>_SCL_SECURE_NO_WARNINGS
+  ;
+
+

@@ -11,25 +11,39 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "../map.hpp"
-#include "../role_type.hpp"
-#include "../status_type.hpp"
-#include "../http/status_code.hpp"
-#include "../connections/tcp_socket.hpp"
+#include "boost/cgi/map.hpp"
+#include "boost/cgi/role_type.hpp"
+#include "boost/cgi/status_type.hpp"
+#include "boost/cgi/http/status_code.hpp"
+#include "boost/cgi/connections/tcp_socket.hpp"
+
+/**************
+ *
+ * THIS FILE IS OBSOLETE.
+ *
+ * SEE request_service.hpp:cgi::scgi::scgi_request_service::implementation_type
+ * INSTEAD.
+ *
+**************/
 
 namespace cgi {
+ namespace scgi {
 
+  
+  /// The implementation_type for scgi_request_service
   class scgi_request_impl
   {
   public:
-    typedef cgi::map                  map_type;
-    typedef tcp_connection            connection_type;
-    typedef connection_type::pointer  connection_ptr;
+    typedef cgi::map                             map_type;
+    typedef tcp_connection                       connection_type;
+    typedef connection_type::pointer             connection_ptr;
+    typedef ::cgi::basic_client<connection_type> client_type;
 
     scgi_request_impl()
       : stdin_parsed_(false)
       , http_status_(http::ok)
       , request_status_(unloaded)
+      , request_finished_(false)
     {
     }
 
@@ -57,9 +71,10 @@ namespace cgi {
     map_type cookie_vars_;
 
     std::string null_str_;
-
+    bool request_finished_;
   };
 
+ } // namespace scgi
 } // namespace cgi
 
 #endif // CGI_SCGI_REQUEST_IMPL_HPP_INCLUDED__

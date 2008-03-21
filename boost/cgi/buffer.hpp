@@ -12,8 +12,13 @@
 #include <boost/asio/buffer.hpp>
 
 namespace cgi {
+ namespace common {
 
   using boost::asio::buffer;
+
+ } // namespace common
+
+  using common::buffer;
 
 } // namespace cgi
 

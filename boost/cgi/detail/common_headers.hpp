@@ -22,5 +22,7 @@
 //#include "boost/cgi/logger.hpp"
 #include "boost/cgi/read.hpp"
 #include "boost/cgi/write.hpp"
+#include "boost/cgi/header.hpp"
+#include "boost/cgi/return.hpp"
 
 #endif // CGI_CGI_CGI_HPP_INCLUDED__

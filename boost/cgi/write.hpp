@@ -12,9 +12,15 @@
 #include <boost/asio/write.hpp>
 
 namespace cgi {
+ namespace common {
 
   using boost::asio::write;
   using boost::asio::async_write;
+
+ } // namespace common
+
+  //using common::write;
+  //using common::async_write;
 
 } // namespace cgi
 

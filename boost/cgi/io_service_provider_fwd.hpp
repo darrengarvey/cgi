@@ -9,6 +9,10 @@
 #ifndef CGI_IO_SERVICE_PROVIDER_FWD_HPP_INCLUDED__
 #define CGI_IO_SERVICE_PROVIDER_FWD_HPP_INCLUDED__
 
+#if _MSC_VER > 1020
+#pragma once
+#endif
+
 #include "boost/cgi/tags.hpp"
 
 namespace cgi {

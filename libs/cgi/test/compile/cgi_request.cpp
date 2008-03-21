@@ -2,7 +2,7 @@
 
 int main()
 {
-  cgi::cgi::request req;
+  cgi::request req;
 
   return 0;
 }

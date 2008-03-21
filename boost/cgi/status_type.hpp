@@ -14,8 +14,9 @@ namespace cgi {
   enum status_type
     { null
     , unloaded
+    , activated
     , loaded
-    , ok
+    , ok = loaded
     , aborted
     , closed
     };

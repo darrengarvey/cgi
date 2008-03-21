@@ -14,7 +14,31 @@
 namespace cgi {
  namespace detail {
 
+   /// Convert a char into a hexadecimal value
+   std::string char_to_hex(char const& ch)
+   {
+     return std::string();      
+   }
+
+   /// Convert two characters into a single, hex-encoded character
+   char hex_to_char(char const& c1, char const& c2)
+   {
+     int ret ( ( std::isalpha(c1)
+                 ? ((c1 & 0xdf) - 'A') + 10
+                 : (c1 - '0')
+               ) << 4
+             );
+
+     ret += ( std::isalpha(c2)
+              ? ((c2 & 0xdf) - 'A') + 10
+              : (c2 - '0')
+            );
+
+     return static_cast<char>(ret);
+   }
+
    /// Take two characters (a hex sequence) and return a char
+   // **DEPRECATED**
    char url_decode( const char& c1, const char& c2 )
    {
      int ret = ( (c1 >= 'A' && c1 <= 'Z') || (c1 >= 'a' && c1 <= 'z')
@@ -42,21 +66,32 @@ namespace cgi {
    {
      std::string ret;
 
-     for( unsigned int i=0; i < str.size(); i++ )
+     for( std::string::const_iterator iter = str.begin(), end = str.end()
+        ; iter != end; ++iter )
      {
-       switch( str[i] )
+       switch( *iter )
        {
          case ' ':
            break;
          case '+':
-           ret += ' ';
+           ret.append(1, ' ');
            break;
          case '%':
-           ret += url_decode(str[i+1], str[i+2]);
-           i += 2;
+           if (std::isxdigit(*(iter+1))
+            && std::isxdigit(*(iter+2))
+            && std::distance(iter, end) >= 2)
+           {
+             char ch = *++iter; // need this because order of function arg 
+                                // evaluation is UB.
+             ret.append(1, hex_to_char(ch, *++iter));
+           }
+           else // we're not dealing with a properly encoded hex value.
+           {
+             ret.append(1, '%');
+           }
            break;
          default:
-           ret += str[i];
+           ret.append(1, *iter);
        }
      }
 

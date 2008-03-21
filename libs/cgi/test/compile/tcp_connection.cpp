@@ -2,8 +2,8 @@
 
 int main()
 {
-  cgi::io_service ios;
-  cgi::tcp_connection conn(ios);
+  cgi::common::io_service ios;
+  cgi::common::connection::tcp conn(ios);
 
   return 0;
 }

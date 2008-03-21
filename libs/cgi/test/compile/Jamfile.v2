@@ -2,29 +2,70 @@
 
 import testing ;
 
+project boost/cgi/test/compile
+  : requirements
+      <toolset>msvc:<define>_CRT_SECURE_NO_DEPRECATE=1
+      <toolset>msvc:<define>_CRT_NONSTDC_NO_DEPRECATE=1
+      <toolset>msvc:<define>_SCL_SECURE_NO_DEPRECATE=1
+      <toolset>msvc:<define>_SCL_SECURE_NO_WARNINGS
+      <toolset>msvc:<define>_CRT_SECURE_NO_WARNINGS
+  ;
+ 
+#rule compile-test( name )
+#{
+#  return [ run $(name).cpp ] ;
+#}
+
+#test-suite scgi_compile_tests
+#  :
+#    [ compile scgi_service.cpp ]
+#    [ compile scgi_request.cpp ]
+#    [ compile scgi_acceptor.cpp ]
+#  :
+#    <toolset>msvc:<define>_CRT_SECURE_NO_DEPRECATE=1
+#    <toolset>msvc:<define>_CRT_NONSTDC_NO_DEPRECATE=1
+#    <toolset>msvc:<define>_SCL_SECURE_NO_DEPRECATE=1
+#    <toolset>msvc:<define>_SCL_SECURE_NO_WARNINGS
+#    <toolset>msvc:<define>_CRT_SECURE_NO_WARNINGS
+#  ;   
+
+#explicit scgi_compile_tests ;
+
+#test-suite acgi_compile_test
+#  :
+#  ;
+
 test-suite compile_test_suite
   :
     # connections
-    [ compile stdio_connection.cpp       ]
-    [ compile async_stdio_connection.cpp ]
-    [ compile tcp_connection.cpp         ]
+    [ compile stdio_connection.cpp         ]
+    [ compile async_stdio_connection.cpp   ]
+    [ compile tcp_connection.cpp           ]
+    [ compile shareable_tcp_connection.cpp ]
     
     # services
-    [ compile acgi_service.cpp           ]
-#   [ compile fcgi_service.cpp           ]
+    [ compile acgi_service.cpp             ]
+    [ compile fcgi_service.cpp             ]
 
     # requests
-    [ compile cgi_request.cpp            ]
-    [ compile acgi_request.cpp           ]
+    [ compile cgi_request.cpp              ]
+    [ compile acgi_request.cpp             ]
+    [ compile fcgi_request.cpp             ]
 
     # response
-    [ compile response.cpp               ]
+    [ compile response.cpp                 ]
+
+    # acceptors
+    #[ compile acgi_acceptor.cpp            ]
+    [ compile fcgi_acceptor.cpp            ]
     
     # misc tests
-    [ compile cgi_header_check.cpp       ]
-    [ compile is_async_test.cpp          ]
+    [ compile cgi_header_check.cpp         ]
+    [ compile is_async_test.cpp            ]
   :
-    <toolset>msvc:<define>_CRT_SECURE_NO_DEPRECIATE=1
+    <toolset>msvc:<define>_CRT_SECURE_NO_DEPRECATE=1
     <toolset>msvc:<define>_CRT_NONSTDC_NO_DEPRECATE=1
     <toolset>msvc:<define>_SCL_SECURE_NO_DEPRECATE=1
   ;
+
+#explicit compile_test_suite ;

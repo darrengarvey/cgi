@@ -10,10 +10,12 @@
 #define CGI_BASIC_CONNECTION_FWD_HPP_INCLUDED__
 
 namespace cgi {
+ namespace common {
 
   template<typename ConnectionType>
   class basic_connection;
 
+ } // namespace common
 } // namespace cgi
 
 #endif // CGI_BASIC_CONNECTION_FWD_HPP_INCLUDED__

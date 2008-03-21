@@ -9,15 +9,25 @@
 #ifndef CGI_SCGI_REQUEST_HPP_INCLUDED__
 #define CGI_SCGI_REQUEST_HPP_INCLUDED__
 
-#include "../tags.hpp"
-#include "../basic_request.hpp"
-
+#include "boost/cgi/tags.hpp"
+#include "boost/cgi/basic_request_fwd.hpp"
+//#include "boost/cgi/request_service_fwd.hpp"
+#include "boost/cgi/scgi/request_service.hpp"
+#include "boost/cgi/scgi/service.hpp"
 namespace cgi {
 
-  class scgi_request_service;
+  //class scgi::scgi_request_service;
 
-  typedef basic_request<scgi_request_service> scgi_request;
+  // This is deprecated/obsolete
+  //typedef basic_request<scgi::scgi_request_service> scgi_request;
 
+ namespace scgi {
+   // typedef for typical usage (SCGI)
+   typedef basic_request<scgi_request_service, service> request;
+ } // namespace scgi
 } // namespace cgi
+
+//#include "boost/cgi/request_service.hpp"
+#include "boost/cgi/basic_request.hpp"
 
 #endif // CGI_SCGI_REQUEST_HPP_INCLUDED__

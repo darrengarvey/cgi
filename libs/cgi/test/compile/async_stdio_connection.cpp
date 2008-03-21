@@ -2,8 +2,8 @@
 
 int main()
 {
-  cgi::io_service ios;
-  cgi::async_stdio_connection conn(ios);
+  cgi::common::io_service ios;
+  cgi::common::async_stdio_connection conn(ios);
 
   return 0;
 }

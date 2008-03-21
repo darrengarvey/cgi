@@ -15,8 +15,13 @@
 #include "boost/cgi/map.hpp"
 
 // The process' environment
-// MSVC warns of 'inconsistent dll linkage' here...
-extern char** environ;
+#if BOOST_WORKAROUND(BOOST_MSVC, BOOST_TESTED_AT(1500))
+  // MSVC warns of 'inconsistent dll linkage' here...
+  _CRTIMP extern char** environ;
+#else
+  extern char** environ;
+#endif
+
 
 namespace cgi {
  namespace detail {
@@ -26,8 +31,8 @@ namespace cgi {
     * @param env This defaults to `::environ`, or the current process'
     *            environment.
     */
-   void save_environment(std::map<std::string,std::string>& env_map
-                        , char** env = environ)
+   template<typename MapT>
+   void save_environment(MapT& env_map, char** env = environ)
    {
      for(; *env; ++env)
      {

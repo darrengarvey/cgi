@@ -30,7 +30,7 @@ namespace cgi {
    * TODO
    * - Data should be URL-encoded, or maybe provide an overload for url_decode
    *   that takes an HttpCookie?
-   * - Add to_string() ?
+   * - Add from_string() ?
    */
   template<typename String>
   struct basic_cookie
@@ -41,7 +41,7 @@ namespace cgi {
 
     /// Delete the cookie named `_name`.
     basic_cookie(const string_type& _name)
-      : content(_name)
+      : name(_name)
       , value()
       , expires("Fri, 05-Jun-1989 15:30:00 GMT")
       , path("/")
@@ -57,7 +57,7 @@ namespace cgi {
                 , const string_type& _domain = ""
                 , bool _secure = false
                 , bool HttpOnly = false)
-      : content(_name)
+      : name(_name)
       , value(_val)
       , expires(_expires)
       , path(_path)
@@ -83,7 +83,7 @@ namespace cgi {
      * - Parts of the cookie are delimited by '; '. ie. if there is no space,
      *   or multiple spaces after the semi-colon, this function won't work...
      */
-    /* Actually, I'm omitting these functions for now, just had a though...
+    /* Actually, I'm omitting these functions for now, just had a thought...
     static basic_cookie<string_type>
       from_string(const char* str, boost::system::error_code& ec)
     {
@@ -121,22 +121,24 @@ namespace cgi {
     /// Make a string out of the cookie
     std::string to_string()
     {
-      std::string str(ck.name + "=" + ck.value);
-      if (!ck.expires.empty()) str += "; expires=" += ck.expires;
-      if (!ck.path.empty()   ) str += "; path="    += ck.path;
-      if (!ck.domain.empty() ) str += "; domain="  += ck.domain;
-      if ( secure            ) str += "; secure";
-      if ( ck.http_only      ) str += "; HttpOnly";
+      std::string str(name + "=" + value);
+      if (!expires.empty()) str += ("; expires=" + expires);
+      if (!path.empty()   ) str += ("; path="    + path);
+      if (!domain.empty() ) str += ("; domain="  + domain);
+      if ( secure         ) str += "; secure";
+      if ( http_only      ) str += "; HttpOnly";
       return str;
     }
   };
 
-  template<typename OutStream, typename Cookie>
-    OutStream& operator<<(OutStream& os, Cookie ck)
+  template<typename OutStream, typename T>
+    OutStream& operator<<(OutStream& os, basic_cookie<T>& ck)
   {
-    return os<< ck.to_string();
+    os<< ck.to_string();
+    return os;
   }
 
 } // namespace cgi
 
 #endif // CGI_COOKIE_HPP_INCLUDED__
+

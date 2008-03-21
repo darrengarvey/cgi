@@ -9,15 +9,16 @@
 #ifndef CGI_BASIC_CONNECTION_HPP_INCLUDED__
 #define CGI_BASIC_CONNECTION_HPP_INCLUDED__
 
-#include <istream>
-#include <ostream>
-#include <boost/asio.hpp>
+//#include <istream>
+//#include <ostream>
+//#include <boost/asio.hpp>
 
-#include "tags.hpp"
-#include "connection_base.hpp"
+//#include "boost/cgi/tags.hpp"
+//#include "boost/cgi/connection_base.hpp"
 //#include "connections/async_stdio_connection_impl.hpp"
 
 namespace cgi {
+ namespace common {
 
   template<typename ConnectionType>
   class basic_connection;
@@ -79,7 +80,7 @@ namespace cgi {
 //#include "connections/async_stdio_connection.hpp"
 //#include "connections/tcp_connection.hpp"
 
-
+ } // namespace common
 } // namespace cgi
 
 #endif // CGI_BASIC_CONNECTION_HPP_INCLUDED__

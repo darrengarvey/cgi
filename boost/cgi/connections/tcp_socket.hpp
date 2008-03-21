@@ -10,31 +10,44 @@
 #define CGI_CONNECTIONS_TCP_SOCKET_HPP_INCLUDED__
 
 #include <boost/shared_ptr.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
-#include "../tags.hpp"
-#include "../io_service.hpp"
-#include "../connection_base.hpp"
-#include "../basic_connection.hpp"
-#include "../detail/push_options.hpp"
+#include "boost/cgi/tags.hpp"
+#include "boost/cgi/io_service.hpp"
+#include "boost/cgi/connection_base.hpp"
+#include "boost/cgi/basic_connection.hpp"
+#include "boost/cgi/detail/push_options.hpp"
 
 namespace cgi {
+ namespace common {
 
   template<>
   class basic_connection<tags::tcp_socket>
     : public connection_base
   {
   public:
-    typedef boost::shared_ptr<basic_connection<tags::tcp_socket> >
-      pointer;
+    typedef basic_connection<tags::tcp_socket> type;
+    typedef boost::shared_ptr<type>            pointer;
+    typedef boost::asio::ip::tcp::socket       next_layer_type;
 
     basic_connection(io_service& ios)
       : sock_(ios)
     {
     }
 
+    bool is_open() const
+    {
+      return sock_.is_open();
+    }
+
+    void close()
+    {
+      sock_.close();
+    }
+
     static pointer create(io_service& ios)
     {
-      return static_cast<pointer>(new basic_connection<tags::tcp_socket>(ios));
+      return pointer(new basic_connection<tags::tcp_socket>(ios));
     }      
 
     template<typename MutableBufferSequence>
@@ -75,26 +88,26 @@ namespace cgi {
       sock_.async_write_some(buf, handler);
     }
 
-    void stop()
+    next_layer_type& next_layer()
     {
-      sock_.close();
+      return sock_;
     }
-
   private:
-    boost::asio::ip::tcp::socket sock_;
+    next_layer_type sock_;
   };
 
+  namespace connection {
+
+    typedef basic_connection<tags::tcp_socket> tcp;
+
+  } // namespace connection
+
+  // Deprecated
   typedef basic_connection<tags::tcp_socket> tcp_connection;
 
-
-  //template<typename ProtocolService = detail::fcgi_service>
-  //struct tcp_connection
-  //{
-  //  typedef basic_connection<tags::tcp_socket, ProtocolService>    type;
-  //};
-
+ } // namespace common
 } // namespace cgi
 
-#include "../detail/pop_options.hpp"
+#include "boost/cgi/detail/pop_options.hpp"
 
 #endif // CGI_CONNECTIONS_TCP_SOCKET_HPP_INCLUDED__

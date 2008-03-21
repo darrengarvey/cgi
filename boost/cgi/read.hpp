@@ -12,10 +12,12 @@
 #include <boost/asio/read.hpp>
 
 namespace cgi {
+ namespace common {
 
   using boost::asio::read;
   using boost::asio::async_read;
 
+ } // namespace common
 } // namespace cgi
 
 #endif // CGI_READ_HPP_INCLUDED

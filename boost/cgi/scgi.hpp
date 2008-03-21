@@ -9,12 +9,14 @@
 #ifndef CGI_SCGI_HPP_INCLUDED__
 #define CGI_SCGI_HPP_INCLUDED__
 
-// #include all scgi-related headers only
-#include "scgi/service.hpp"
-#include "scgi/request_service.hpp"
-#include "scgi/request_acceptor_service.hpp"
-#include "detail/common_headers.hpp"
+// #include headers for SCGI use.
+#include "boost/cgi/scgi/service.hpp"
+#include "boost/cgi/scgi/acceptor.hpp"
+#include "boost/cgi/scgi/request_service.hpp"
+#include "boost/cgi/scgi/request_acceptor_service.hpp"
+#include "boost/cgi/detail/common_headers.hpp"
 
+/*
 namespace cgi {
 
   typedef basic_request_acceptor<scgi_request_acceptor_service> scgi_acceptor;
@@ -24,5 +26,14 @@ namespace cgi {
 # endif
 
 } // namespace cgi
+*/
+
+/// Dump acgi stuff into the boost namespace
+namespace boost {
+ namespace scgi {
+   using namespace ::cgi::scgi;
+   using namespace ::cgi::common;
+ } // namespace acgi
+} // namespace boost
 
 #endif // CGI_SCGI_HPP_INCLUDED__

@@ -6,6 +6,11 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 //
 ////////////////////////////////////////////////////////////////
+//
+// Defines the basic_request<> class; the main entry-point to the
+// library.
+//
+////////////////////////////////////////////////////////////////
 #ifndef CGI_BASIC_REQUEST_HPP_INCLUDED__
 #define CGI_BASIC_REQUEST_HPP_INCLUDED__
 
@@ -37,6 +42,7 @@
 #include "boost/cgi/map.hpp"
 
 namespace cgi {
+ namespace common {
 
   /// The basic_request class, primary entry point to the library
   /**
@@ -75,80 +81,91 @@ namespace cgi {
   {
   public:
     typedef basic_request<RequestService, ProtocolService
-                         , Role, Allocator >  type;
+                         , Role, Allocator >             type;
+    typedef ::cgi::common::map                                   map_type;
     typedef RequestService                               service_type;
     typedef typename service_type::protocol_type         protocol_type;
     typedef ProtocolService                              protocol_service_type;
     typedef boost::shared_ptr<type>                      pointer;
     typedef typename RequestService::implementation_type implementation_type;
+    typedef typename implementation_type::client_type    client_type;
 
 
     // Throws
     basic_request(bool load_now = true, bool parse_post = true)
       : basic_sync_io_object<service_type>()
     {
-      if (load_now) load(parse_post);//this->service.load(this->impl, true, ec);
+      if (load_now) load(parse_post);//this->service.load(this->implementation, true, ec);
     }
 
+		// Won't throw
     basic_request(boost::system::error_code& ec
                  , const bool load_now = true
                  , const bool parse_post = true)
       : basic_sync_io_object<service_type>()
     {
-      if (load_now) load(ec, parse_post);//this->service.load(this->impl, true, ec);
+      if (load_now) load(ec, parse_post);//this->service.load(this->implementation, true, ec);
     }
 
+		// Throws
     basic_request(protocol_service_type& s, const bool load_now = false
                  , const bool parse_post = false)
       : basic_io_object<service_type>(s.io_service())
     {
-      if (load_now) load(parse_post);//this->service.load(this->impl, false, ec);
+      set_protocol_service(s);
+      if (load_now) load(parse_post);//this->service.load(this->implementation, false, ec);
     }
 
+		// Won't throw
     basic_request(protocol_service_type& s
                  , boost::system::error_code& ec
                  , const bool load_now = false, const bool parse_post = false)
       : basic_io_object<service_type>(s.io_service())
     {
-      if(load_now) load(ec, parse_post);//this->service.load(this->impl, false, ec);
+      set_protocol_service(s);
+      if(load_now) load(ec, parse_post);//this->service.load(this->implementation, false, ec);
     }
 
+    /// Make a new mutiplexed request from an existing connection.
+    basic_request(implementation_type& impl)
+      : basic_io_object<service_type>(impl.service_->io_service())
+    {
+      set_protocol_service(*impl.service_);
+      boost::system::error_code ec;
+      this->service.begin_request_helper(this->implementation
+                                        , impl.header_buf_, ec);
+      detail::throw_error(ec);
+    }
+
+    /// Make a new mutiplexed request from an existing connection.
+    basic_request(implementation_type& impl, boost::system::error_code& ec)
+      : basic_io_object<service_type>(impl.service_->io_service())
+    {
+      set_protocol_service(*impl.service_);
+      this->service.begin_request_helper(this->implementation
+                                        , impl.header_buf_, ec);
+    }
+      
     ~basic_request()
     {
-      if (is_open())
-        close(http::internal_server_error, 0);
+      //if (is_open())
+      //  close(http::internal_server_error, 0);
+    }
+
+    static pointer create(protocol_service_type& ps)
+    {
+      return pointer(new type(ps));
+    }
+
+    void set_protocol_service(protocol_service_type& ps)
+    {
+      this->service.set_service(this->implementation, ps);
     }
 
     /// Return `true` if the request is still open (ie. not aborted or closed)
     bool is_open()
     {
-      return this->service.is_open(this->impl);
-    }
-
-    /// Set a header
-    void set_header(const std::string& name, const std::string& val
-                   , const std::string& expires)
-    {
-      this->service.set_header(this->impl, name, val, expires);
-    }
-
-    /// Set a cookie
-    void set_cookie(const std::string& name, const std::string& val
-                   , const std::string& expires = "")
-    {
-      this->service.set_cookie(this->impl, name, val, expires);
-    }
-
-    /// Delete a cookie
-    void del_cookie(const std::string& name)
-    {
-      this->service.del_cookie(this->impl, name);
-    }
-
-    /// Delete all cookies
-    void del_cookies()
-    {
-      this->service.del_cookies();
+      return this->service.is_open(this->implementation);
     }
 
     /// Synchronously read/parse the request meta-data
@@ -159,15 +176,15 @@ namespace cgi {
     void load(bool parse_stdin = false)
     {
       boost::system::error_code ec;
-      this->service.load(this->impl, parse_stdin, ec);
+      this->service.load(this->implementation, parse_stdin, ec);
       detail::throw_error(ec);
     }
 
     // Error-code semantics
-    boost::system::error_code& load(boost::system::error_code& ec
-                                   , bool parse_stdin = false)
+    boost::system::error_code&
+      load(boost::system::error_code& ec, bool parse_stdin = false)
     {
-      return this->service.load(this->impl, parse_stdin, ec);
+      return this->service.load(this->implementation, parse_stdin, ec);
     }
 
 
@@ -178,7 +195,8 @@ namespace cgi {
     template<typename Handler>
     void async_load(Handler handler, bool parse_stdin = false)
     {
-      this->service.async_load(this->impl, parse_stdin, handler);
+      this->service.async_load(this->implementation, parse_stdin
+                              , handler);
     }
 
     /// Notify the server the request has finished being handled
@@ -194,25 +212,53 @@ namespace cgi {
      *
      * @returns The value of program_status
      */
-    int close(http::status_code http_status, int program_status)
+    int close(http::status_code http_status = http::ok
+             , int program_status = 0)
     {
       //BOOST_ASSERT( request_status_ != status_type::ended );
 
-      //this->service.set_status(this->impl, http_status);
-      return this->service.close(this->impl, http_status, program_status);
+      //this->service.set_status(this->implementation, http_status);
+      return this->service.close(this->implementation, http_status
+                                , program_status);
+    }
+
+    int close(http::status_code http_status
+             , int program_status
+             , boost::system::error_code& ec)
+    {
+      return this->service.close(this->implementation, http_status
+                                , program_status, ec);
     }
 
     /// Reject the request with a standard '500 Internal Server Error' error
     int reject()
     {
-      this->service.set_status(this->impl, aborted);
-      return this->service.close(this->impl, http::internal_server_error);
+      this->service.set_status(this->implementation, aborted);
+      return this->service.close(this->implementation
+                                , http::internal_server_error);
     }
 
     /// Abort a request
     void abort()
     {
-      this->service.set_status(this->impl, aborted);
+      this->service.set_status(this->implementation, aborted);
+    }
+
+    /// Clear the data for the request, for reusing this object.
+    // I'd imagine clearing and re-loading a request is quicker than 
+    // destroying/re-creating one. **Unverified claims** **FIXME**
+    void clear()
+    {
+      this->service.clear(this->implementation);
+    }
+
+    /// Get the client connection associated with the request
+    /**
+     * You use the client for read/write calls. Y
+		 */
+    client_type& client()
+    {
+      return this->service.client(this->implementation);
     }
 
     /// Set the output for the request
@@ -221,11 +267,42 @@ namespace cgi {
      *
      * Set the output sink as `stdout_`, `stderr_`, or `stdout_ | stderr_`
      */
+    /*
     void set_output(cgi::sink dest = stdout_)
     {
       boost::system::error_code ec;
-      this->service(this->impl, dest, ec);
+      this->service(this->implementation, dest, ec);
       detail::throw_error(ec);
+    }
+    */
+/*
+    void read_some()
+    {
+      boost::system::error_code ec;
+      this->service.read_some(this->implementationementation,ec);
+      detail::throw_error(ec);
+    }
+
+    boost::system::error_code
+      read_some(boost::system::error_code& ec)
+    {
+      return this->service.read_some(this->implementationementation, ec);
+    }
+*/
+    template<typename MutableBufferSequence>
+    void read_some(const MutableBufferSequence& buf)
+    {
+      boost::system::error_code ec;
+      this->service.read_some(this->implementation, buf, ec);
+      detail::throw_error(ec);
+    }
+
+    template<typename MutableBufferSequence>
+    boost::system::error_code
+      read_some(const MutableBufferSequence& buf
+               , boost::system::error_code& ec)
+    {
+      return this->service.read_some(this->implementation, buf, ec);
     }
 
     /// Set the output for the request
@@ -234,59 +311,17 @@ namespace cgi {
      *
      * Set the output sink as `stdout_`, `stderr_`, or `stdout_ | stderr_`
      */
+    /*
     void set_output(cgi::sink dest, boost::system::error_code& ec)
     {
-      this->service(this->impl, dest, ec);
+      this->service(this->implementation, dest, ec);
     }
-
-    /// Read some data from the client
-    template<typename MutableBufferSequence/*, typename Source*/>
-    std::size_t read_some(const MutableBufferSequence& buf)
-    {
-      boost::system::error_code ec;
-      std::size_t s = this->service.read_some(this->impl, buf, ec);
-      detail::throw_error(ec);
-      return s;
-    }
-
-    /// Read some data from the client
-    template<typename MutableBufferSequence/*, typename Source*/>
-    std::size_t read_some(const MutableBufferSequence& buf
-                         , boost::system::error_code& ec)
-    {
-      return this->service.read_some(this->impl, buf, ec);
-    }
-
-    /// Write some data to the client
-    /**
-     * Note: on the first write, the header block is closed (with a blank
-     * line).
-     */
-    template<typename ConstBufferSequence/*, typename Sink*/>
-    std::size_t write_some(const ConstBufferSequence& buf)
-    {
-      boost::system::error_code ec;
-      std::size_t s = this->service.write_some(this->impl, buf, ec);
-      detail::throw_error(ec);
-      return s;
-    }
-
-    /// Write some data to the client
-    /**
-     * Note: on the first write, the header block is closed (with a blank
-     * line).
-     */
-    template<typename ConstBufferSequence/*, typename Sink*/>
-    std::size_t write_some(const ConstBufferSequence& buf
-                          , boost::system::error_code& ec)
-    {
-      return this->service.write_some(this->impl, buf, ec);
-    }
+    */
 
     /// Get a `cgi::map&` corresponding to all of the GET variables
-    cgi::map& get_()
+    map_type& GET()
     {
-      return this->service.meta_get(this->impl);
+      return this->service.GET(this->implementation);
     }
 
     /// Find the get meta-variable matching name
@@ -295,10 +330,10 @@ namespace cgi {
      * fail with `cgi::error::request_aborted` if the request has been aborted
      * by the client.
      */
-    std::string get_(const std::string& name)
+    std::string GET(const std::string& name)
     {
       boost::system::error_code ec;
-      std::string ret = this->service.meta_get(this->impl, name, ec);
+      std::string ret = this->service.GET(this->implementation, name, ec);
       detail::throw_error(ec);
       return ret;
     }
@@ -309,15 +344,15 @@ namespace cgi {
      * fail with `ec == cgi::error::request_aborted` if the request has been
      * aborted by the client.
      */
-    std::string get_(const std::string& name, boost::system::error_code& ec)
+    std::string GET(const std::string& name, boost::system::error_code& ec)
     {
-      return this->service.meta_get(this->impl, name, ec);
+      return this->service.GET(this->implementation, name, ec);
     }
 
     /// Get a `cgi::map&` corresponding to all of the POST variables
-    cgi::map& post_()
+    map_type& POST()
     {
-      return this->service.meta_post(this->impl);
+      return this->service.POST(this->implementation);
     }
 
     /// Find the post meta-variable matching name
@@ -330,10 +365,11 @@ namespace cgi {
      * fail with `cgi::error::request_aborted` if the request has been aborted
      * by the client.
      */
-    std::string post_(const std::string& name, bool greedy = true)
+    std::string POST(const std::string& name, bool greedy = true)
     {
       boost::system::error_code ec;
-      std::string ret = this->service.meta_post(this->impl, name, ec, greedy);
+      std::string ret
+        = this->service.POST(this->implementation, name, ec, greedy);
       detail::throw_error(ec);
       return ret;
     }
@@ -343,16 +379,19 @@ namespace cgi {
      * fail with `ec == cgi::error::request_aborted` if the request has been
      * aborted by the client.
      */
-    std::string post_(const std::string& name, boost::system::error_code& ec
+    std::string POST(const std::string& name, boost::system::error_code& ec
                           , bool greedy = true)
     {
-      return this->service.meta_post(this->impl, name, ec, greedy);
+      return this->service.POST(this->implementation, name, ec, greedy);
     }
 
     /// Get a `cgi::map&` corresponding to all of the form variables
-    cgi::map& form_()
+    map_type& form(bool greedy = true)
     {
-      return this->service.meta_form(this->impl);
+		  boost::system::error_code ec;
+			map_type& data = this->service.form(this->implementation, ec, greedy);
+			detail::throw_error(ec);
+			return data;
     }
 
     /// Find the form variable matching name
@@ -364,10 +403,10 @@ namespace cgi {
      * fail with `cgi::error::request_aborted` if the request has been aborted
      * by the client.
      */
-    std::string form_(const std::string& name, bool greedy = true)
+    std::string form(const std::string& name, bool greedy = true)
     {
       boost::system::error_code ec;
-      std::string ret = form_(name, ec, greedy);
+      std::string ret = form(name, ec, greedy);
       detail::throw_error(ec);
       return ret;
     }
@@ -377,23 +416,23 @@ namespace cgi {
      * fail with `ec == cgi::error::request_aborted` if the request has been
      * aborted by the client.
      */
-    std::string form_(const std::string& name, boost::system::error_code& ec
+    std::string form(const std::string& name, boost::system::error_code& ec
                          , bool greedy = true)
     {
       std::string rm(request_method());
       if (rm == "GET")
-        return this->service.meta_get(this->impl, name, ec);
+        return this->service.GET(this->implementation, name, ec);
       else
       if (rm == "POST")
-        return this->service.meta_post(this->impl, name, ec, greedy);
+        return this->service.POST(this->implementation, name, ec, greedy);
       else
         return "";
     }
 
     /// Get a `cgi::map&` corresponding to all of the HTTP_COOKIE variables
-    cgi::map& cookie_()
+    map_type& cookie()
     {
-      return this->service.meta_cookie(this->impl);
+      return this->service.cookie(this->implementation);
     }
 
     /// Find the cookie meta-variable matching name
@@ -402,10 +441,11 @@ namespace cgi {
      * fail with `cgi::error::request_aborted` if the request has been aborted
      * by the client.
      */
-    std::string cookie_(const std::string& name)
+    std::string cookie(const std::string& name)
     {
       boost::system::error_code ec;
-      std::string ret = this->service.cookie(this->impl, name, ec);
+      std::string ret
+        = this->service.cookie(this->implementation, name, ec);
       detail::throw_error(ec);
       return ret;
     }
@@ -416,15 +456,15 @@ namespace cgi {
      * fail with `ec == cgi::error::request_aborted` if the request has been
      * aborted by the client.
      */
-    std::string cookie_(const std::string& name, boost::system::error_code& ec)
+    std::string cookie(const std::string& name, boost::system::error_code& ec)
     {
-      return this->service.cookie(this->impl, name, ec);
+      return this->service.cookie(this->implementation, name, ec);
     }
 
     /// Get a `cgi::map&` corresponding to all of the environment variables
-    cgi::map& env_()
+    map_type& env()
     {
-      return this->service.meta_env(this->impl);
+      return this->service.env(this->implementation);
     }
 
     /// Find the environment meta-variable matching name
@@ -433,10 +473,10 @@ namespace cgi {
      * fail with `cgi::error::request_aborted` if the request has been aborted
      * by the client.
      */
-    std::string env_(const std::string& name)
+    std::string env(const std::string& name)
     {
       boost::system::error_code ec;
-      std::string ret = this->service.meta_env(this->impl, name, ec);
+      std::string ret = this->service.env(this->implementation, name, ec);
       detail::throw_error(ec);
       return ret;
     }
@@ -447,9 +487,9 @@ namespace cgi {
      * fail with `ec == cgi::error::request_aborted` if the request has been
      * aborted by the client.
      */
-    std::string env_(const std::string& name, boost::system::error_code& ec)
+    std::string env(const std::string& name, boost::system::error_code& ec)
     {
-      return this->service.meta_env(this->impl, name, ec);
+      return this->service.env(this->implementation, name, ec);
     }
 
     /// Search through all meta vars for the meta-variable matching name
@@ -466,94 +506,106 @@ namespace cgi {
      * provide a meta_var_all() function which is greedy; the
      * ugly/long name there to discourage use.
      */
-    std::string var_(const std::string& name, bool greedy = false)
+    std::string var(const std::string& name, bool greedy = false)
     {
       boost::system::error_code ec;
-      std::string ret = var_(name, ec, greedy);
-      return this->service.meta_var(this->impl, name, greedy);
-      std::string request_method( env_("REQUEST_METHOD") );
+      std::string ret = var(name, ec, greedy);
+      return this->service.var(this->implementation, name, greedy);
+      std::string request_method( env("REQUEST_METHOD") );
 
       std::string tmp;
 
       // If it's not a POST request search meta_get first (to save time)
       if (request_method.empty() || request_method == "GET")
       {
-        tmp = get_(name);
+        tmp = GET(name);
         if (!tmp.empty())
           return tmp;
       }
 
-      tmp = cookie_(name);
+      tmp = cookie(name);
       if (!tmp.empty())
 	      return tmp;
 
-      tmp = env_(name);
+      tmp = env(name);
       if (!tmp.empty())
 	      return tmp;
 
       if (!request_method.empty() && request_method == "POST")
       {
-        tmp = post_(name);
+        tmp = POST(name);
         if (!tmp.empty())
           return tmp;
       }
 
-      tmp = get_(name);
+      tmp = GET(name);
       return tmp.empty() ? "" : tmp;
     }
 
-    // Some helper functions for the basic CGI 1.1 meta-variables
+    // [helper-functions for the basic CGI 1.1 meta-variables.
     std::string auth_type()
-    { return env_("AUTH_TYPE"); }
+    { return env("AUTH_TYPE"); }
 
     std::string content_length()
-    { return env_("CONTENT_LENGTH"); }
+    { return env("CONTENT_LENGTH"); }
 
     std::string content_type()
-    { return env_("CONTENT_TYPE"); }
+    { return env("CONTENT_TYPE"); }
 
     std::string gateway_interface()
-    { return env_("GATEWAY_INTERFACE"); }
+    { return env("GATEWAY_INTERFACE"); }
 
     std::string path_info()
-    { return env_("PATH_INFO"); }
+    { return env("PATH_INFO"); }
 
     std::string path_translated()
-    { return env_("PATH_TRANSLATED"); }
+    { return env("PATH_TRANSLATED"); }
 
     std::string query_string()
-    { return env_("QUERY_STRING"); }
+    { return env("QUERY_STRING"); }
 
     std::string remote_addr()
-    { return env_("REMOTE_ADDR"); }
+    { return env("REMOTE_ADDR"); }
 
     std::string remote_host()
-    { return env_("REMOTE_HOST"); }
+    { return env("REMOTE_HOST"); }
 
     std::string remote_ident()
-    { return env_("REMOTE_IDENT"); }
+    { return env("REMOTE_IDENT"); }
 
     std::string remote_user()
-    { return env_("REMOTE_USER"); }
+    { return env("REMOTE_USER"); }
 
     std::string request_method()
-    { return env_("REQUEST_METHOD"); }
+    { return env("REQUEST_METHOD"); }
 
     std::string script_name()
-    { return env_("SCRIPT_NAME"); }
+    { return env("SCRIPT_NAME"); }
 
     std::string server_name()
-    { return env_("SERVER_NAME"); }
+    { return env("SERVER_NAME"); }
 
     std::string server_port()
-    { return env_("SERVER_PORT"); }
+    { return env("SERVER_PORT"); }
 
     std::string server_protocol()
-    { return env_("SERVER_PROTOCOL"); }
+    { return env("SERVER_PROTOCOL"); }
 
     std::string server_software()
-    { return env_("SERVER_SOFTWARE"); }
+    { return env("SERVER_SOFTWARE"); }
+    // -- end helper-functions]
 
+    /// Get the charset from the CONTENT_TYPE header
+    std::string charset()
+    {
+      // Not sure if regex is needlessly heavy-weight here.
+      boost::regex re(";[ ]?charset=([-\\w]+);");
+      boost::smatch match;
+      if (!boost::regex_match(this->content_type(), match, re))
+        return ""; // A default could go here.
+
+      return match[1];
+    }
 
     /// The role that the request is playing
     /**
@@ -565,7 +617,7 @@ namespace cgi {
      */
     role_type& role()
     {
-      return this->service.get_role(this->impl);
+      return this->service.get_role(this->implementation);
     }
 
     /// Get the strand associated with the request (if any)
@@ -575,41 +627,29 @@ namespace cgi {
     // and there would be no need for protocol-specific code in user programs.
       /*    boost::asio::strand* strand()
     {
-      return this->impl.strand();
+      return this->implementation.strand();
     }
       */
 
     /// Get the implementation type for the request
-    //impl_type& impl() const
+    //implementation_type* impl()
     //{
-    //  return this->impl;
+    //  return &(this->implementation);
     //}
 
     void set_status(http::status_code status)
     {
-      this->service.set_status(this->impl, status);
+      this->service.set_status(this->implementation, status);
     }
 
-    /// Get the client connection associated with the request
-    typename implementation_type::connection_type&
-    client()
+    // The boundary marker for multipart forms (this is likely a transient function).
+    std::string boundary_marker()
     {
-      return this->service.client(this->impl);
-    }
-
-    /// Set a user cookie
-    /**
-     * Note: this must be called before you have finished outputting
-     * the reply headers or it will just appear as normal data
-     *
-     * ** Is this actually necessary? **
-     */
-    void set_cookie(const std::string& name, const std::string& value)
-    {
-      return this->service.set_cookie(this->impl, name, value);
+      return this->implementation.boundary_marker;
     }
   };
 
+ } // namespace common
 } // namespace cgi
 
 #include "boost/cgi/detail/pop_options.hpp"
@@ -623,3 +663,4 @@ NOTES::future_plans:
   - The user should supply an abort_handler-derived function if they want
     any special handling of aborted requests
 */
+

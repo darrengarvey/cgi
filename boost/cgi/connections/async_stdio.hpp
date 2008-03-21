@@ -14,11 +14,12 @@
 #include <boost/system/error_code.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
-#include "stdio.hpp"
-#include "../io_service.hpp"
-#include "../tags.hpp"
+#include "boost/cgi/connections/stdio.hpp"
+#include "boost/cgi/io_service.hpp"
+#include "boost/cgi/tags.hpp"
 
 namespace cgi {
+ namespace common {
 
   // Asynchronous access to stdio
   template<>
@@ -30,13 +31,23 @@ namespace cgi {
     typedef basic_connection<tags::async_stdio> type;
     typedef boost::shared_ptr<type>             pointer;
 
-    basic_connection(io_service& ios)
+    basic_connection(::cgi::io_service& ios)
       : basic_connection<tags::stdio>()
       , io_service_(ios)
     {
     }
 
-    static pointer create(cgi::io_service& ios)
+    bool is_open() const
+    {
+      return is_open_;
+    }
+
+    void close()
+    {
+      is_open_ = false;
+    }
+
+    static pointer create(::cgi::io_service& ios)
     {
       return pointer(new basic_connection<tags::async_stdio>(ios));
     }
@@ -108,7 +119,7 @@ namespace cgi {
     }
 
   private:
-    io_service& io_service_;
+    ::cgi::io_service& io_service_;
   };
 
   typedef basic_connection<tags::async_stdio> async_stdio_connection;
@@ -120,6 +131,7 @@ namespace cgi {
   //  typedef basic_connection<tags::async_cgi, ProtocolService>    type;
   //};
 
+ } // namespace common
 } // namespace cgi
 
 #endif // CGI_ASYNC_STDIO_HPP_INCLUDED__

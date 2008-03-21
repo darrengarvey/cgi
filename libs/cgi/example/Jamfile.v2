@@ -4,20 +4,29 @@
 #     (See accompanying file LICENSE_1_0.txt or copy 
 #        at http://www.boost.org/LICENSE_1_0.txt)
 
-
-import os ;
-
-local BOOST_ROOT = [ os.environ BOOST_ROOT ] ;
-
-
-
-install examples
-  : # the sources
-    ecgi
-    acgi
-    #reply
-  : <location>/var/www/cgi-bin
+project boost.cgi.examples
+  : requirements
+      <library>/boost/system/
+      <library>/boost/thread/
   ;
+
+# Install all of the acgi examples
+install acgi
+ : # sources
+   acgi//install
+ :
+   <location>$(cgi-bin)
+ ;
+
+explicit acgi ;
+
+#install examples
+#  : # the sources
+#    ecgi
+#    acgi
+#    #reply
+#  : <location>/var/www/cgi-bin
+#  ;
 
 #install scgi
 #  : # the sources

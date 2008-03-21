@@ -20,10 +20,10 @@ namespace cgi {
   /**
    * Works with both cgi_request and acgi_request.
    */
-  typedef basic_protocol_service<tags::acgi> acgi_service;
+  typedef common::basic_protocol_service<tags::acgi> acgi_service;
 
   namespace acgi {
-    typedef basic_protocol_service<tags::acgi> service;
+    typedef common::basic_protocol_service<tags::acgi> service;
   }
 
   /// A service 'owned' by a single user-supplied io_service

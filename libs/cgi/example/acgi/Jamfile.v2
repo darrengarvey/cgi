@@ -4,31 +4,18 @@
 #     (See accompanying file LICENSE_1_0.txt or copy 
 #        at http://www.boost.org/LICENSE_1_0.txt)
 
-import os ;
+project boost.cgi.examples.acgi ;
 
-
-local BOOST_ROOT = [ os.environ BOOST_ROOT ] ;
-
-
-SOURCES = main ;
-
-exe acgi
+# Install all acgi examples to the user-provided variable "cgi-bin"
+install install
   :
-    $(SOURCES).cpp
-  : requirements
-      <include>$(BOOST_ROOT)
-      <include>"../../../../"
-      <library>../../util/system//boost_system
-      #<library>libboost_system
-      <define>BOOST_ALL_NO_LIB=1
-      <toolset>gcc:<linkflags>-lpthread
+    hello_world
+    echo
+    cookie_game
+    login
   :
+    <location>$(cgi-bin)
   ;
 
-# uncomment this if you want to test the example with your HTTP server
-#install _
-#  : acgi
-#  : # this is where the compiled executable is copied to
-#    # ie. change this to your server's /cgi-bin/
-#    <location>/var/www/cgi-bin
-#  ;
+# Only install example if you use `bjam install' or equivalent
+explicit install ;

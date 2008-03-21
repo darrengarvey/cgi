@@ -11,7 +11,8 @@ namespace cgi {
  } // namespace role
  
   enum role_type
-  { responder
+  { none
+  , responder
   , authorizer
   , filter
   };
