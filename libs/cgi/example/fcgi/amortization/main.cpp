@@ -11,8 +11,8 @@
 // -----------------------
 //
 // This file uses Google cTemplate to show the benefits of using an
-// HTML template engine. The code isn't commented, but should be 
-// reasonably self-explanatory.
+// HTML template engine. The code isn't commented yet, but should be 
+// *reasonably* self-explanatory.
 //
 // It is a very basic amortization calculator.
 //
@@ -21,7 +21,6 @@
 #include <boost/cgi/fcgi.hpp>
 #include <boost/algorithm/string/regex.hpp>
 #include <google/template.h>
-#include <boost/high_resolution_timer.hpp>
 
 using namespace boost::fcgi;
 
@@ -103,13 +102,14 @@ int write_amortization_template(Request& req, response& resp)
   google::Template* tmpl
     = google::Template::GetTemplate("amortization.tpl", google::STRIP_WHITESPACE);
 
-  boost::high_resolution_timer t;
-
   std::string h("Content-type: text/html\r\n\r\n");
   write(req.client(), buffer(h));
 
   std::string arg(req.GET("arg"));
+  if (arg.empty())
+    arg = "2"; // set this as default (for no particular reason).
 
+  // Different, but equivalent ways of writing the output.
   if (arg == "1")
   {
     std::string output;
@@ -122,66 +122,26 @@ int write_amortization_template(Request& req, response& resp)
     tmpl->Expand(&output, &dict);
     write(req.client(), buffer(output));
   }else
-  if (arg == "3")
-  {
-    std::string s;
-    std::vector<boost::asio::const_buffer> out;
-
-    tmpl->Expand(&s, &out, &dict);
-    write(req.client(), out);
-  }else
+//  if (arg == "3")
+//  {
+//    // This requires a modified version of Google.cTemplate, so it won't work.
+//    std::string s;
+//    std::vector<boost::asio::const_buffer> out;
+//
+//    tmpl->Expand(&s, &out, &dict);
+//    write(req.client(), out);
+//  }else
   {
     resp<< "Error!";
     return 1;
   }
-   //output.clear();
-      //<< "<b>" << t.elapsed() << "</b><p />"
-      //<< output << "<p /><p />"
-      //<< "<b>" << t.elapsed() << "</b><p />";
-  //}
- 
-  //std::cout<<
-  //  "<pre>\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nSTARTING OTHER THINGY\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n</pre>"
-  //  ;
-/*
-    std::string s;
-    std::vector<boost::asio::const_buffer> out;
-for(int i=0; i < 50000; ++i) {
-   // boost::high_resolution_timer t;
 
-    tmpl->Expand(&s, &out, &dict);
-    out.clear();
-    s.clear();
-    //std::cout<< "<b>" << t.elapsed() << "</b><p />";
-
-      //<< "<p /><p />"
-      //<< "<b>" << t.elapsed() << "</b><p />";
-  }
- 
-
-  std::cerr<< "a took " << std::setiosflags(std::ios::fixed) << std::setprecision(5) << a/100000 << " secs<p />"
-           << "b took " << b/100000 << " secs<p />";
-
-  
-  std::cerr
-    << "Content-type: text/html\r\n\r\n"
-    << output << "<p /><p />";
-  
-  resp<< content_type("text/html");
-  resp.flush(req.client());
-  write(req.client(), buffer(output));
-  */
   return 0;
 }
 
 int handle_request(acceptor& a)
 {
   boost::system::error_code ec;
-
-  //std::ofstream of("/var/www/log/fcgi_reaccept.txt");
-  using std::endl;
-  //std::cerr<< "Eh?" << endl;
-  //of<< "Opening request" << endl;
 
   request req(a.protocol_service());
  
@@ -191,24 +151,21 @@ int handle_request(acceptor& a)
   {
     response resp;
     ++num;
-    //std::cerr<< endl << endl << "request num := " << num << endl << endl;
-    //of<< "Accepting now" << endl;
+
+    // Accepting on a closed request is fine (and more efficient than constantly
+    // creating/destructing request objects). You must call close() first though!
     a.accept(req);
-    //of<< "Loading" << endl;
+
     req.load(true);
 
     resp<< content_type("text/html")
         << "map size := " << req.POST().size() << "<p>";
   
-    //of<< "Writing template" << endl;
     ret = write_amortization_template(req, resp);
 
-    //of<< "Sending" << endl;
     resp.send(req.client(), ec);
-    //of<< "Closing" << endl;
+
     ret = ret ? ret : req.close(resp.status(), 0,  ec);
-    //of<< "ok. ec := " << ec.message() << endl;
-    //return 1;
   }
   return ret;
 }
@@ -217,6 +174,7 @@ void accept_requests(acceptor& a)
 {
   for(;;)
   {
+    // Keep handling requests until something goes wrong.
     if (handle_request(a))
       break;
   }
@@ -225,14 +183,9 @@ void accept_requests(acceptor& a)
 int main()
 {
   try{
-  //std::cout
-  //  << "Content-type: text/html\r\n\r\n";
-  using std::endl;
+
     service s;
-  std::cerr<< "Eh1?" << endl;
     acceptor a(s, true);
-    //a.assign(boost::asio::ip::tcp::v4(), 0);
-  std::cerr<< "Eh2?" << endl;
 
     accept_requests(a);
     

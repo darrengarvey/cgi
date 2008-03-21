@@ -21,7 +21,6 @@
 #include <boost/cgi/acgi.hpp>
 #include <boost/algorithm/string/regex.hpp>
 #include <google/template.h>
-#include <boost/high_resolution_timer.hpp>
 
 using namespace boost::acgi;
 
@@ -102,38 +101,53 @@ void write_amortization_template(Request& req, response& resp)
   google::Template* tmpl
     = google::Template::GetTemplate("example.tpl", google::STRIP_WHITESPACE);
 
-  boost::high_resolution_timer t;
-
   std::string arg(req.GET("arg"));
+  if (arg.empty())
+    arg = "4"; // Make this the default
+
+  // Depending on the value of `arg`, we can write the output in
+  // different ways.
 
   if (arg == "1")
   {
+    // Output the response straight to std::cout. This won't work with
+    // anything but vanilla CGI and isn't recommended. It's useful for
+    // checking things work though (don't forget to write a content type
+    // header - followed by a blank line - first though!).
     std::string output;
     tmpl->Expand(&output, &dict);
     std::cout<< output;
   }else
   if (arg == "2")
   {
+    // Expand the output to a string and copy the string to the response.
+    // Should be expensive, but doesn't seem to impact performance hugely...
     std::string output;
     tmpl->Expand(&output, &dict);
     resp<< output;
   }else
-  if (arg == "3")
-  {
-    std::string s;
-    std::vector<boost::asio::const_buffer> out;
-
-    tmpl->Expand(&s, &out, &dict);
-    write(req.client(), out);
-  }else
+//  if (arg == "3")
+//  {
+//    // Expand the string to a vector<const_buffer>, which should minimise any
+//    // copying of data. This requires a modified version of Google.cTemplate, but
+//    // doesn't seem to add anything to performance. Will have to check if there's a
+//    // better way to do it. 
+//    std::string s;
+//    std::vector<boost::asio::const_buffer> out;
+//
+//   tmpl->Expand(&s, &out, &dict);
+//    write(req.client(), out);
+//  }else
   if (arg == "4")
   {
+    // Write the output directly to the request's client.
     std::string output;
     tmpl->Expand(&output, &dict);
     write(req.client(), buffer(output));
   }else
    if (arg == "5")
   {
+    // An alternative to { arg == "1" }, which seems to be slightly faster.
     std::string output;
     tmpl->Expand(&output, &dict);
     std::cout.write(output.c_str(), output.size());
@@ -141,58 +155,20 @@ void write_amortization_template(Request& req, response& resp)
   {
     resp<< "Error!";
   }
-   //output.clear();
-      //<< "<b>" << t.elapsed() << "</b><p />"
-      //<< output << "<p /><p />"
-      //<< "<b>" << t.elapsed() << "</b><p />";
-  //}
- 
-  //std::cout<<
-  //  "<pre>\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nSTARTING OTHER THINGY\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n</pre>"
-  //  ;
-/*
-    std::string s;
-    std::vector<boost::asio::const_buffer> out;
-for(int i=0; i < 50000; ++i) {
-   // boost::high_resolution_timer t;
-
-    tmpl->Expand(&s, &out, &dict);
-    out.clear();
-    s.clear();
-    //std::cout<< "<b>" << t.elapsed() << "</b><p />";
-
-      //<< "<p /><p />"
-      //<< "<b>" << t.elapsed() << "</b><p />";
-  }
- 
-
-  std::cerr<< "a took " << std::setiosflags(std::ios::fixed) << std::setprecision(5) << a/100000 << " secs<p />"
-           << "b took " << b/100000 << " secs<p />";
-
-  
-  std::cerr
-    << "Content-type: text/html\r\n\r\n"
-    << output << "<p /><p />";
-  
-  resp<< content_type("text/html");
-  resp.flush(req.client());
-  write(req.client(), buffer(output));
-  */
 }
 
 int main()
 {
   try{
-  std::cout
-    << "Content-type: text/html\r\n\r\n";
-  service s;
-  request req(s);
-  req.load(true);
-  response resp;
+    std::cout<< "Content-type: text/html\r\n\r\n"; // just for debugging
+    service s;
+    request req(s);
+    req.load(true);
+    response resp;
 
-  write_amortization_template(req, resp);
+    write_amortization_template(req, resp);
   
-  return_(resp, req, 0);
+    return_(resp, req, 0);
   }catch(...){
     std::cout<< "Content-type: text/html\r\n\r\n"
       << "ERROR!! BOOM!";
