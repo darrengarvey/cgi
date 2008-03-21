@@ -41,6 +41,8 @@ namespace cgi {
    struct stdio {};
    struct async_stdio {};
    struct tcp_socket {};
+   // A shareable tcp_socket (ie. one that can be locked)
+   struct shareable_tcp_socket {};
 
  } // namespace tags
 } // namespace cgi
