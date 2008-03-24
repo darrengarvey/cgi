@@ -39,7 +39,7 @@ Finally, we need to send the response somewhere. This can be done to any model o
 
 And that's most of what you need to know to get using the `response`. Check out the [classref cgi::response] for the rest.
 
-[endsect][/ example]
+[endsect] [/ example]
 
 [section:api `cgi::response` Interface]
 
@@ -51,7 +51,7 @@ And that's most of what you need to know to get using the `response`. Check out 
 
 ]
 
-[endsect][/ api]
+[endsect] [/ api]
 
-[endsect][/ responses]
+[endsect] [/ responses]
 

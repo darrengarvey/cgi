@@ -21,7 +21,8 @@ This section of the documentation is probably best read before the [link __tutor
 
 [/include:tutorial user_guide/tutorial.qbk]
 
-[/include:examples user_guide/examples.qbk]
+[include:examples user_guide/examples.qbk]
 
+[include user_guide/tutorial/tutorial.qbk]
 
 [/endsect]

@@ -8,8 +8,8 @@
 [section:intro Introduction]
 
 ``
-#include <boost/cgi/cgi.hpp>
-using namespace cgi;
+#include <boost/cgi.hpp>
+using namespace boost::cgi;
 
 int main()
 {
@@ -17,40 +17,56 @@ int main()
   response resp;
 
   resp<< "Hello there, Universe. "
-      << "Oh wait, it's just you, " << req.form("name")
-      << ", isn't it.";
+      << "-- " << req.GET("name")
+      << content_type("text/plain");
 
   return_(req, resp, 0); // write the response and 'return 0;'
 }
+
+Example request:
+example.com/program_name?name=Mr.+Allison
+
+Output:
+Hello there, Universe. -- Mr. Allison
+
 ``
 
-This CGI library is a reasonably high-level library for creating CGI, FastCGI or SCGI programs. Its scope is intentionally limited to the ''controller'' portion of the Model-View-Controller idiom. In other words, XML/HTML templates are not addressed, even if their use is highly recommended (consider having a look at google's cTemplate, or the upcoming ''Karma'' part of Boost.Spirit).
+This CGI library is a reasonably high-level library for creating CGI, FastCGI or SCGI programs. Its scope is intentionally limited to the ''controller'' portion of the Model-View-Controller idiom. In other words, XML/HTML templates are not addressed, even if their use is highly recommended.
+
+[tip
+  The __amort_example__ example uses Google cTemplate for dealing with HTML templates. Consider having a look at it, or at the upcoming ''Karma'' part of Boost.Spirit.
+]
 
 [h4 Concepts]
 
-The library provides abstractions which hide details of the widely varying specifications of CGI, FastCGI and SCGI. These abstractions are briefly:
+The library provides abstractions which hide details of the vastly different specifications of CGI, FastCGI and SCGI. The main abstractions are, briefly:
 
 [table
 [
   [Concept] [Purpose]
 ]
 [
-  [RequestAcceptor]
-  [CGI applications handle one request per process, while both SCGI and FastCGI allow each process to handle many requests, potentially at the same time. A RequestAcceptor makes it easy to ignore these differences and it also allows you to control how fast your process takes on new requests.
+  [`Request`]
+  [Access to all request data is done through a `Request` object.]
+]
+[
+  [`ProtocolService`]
+  [For those of you familiar with Boost.Asio, this is very similar to the `io_service` class (it actually uses one or more of these for its functionality). Its purpose is to provide certain guarantees when you are using asynchronous functions and/or multiple threads, so it essentially underpins the whole library.]
+]
+[
+  [`RequestAcceptor`]
+  [CGI applications handle one request per process, a limitation which doesn't apply to SCGI and FastCGI applications. Using a `RequestAcceptor` allows you to ignore protocol-specific details, without losing track of how fast each process takes on new requests.
   ]
 ]
 [
-  [Request]
-  [Access to all request data is done through a Request object.]
-]
-[
-  [Client]
-  [Each request has an associated Client, which will usually represent a connection to the HTTP server associated with the current request.
+  [`Response`]
+  [Using the `Response` class is ['only recommended], not required. It is a generally useful class for writing responses to requests. The class is lightweight and responses are protocol agnostic, allowing a response for a CGI request to be used to reply to a FastCGI request.
   ]
 ]
 [
-  [ProtocolService]
-  [For those of you familiar with Boost.Asio, this is very similar to the `io_service` class (it actually uses one or more of these for its functionality). Its purpose is to provide certain guarantees when you are using asynchronous functions and/or multiple threads. The asynchronous stuff is what underpins this whole library.]
+  [`Client`[footnote Taken from simultaneous suggestions by Phil Endecott and Chris Kohlhoff].]
+  [Each request has an associated Client, which may represent a connection to the HTTP server associated with the current request. It is used when writing replies to requests. Note: it is possible to avoid exposure to it entirely if you use the `response` class and the `return_` macro.
+  ]
 ]
 ]
 
@@ -60,16 +76,18 @@ The library provides abstractions which hide details of the widely varying speci
 
 In a nutshell, CGI is the simple and 'original' way of communicating with web servers. I'll assume you know what it is: one request per process and communication using standard input/output. A nice and simple way of making ['web pages that can change].
 
-FastCGI was then developed as a means of allowing much more scalable CGI-like programs to be written. In fact, the FastCGI specification implies maximal efficiency was the main goal of the protocol. Communication with the server now works over sockets or pipes (only TCP sockets are supported for now). Each process and each connection can be used for handling multiple requests. In theory this means you could have a single monolithic process behind your HTTP server handling thousands of concurrent requests.
+FastCGI was then developed as a means of allowing much more scalable CGI-like programs to be written. In fact, the FastCGI specification implies scalability was the main motivation for the protocol. Communication with the server works over sockets or pipes (only TCP sockets are supported for now). Each process and each connection can be used for handling multiple requests. In theory this means you could have a single monolithic process behind your HTTP server handling all incoming requests concurrently.
 
-SCGI is essentially a simpler version - hence [*S]imple[*CGI] - of FastCGI but is still a significant step up from vanilla CGI: as with FastCGI, each process can handle multiple requests. Use of FastCGI is recommended over SCGI, but unfortunately support for FastCGI is unreliable and buggy with some servers so it may not be a matter of choice.
+SCGI is essentially a simpler version - hence [*S]imple[*CGI] - of FastCGI but is still a significant step up from vanilla CGI, mainly because each process can handle multiple requests. Use of FastCGI is recommended over SCGI, but unfortunately support for FastCGI is unreliable and buggy with some servers and/or you may not have that option.
 
 [h4 Multiple Requests per Process]
 
-So I keep harping on about this, that's because it removes so many limitations of traditional CGI programming. In return for the added complexity, your programs become complete servers, capable of handling arbitrary numbers of requests during each invocation (assuming they don't crash, or leak memory!). This gives you the freedom to keep database connections open between requests, or cache ready-parsed responses, for example. Processing of a client request can even be continued in the case of the client crashing - the `response` can then be stored and given to them when they return - saving precious CPU cycles.
+So I keep harping on about this, that's because it removes so many limitations of traditional CGI programming. Your programs can become servers, capable of handling an arbitrary number of requests with each invocation (assuming they don't crash, or leak memory!). This gives you the freedom to keep database connections open between requests or cache ready-parsed responses, for example. Processing of a client request can even be continued in the case of the client crashing - the `response` can then be stored and given to them when they return - saving precious CPU cycles.
 
-You might think dealing with request queues could be a handful but, fortunately, management of the queue (or queues, if you'd prefer) can be largely isolated from the handling of each request. That means that after you have set up a 'server' (ie. something that gathers requests), requests can be handled in much the same way as they would be with a standard CGI program that uses this library.
+The downside is added complexity: managing multiple requests and having to keep a tight reign on memory/resource consumption.
 
-Now on to demonstrations...
+You might think dealing with request queues could be a handful but, fortunately, management of the queue (or queues, if you'd prefer) can be largely isolated from everything else. ['Accepting] requests and ['handling] them are your two key responsibilities. That means that after you have set up a 'server' (ie. something that gathers requests), requests can be handled in an essentially protocol-agnostic way.
+
+Now on to some demonstrations...
 
 [endsect]

@@ -7,6 +7,14 @@
 
 [section Acknowledgements]
 
-Provided courtesy of the Google Summer of Code!
+Provided courtesy of the Google Summer of Code (GSoC '08)!
+
+Christopher Kohlhoff: for crafting Boost.Asio, which does most of the hard stuff. Chris mentored me through the GSoC (no mean feat!), without which this library would not be in your hands.
+
+Phil Endecott: for offering use-cases and encouragement at the start of the GSoC and for coming up with many further suggestions (such as the Client concept) in the months since.
+
+The Boost mailing lists: for so many deeply critical and objective comments about the library. :) That, is a relentless and ['Good Thing].
+
+[-forgetting everyone's names:] Jeff Dunlap
 
 [endsect]

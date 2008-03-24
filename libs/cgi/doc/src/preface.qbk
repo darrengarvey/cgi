@@ -13,7 +13,13 @@
 
 [h3 Overview]
 
-Boost.CGI is an open-source library for writing CGI programs in Standard C++. The library supports vanilla CGI, SCGI and FastCGI (SCGI/FastCGI don't really work yet) so it can be used to write anything from simple 'admin scripts' to full-fledged, scalable applications. This library rests on top of and should appear familiar to users of Boost.Asio, a cross-platform asynchronous networking library in boost-style C++. One of the main aims of the library is to allow programs to be written for any of the supported protocols without any real modification.
+[* THIS LIBRARY IS NOT A PART OF BOOST.]
+
+Boost.CGI is an open-source library for writing CGI programs in Standard C++. The library supports vanilla CGI, SCGI and FastCGI (SCGI doesn't really work yet) so it can be used to write anything from simple 'CGI scripts' to full-fledged, scalable applications. This library rests on top of and should appear familiar to users of Boost.Asio, a cross-platform asynchronous (and ['fast]) networking library. One of the main aims of the library is to allow programs to be written for any of the supported protocols without any real modification.
+
+[tip
+  The [*Deep End] is located in the examples directory. Try looking for the __examples__.
+]
 
 [h3 Motivation]
 

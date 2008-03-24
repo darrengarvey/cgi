@@ -26,6 +26,6 @@ Except for when using CGI synchronously, handling a client request generally inv
 
 [include meta_data.qbk]
 
-[include wrapping_up.qbk]
+[/include wrapping_up.qbk]
 
 [endsect]

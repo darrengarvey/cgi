@@ -7,14 +7,14 @@
 
 [section Building]
 
-__this__ is a header-only library, but it relies on [link __boost_system__ Boost.System], which must be built.
+__this__ is a header-only library, but it relies on [link __boost_system__ Boost.System], which for now should be built.
 
 [/h5 What you need:]
 
 Boost-related elements can be downloaded from the Boost download site at sourceforge, [@http://sf.net/project/showfiles.php?group_id=7586 located here].
 
 [note
-"invoking `bjam`" implies calling "`bjam --toolset=<your_toolset>`", where "`<your_toolset>`" is one of [@http://www.boost.org/doc/html/bbv2/reference.html#bbv2.reference.tools.compilers these]. More information can be found [link __boost_getting_started__ here] (these are general instructions for building Boost [*and] configuring `bjam`. Following these instructions will also 'tick' the first two requirements below.
+"invoking `bjam`" implies calling "`bjam --toolset=<your_toolset>`", where "`<your_toolset>`" is one of [@http://www.boost.org/doc/html/bbv2/reference.html#bbv2.reference.tools.compilers these]. More information can be found [@http://boost.org/more/getting_started/index.html here] (these are general instructions for building Boost [*and] configuring `bjam`. Following these instructions will also 'tick' the first two requirements below.
 ]
 
 [table What you need
@@ -22,7 +22,7 @@ Boost-related elements can be downloaded from the Boost download site at sourcef
   [
    [Boost.Jam - `bjam`]
    [No]
-   [Download 'boost-jam' (precomiled versions are highly recommended) and make it accessible to your system's PATH.]
+   [Download '__boost_jam__' (precompiled versions are highly recommended) and make it accessible to your system's PATH.]
   ]
   [
    [Boost.System]
@@ -31,7 +31,7 @@ Boost-related elements can be downloaded from the Boost download site at sourcef
 
    2. Set the environment variable BOOST_ROOT on your system to the download location.
 
-   3. Go to the directory BOOST_ROOT and invoke `bjam` (see above), passing it `--with-system --layout=system install` on the command line. This should finish without any fails.]
+   3. Go to the directory BOOST_ROOT and invoke `bjam` (see above), passing it `--with-system --layout=system install` on the command line. This should finish without any failures.]
   ]
   [
    [Documentation]
@@ -46,7 +46,7 @@ Boost-related elements can be downloaded from the Boost download site at sourcef
   [
    [Examples]
    [Yes]
-   [There are some examples provided with the library in the `libs/cgi/example` directory. They are useful for testing your server configuration, which can be notoriously tricky. They can all be found in the lib/cgi/example directory. Invoking `bjam` in the example directory should build all examples whereas invoking `bjam` in each sub-directory will build only the example contained therein.]
+   [There are some examples provided with the library in the `libs/cgi/example` directory. They are useful for learning the library or testing your server configuration, something that can be tricky. They can all be found in the lib/cgi/example directory. Invoking `bjam` in the example directory should build all examples whereas invoking `bjam` in each sub-directory will build only the example contained therein.]
   ]
 ]
 

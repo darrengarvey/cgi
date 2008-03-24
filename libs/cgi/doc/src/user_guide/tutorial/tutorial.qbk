@@ -1,0 +1,31 @@
+
+[section Tutorial]
+
+[include step_one.qbk]
+
+[section:what_next The next step]
+
+Now we have a "Hello world" example compiling and working with our server we can choose to do two things:
+
+* Make a CGI program that handles user-supplied data to provide dynamic content, or
+
+* Turn the CGI "Hello world" into a FastCGI "Hello world", allowing better scalability.
+
+The first option is of course what CGI is all about: you take form data or a query string or a user's cookies and serve a custom response. The second option isn't mutually exclusive to the first, it is essentially an 'extra step' that you should be able to do at any point in the life-cycle of your application - although the sooner you do it the easier it might be!
+
+[important
+  Once you have set up an `fcgi::request`, you use it in almost exactly the same way as a `cgi::request`.
+]
+
+[link __branching__ branching?]
+
+[endsect] [/ what_next]
+
+[include scaling.qbk]
+
+[/include step_two.qbk]
+
+[/include step_three.qbk]
+
+[endsect] [/ tutorial]
+

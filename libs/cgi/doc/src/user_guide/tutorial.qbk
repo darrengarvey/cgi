@@ -39,5 +39,6 @@ Except for when using CGI synchronously, a typical program will have two fundame
 
 [include:wrapping_up wrapping_up.qbk]
 
+[/endsect]
 
 [endsect]

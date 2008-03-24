@@ -19,51 +19,51 @@ In all, there are twelve member functions of [classref cgi::basic_request `basic
 [table Request variable accessor functions
   [[Function signature] [Purpose]]
   [
-   [`cgi::map& env_()`]
+   [`cgi::map& env()`]
    [Return a complete map of the meta-variables associated with the request.]
   ]
   [
-   [`std::string env_(const std::string&)`]
+   [`std::string env(const std::string&)`]
    [Takes the name of the environment variable wanted and returns the value associated with it.]
   ]
   [
-   [`cgi::map& get_()`]
+   [`cgi::map& GET()`]
    [Return a complete map of the GET variables associated with the request.]
   ]
   [
-   [`std::string get_(const std::string&)`]
+   [`std::string GET(const std::string&)`]
    [Takes the name of the __GET__ variable and returns the value associated with it (if any).]
   ]
   [
-   [`cgi::map& post_()`]
+   [`cgi::map& POST()`]
    [Return a complete map of the POST variables associated with the request.]
   ]
   [
-   [`std::string post_(const std::string&, bool greedy = true)`]
+   [`std::string POST(const std::string&, bool greedy = true)`]
    [Takes the name of a __POST__ variable and returns the value associated with it (if any).
 
     If `greedy == true` - which it is by default - then more data is read from the request if required until all of the POST data has been read.]
   ]
   [
-   [`cgi::map& form_()`]
+   [`cgi::map& form()`]
    [Return a complete map of the from variables associated with the request. These will either be the GET or POST variables, depending on whether the `request_method()` is `"GET"` or `"POST"` respectively.]
   ]
   [
-   [`std::string form_(const std::string&, bool greedy = true)`]
+   [`std::string form(const std::string&, bool greedy = true)`]
    [Takes the name of either a __GET__ or __POST__ variable and returns the value associated with it (if any). Note that this will only search the type referred to by the environment variable `"REQUEST_METHOD"`, so it is generally safe to use.
 
    If `greedy == true` - which it is by default - then more data is read from the request as required until all of the POST data has been read.]
   ]
   [
-   [`cgi::map& cookie_()`]
+   [`cgi::map& cookie()`]
    [Return a complete map of the cookie variables associated with a request.]
   ]
   [
-   [`std::string cookie_(const std::string& name)`]
+   [`std::string cookie(const std::string& name)`]
    [Takes the name of the cookie variable and returns the value associated with it (if any).]
   ]
   [
-   [`std::string var_(const std::string& name, bool greedy = true)`]
+   [`std::string var(const std::string& name, bool greedy = true)`]
    [Takes the name of [*any] meta-variable and returns the value associated with it (if any).[footnote __xss_footnote__]
 
    If `greedy == true` - which it is by default - then more data is read from the request if required until either the requested variable is found or all of the POST data has been read, which ever comes first.]
@@ -77,7 +77,7 @@ In all, there are twelve member functions of [classref cgi::basic_request `basic
 // ...
   cgi::request req;
 
-  cgi::map& get_vars = req.get_();
+  cgi::map& get_vars = req.GET();
   std::string user_id( get_vars["user_id"] );
 
   if (!user_id.empty()) {
@@ -103,76 +103,76 @@ Since looking up variables using raw strings can be error-prone, the `basic_requ
 [table Standard CGI Meta-variables
   [[Function signature] [Purpose]]
   [
-   [`std::string auth_type()`]
+   [`auth_type()`]
    [If the server supports user authentication, and the script is protected, this is the protocol-specific authentication method used to validate the user.]
   ]
   [
-   [`std::string content_length()`]
+   [`content_length()`]
    [The size of the message-body attached to the request.]
   ]
   [
-   [`std::string content_type()`]
+   [`content_type()`]
    [The content type of data attached to the query, if any (ev. POST, PUT)]
   ]
   [
-   [`std::string gateway_interface()`]
+   [`gateway_interface()`]
    [The revision of the CGI specification to which this server complies. Format: CGI/revision, eg. `"CGI/1.1"`]
   ]
   [
-   [`std::string path_info()`]
+   [`path_info()`]
    [The extra path information, as given by the client. In other words, scripts can be accessed by their virtual pathname, followed by extra information at the end of this path. The extra information is sent as PATH_INFO.]
   ]
   [
-   [`std::string path_translated()`]
+   [`path_translated()`]
    [The server provides a translated version of PATH_INFO, which takes the path and does any virtual-to-physical mapping to it.]
   ]
   [
-   [`std::string query_string()`]
+   [`query_string()`]
    [The information following the '?' in the URL. This is where the GET data is extracted from. Format: `"name1=value1&name2=value2..."` Any reserved characters are URL-encoded.]
   ]
   [
-   [`std::string remote_addr()`]
+   [`remote_addr()`]
    [The IP address of the remote host making the request. You should [*never] rely on the accuracy of this value, as it is easily forged.]
   ]
   [
-   [`std::string remote_host()`]
+   [`remote_host()`]
    [The hostname making the request.]
   ]
   [
-   [`std::string remote_ident()`]
+   [`remote_ident()`]
    [If the HTTP server supports [rfc 931] identification, then this variable will be set to the remote user name retrieved from the server. Usage of this variable should be limited to logging only.]
   ]
   [
-   [`std::string remote_user()`]
+   [`remote_user()`]
    [If the server supports user authentication, and the script is protected, this is the username they have authenticated as.]
   ]
   [
-   [`std::string request_method()`]
+   [`request_method()`]
    [The method with which the request was made. For HTTP, this is "GET", "HEAD", "POST", etc.]
   ]
   [
-   [`std::string script_name()`]
+   [`script_name()`]
    [A virtual path to the script being executed, used for self-referencing URLs.]
   ]
   [
-   [`std::string server_name()`]
+   [`server_name()`]
    [The server's hostname, DNS alias, or IP address as it would appear in self-referencing URLs.]
   ]
   [
-   [`std::string server_port()`]
+   [`server_port()`]
    [The port number to which the request was sent.]
   ]
   [
-   [`std::string server_protocol()`]
+   [`server_protocol()`]
    [The name and revision of the information protcol this request came in with. Format: protocol/revision.]
   ]
   [
-   [`std::string server_software()`]
+   [`server_software()`]
    [The name and version of the information server software answering the request (and running the gateway). Format: name/version.]
   ]
 ]
 
 
-[/ should this return a `std::pair<std::string, cgi::meta_type>` instead, where a `cgi::meta_type` is one of `get`, `post`, `env`, or `cookie`?]
+[/ should this return a `std::pair<std::string, cgi::var_type>` instead, where a `cgi::var_type` is one of `get`, `post`, `env`, or `cookie`?]
 
 [endsect]

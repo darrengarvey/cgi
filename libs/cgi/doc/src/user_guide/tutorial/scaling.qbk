@@ -1,0 +1,107 @@
+
+[section:scaling Turning a CGI program into a FastCGI daemon]
+
+So you want more flexibility and power than CGI can provide? This section shows you how to turn the CGI "Hello world" program into a FastCGI daemon that can handle more than one request at a time. We'll start off simple by handling one requests after another, before moving on to handling multiple requests simultaneously.
+
+[note
+  The examples in this section assume you have prepended:
+  ``
+  #include <boost/cgi/fcgi.hpp>
+  using namespace boost::fcgi;
+  ``
+]
+
+[section:sync_fcgi Synchronous FastCGI]
+
+``
+int main()
+{
+  try
+  {
+    service s;
+    acceptor a(s);
+  
+    for(;;)
+    {
+      request req(s);
+      a.accept(req);
+
+      req.load();
+  
+      response resp;
+  
+      resp<< content_type("text/plain")
+          << "Hello, world.";
+  
+      resp.send(req.client());
+      req.close(http::ok, 0);
+    }
+  
+    return 0;
+
+  }catch(boost::system::system_error& err){
+    return 1;
+  }
+}
+``
+
+If should be reasonably obvious what's going on above. Let's go through the differences to the original CGI example.
+
+``
+acceptor a(s);
+``
+
+This is what you use to accept requests.
+
+``
+for(;;)
+{
+  // ...
+}
+``
+
+This is a simple example, so the program handles an arbitrary number of requests. You may choose to limit the number of requests you handle.
+
+``
+a.accept(req);
+
+req.load();
+``
+
+This accepts one request. An accepted request is in a protocol-dependent state and generally isn't very useful. You must either `load()` or `async_load()` the request to put in a useful state. The arguments to these functions determine what is parsed (**FIXME** these will have to be named, so you can do `req.load(parse_params|parse_post|parse_cookies|etc...)`).
+
+Beyond this the request is basically the same as a CGI request. As mentioned previously, you must explicitly close the request when you're finished with it:
+
+``
+req.close(http::ok);
+``
+
+More information on the available HTTP status codes can be found [link __http_status_codes__ here].
+
+One final thing to note is the type of error thrown by this library:
+
+``
+try {
+  // ...
+}catch(boost::system::system_error& err){
+  // err.message() <- string representing the error
+  // err.id()      <- the error code (a number)
+  // if(err) {}    <- only true when err represents an error
+}
+``
+
+[tip
+  There are non-`throw`ing alternatives to most of the `throw`ing functions in the library that take an additional `boost::cgi::error_code` argument. Due to the nature of FastCGI, exceptions may be undesireable - you won't usually want all the requests a process is handling to abort just because of a problem with one of them. In this case you can use the non-throwing versions of functions and gracefully close individual requests when something goes wrong.
+]
+
+The next example is very similar to the above but shows you how you might want to organise your program. As a demonstration it also uses the non-throwing alternatives to some functions.
+
+[endsect] [/ sync_fcgi]
+
+[section:async_fcgi Asynchronous FastCGI]
+
+[endsect] [/ async_fcgi]
+
+
+[endsect] [/ scaling]
+

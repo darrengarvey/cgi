@@ -19,7 +19,7 @@ Due to configuration issues, this isn't functional yet.
 
 FastCGI support is essential to any modern CGI library. There is currently ['no] known FastCGI library for C or C++ that aims to implement the complete [@http://www.fastcgi.com/devkit/doc/fcgi-spec.html FastCGI 1.0] specification. Providing support for multiplexing FastCGI daemons is one of this library's major goals.
 
-There are a couple of issues that have yet to be worked out, but in general the new framework is known to 'fit' with all the details of FastCGI and should lend itself to an efficient implementation.
+There are a couple of issues that have yet to be worked out, but in general the new framework is known to 'fit' with all the details of FastCGI and should lend itself to an efficient implementation. It's only partially working at the moment.
 
 [h4 Access to error output streams]
 
@@ -53,8 +53,8 @@ Compare:
 cgi::request req;
 cgi::response resp;
 
-cgi::map::iterator iter = req.form_().find("number");
-if (iter != cgi::map::iterator::end())
+cgi::map::const_iterator iter = req.form().find("number");
+if (iter != cgi::map::const_iterator())
 {
   rep<< "You picked no numbers...";
 }
@@ -62,7 +62,7 @@ else
 {
   int sum(0);
   resp<< "Your numbers are: ";
-  for(; iter != cgi::map::iterator::end(); ++iter)
+  for(; iter != cgi::map::const_iterator(); ++iter)
   {
     resp<< iter->second << " ";
     sum +=  boost::lexical_cast<int>(iter->second);
@@ -79,18 +79,18 @@ to:
 cgi::request req;
 cgi::response resp;
 
-cgi::param parm = req.form_("number");
-if (parm.empty())
+cgi::param p = req.form("number");
+if (p.empty())
 {
   resp<< "You picked no numbers...";
 }
 else
 {
   int sum(0);
-  for(; parm != parm.end(); ++parm)
+  for(; p != p.end(); ++p)
   {
-    resp<< parm << " ";
-    sum += parm.as<int>());
+    resp<< p << " ";
+    sum += p.as<int>());
   }
 
   resp<< std::endl

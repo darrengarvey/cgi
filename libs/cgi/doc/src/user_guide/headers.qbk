@@ -8,7 +8,7 @@
 
 [section:headers Choosing the correct headers]
 
-Depending on what protocol you plan on using, you should include [*one] of the following headers:
+Depending on what protocol you plan on using, you should include one of the following headers:
 
 ``
 #include <boost/cgi.hpp>      // include header files for any protocol
@@ -21,42 +21,5 @@ Depending on what protocol you plan on using, you should include [*one] of the f
 
 #include <boost/cgi/scgi.hpp> // include all headers required for SCGI usage
 ``
-
-Including <boost/cgi.hpp> [*and] defining one of the `BOOST_CGI_IMPLICIT_*` macros is equivalent to including one of the protocol-specific headers. As such, the shortcuts `cgi::request`, `cgi::acceptor` and `cgi::service` become `typedef`s for that protocol's more explicit types.
-
-For example:
-``
-#define BOOST_CGI_IMPLICIT_SCGI 1
-#include <boost/cgi.hpp>
-cgi::service service;           // implicit SCGI service
-cgi::request req(service);      // implicit SCGI request
-``
-Is equivalent to:
-``
-#include <boost/cgi/scgi.hpp>
-cgi::service service;           // implicit SCGI service
-cgi::request req(service);      // implicit SCGI request
-``
-Which is equivalent to:
-``
-#include <boost/cgi.hpp>
-cgi::scgi_service service;      // SCGI service
-cgi::scgi_request req(service); // SCGI request
-``
-and:
-``
-#include <boost/cgi/scgi.hpp>
-cgi::scgi_service service;      // SCGI service
-cgi::scgi_request req(service); // SCGI request
-``
-But:
-``
-#include <boost/cgi.hpp>
-cgi::service service;           // error: cgi::service does not name a type
-cgi::request req(service);      // error: cgi::request does not name a type
-``
-will not work.
-
-Note that the explicit form - `scgi_request`/`scgi_service` - is always valid, assuming you have (implicitly or otherwise) included, for example, `<boost/cgi/scgi/request.hpp>`.
 
 [endsect] [/ headers]
