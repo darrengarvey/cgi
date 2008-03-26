@@ -1,10 +1,7 @@
 import os ;
 import modules ;
 
-path-constant BOOST_ROOT : [ os.environ BOOST_ROOT ] ;
 path-constant BOOST_BUILD_PATH : [ os.environ BOOST_BUILD_PATH ] ;
-
-path-constant PROJECT_ROOT : . ;
 
 path-constant top : . ;
 path-constant include-dir : /usr/local/include ;
@@ -27,27 +24,30 @@ path-constant boost-root-relative : $(top)/../../../../boost/trunk/ ;
 #
 # Note that the command line will override the environment variable!
 #############################################################################
-local rule get-bin-dir ( bin-name : envvar )
+local rule get-bin-dir ( protocol )
 {
-  local bin-dir = [ MATCH "^--$(bin-name)=(.*)" : [ modules.peek : ARGV ] ] ;
+  local bin-dir = [ MATCH "^--$(protocol:L)-bin=(.*)" : [ modules.peek : ARGV ] ] ;
   if $(bin-dir)
   {
     return $(bin-dir) ;
   }
   else
   {
-    bin-dir = [ os.environ $(envvar) ] ;
+    bin-dir = [ os.environ "BOOST_$(protocol:U)_BIN_PATH" ] ;
     if $(bin-dir)
     {
       return $(bin-dir) ;
     }
-    return $(top)/$(bin-name) ;
+    else
+    {
+      return $(top)/$(protocol:L)"-bin" ;
+    }
   }
 }
 
-path-constant cgi-bin  : [ get-bin-dir "cgi-bin" : "BOOST_CGI_BIN_PATH" ] ; 
-path-constant fcgi-bin : [ get-bin-dir "fcgi-bin" : "BOOST_FCGI_BIN_PATH" ] ;
-path-constant scgi-bin : [ get-bin-dir "scgi-bin" : "BOOST_SCGI_BIN_PATH" ] ;
+path-constant cgi-bin  : [ get-bin-dir "cgi" ] ; 
+path-constant fcgi-bin : [ get-bin-dir "fcgi" ] ;
+path-constant scgi-bin : [ get-bin-dir "scgi" ] ;
 
 
 use-project /boost/ : $(boost-root) ;
@@ -60,7 +60,6 @@ project cgi
   : requirements
       <include>$(boost-root)
       <include>$(top)
-      #<include>C:\cc\src\ctemplate\windows
       <define>_CRT_SECURE_NO_WARNINGS
       <define>_SCL_SECURE_NO_WARNINGS
   ;
