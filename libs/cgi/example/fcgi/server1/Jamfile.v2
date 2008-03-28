@@ -1,0 +1,14 @@
+
+project cgi.examples.fcgi.sync_server ;
+
+exe fcgi_server1 : main.cpp ;
+
+install install
+  :
+    fcgi_server1
+  :
+    <location>$(fcgi-bin)
+  ;
+
+explicit install ;
+
