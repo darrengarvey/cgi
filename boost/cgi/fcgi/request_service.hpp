@@ -24,8 +24,37 @@
 #include "boost/cgi/fcgi/client.hpp"
 
 namespace cgi {
- namespace fcgi {
 
+   namespace detail {
+     
+     template<typename T, typename Handler>
+     struct async_load_helper
+     {
+       async_load_helper(T& t, typename T::implementation_type& impl
+                        , bool parse_stdin, Handler h)
+         : type(t)
+         , impl_(impl)
+         , parse_stdin_(parse_stdin)
+         , handler_(h)
+       {
+       }
+
+       void operator()()
+       {
+         boost::system::error_code ec;
+         type.load(impl_, parse_stdin_, ec);
+         handler_(ec);
+       }
+
+       T& type;
+       typename T::implementation_type& impl_;
+       bool parse_stdin_;
+       Handler handler_;
+     };
+   }
+
+  namespace fcgi {
+ 
   /// The IoObjectService class for a FCGI basic_request<>s
   class fcgi_request_service
     : public detail::service_base<fcgi_request_service>
@@ -274,6 +303,15 @@ namespace cgi {
 
       //std::cerr<< "done!" << std::endl;
       return ec;
+    }
+
+    // **FIXME**
+    template<typename Handler>
+    void async_load(implementation_type& impl, bool parse_stdin, Handler handler)
+    {
+      this->io_service().post(
+        detail::async_load_helper<type, Handler>(this, parse_stdin, handler)
+      );
     }
 
     /* These Don't Belong Here.

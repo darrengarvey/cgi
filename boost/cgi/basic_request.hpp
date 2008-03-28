@@ -188,16 +188,17 @@ namespace cgi {
     }
 
 
+    // **FIXME**
     /// Asynchronously read/parse the request meta-data
     /**
      * Note: 'loading' including reading/parsing STDIN if parse_stdin == true
      */
-    template<typename Handler>
-    void async_load(Handler handler, bool parse_stdin = false)
-    {
-      this->service.async_load(this->implementation, parse_stdin
-                              , handler);
-    }
+    //template<typename Handler>
+    //void async_load(Handler handler, bool parse_stdin = false)
+    //{
+    //  this->service.async_load(this->implementation, parse_stdin
+    //                          , handler);
+    //}
 
     /// Notify the server the request has finished being handled
     /**

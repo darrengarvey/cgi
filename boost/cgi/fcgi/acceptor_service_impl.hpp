@@ -34,7 +34,7 @@ namespace cgi {
    namespace detail {
 
      /// Helper functions for async_accept operation.
-     template<typename T, /*typename Request, */typename Handler>
+     template<typename T, typename Handler>
      struct accept_handler
      {
        accept_handler(T& t, typename T::implementation_type& impl
@@ -297,17 +297,6 @@ namespace cgi {
        this->io_service().post(
          detail::accept_handler<type, Handler>(*this, impl, request, handler)
        );
-       //boost::system::error_code ec;
-       //handler(ec);
-       //acceptor_service_.async_accept(impl.acceptor_, request.client().connection()->next_layer_type()
-
-/*
-           &acceptor_service_impl<protocol_type>
-           ::typename check_for_waiting_request<
-           CommonGatewayRequest
-           , Handler>,
-           this, boost::ref(impl), boost::ref(request), handler));      
-*/
      }
 
      /// Close the acceptor (not implemented yet).
@@ -329,18 +318,6 @@ namespace cgi {
                                    , CommonGatewayRequest& request
                                    , Handler handler)
      {
-       /*
-       {
-         boost::mutex::scoped_lock lk(impl.mutex_);
-         if (!impl.waiting_requests_.empty())
-         {
-           request = *(impl.waiting_requests_.front());
-           impl.waiting_requests_.pop();
-           return handler(ec); // this could be `io_service::post`ed again
-         }
-       }
-       */
-
        // We can't call accept on an open request (close it first).
        if (request.is_open())
          return handler(error::accepting_on_an_open_request);
