@@ -1,4 +1,4 @@
-//                 -- server1/main.hpp --
+//                 -- server2/main.hpp --
 //
 //           Copyright (c) Darren Garvey 2007.
 // Distributed under the Boost Software License, Version 1.0.
@@ -7,7 +7,7 @@
 //
 ////////////////////////////////////////////////////////////////
 //
-//[fcgi_server1
+//[fcgi_server2
 //
 // This example simply echoes all variables back to the user. ie.
 // the environment and the parsed GET, POST and cookie variables.
@@ -17,11 +17,15 @@
 // It is a demonstration of how a 'server' can be used to abstract
 // away the differences between FastCGI and CGI requests.
 //
-// This is very similar to the fcgi_echo example.
+// This is very similar to the fcgi_echo and fcgi_server1 examples.
+// Unlike in the server1 example, the server class in this example uses
+// asynchronous functions, to increase throughput.
 //
+//
+// **FIXME**
+// This is slower than the server1 example, which is stupid.
 
 #include <fstream>
-#include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/program_options/environment_iterator.hpp>
 
@@ -31,7 +35,7 @@ using namespace std;
 using namespace boost::fcgi;
 
 // This is a file to put internal logging info into
-#define LOG_FILE "/var/www/log/fcgi_server1.txt"
+#define LOG_FILE "/var/www/log/fcgi_server2.txt"
 
 // This function writes the title and map contents to the ostream in an
 // HTML-encoded format (to make them easier on the eye).
@@ -134,35 +138,60 @@ public:
     , acceptor_(service_)
   {}
 
-  int run()
+  void run()
   {
     // Create a new request (on the heap - uses boost::shared_ptr<>).
     request_type::pointer new_request = request_type::create(service_);
     // Add the request to the set of existing requests.
     requests_.insert(new_request);
-    
-    int ret(0);
-    for (;;)
+
+    start_accept(new_request);
+    service_.run();
+  }
+
+  void start_accept(request_type::pointer& new_request)
+  {
+    acceptor_.async_accept(*new_request, boost::bind(&server::handle_accept
+                                                    , this, new_request
+                                                    , boost::asio::placeholders::error)
+                          );
+  }
+
+  void handle_accept(request_type::pointer req  
+                    , boost::system::error_code ec)
+  {
+    if (ec)
     {
-      boost::system::error_code ec;
-
-      acceptor_.accept(*new_request, ec);
-
-      if (ec) 
-      {
-        std::cerr<< "Error accepting: " << ec.message() << std::endl;
-        return 5;
-      }
-  
-      // Load in the request data so we can access it easily.
-      new_request->load(ec, true); // The 'true' means read and parse POST data.
-
-      ret = handler_(*new_request, ec);
-
-      if (ret)
-        break;
+      //std::cerr<< "Error accepting request: " << ec.message() << std::endl;
+      return;
     }
-    return ret;
+
+    req->load(ec, true);
+
+    //req->async_load(boost::bind(&server::handle_request, this
+    //                           , req, boost::asio::placeholders::error)
+    //               , true);
+
+    service_.post(boost::bind(&server::handle_request, this, req, ec));
+
+    // Create a new request (on the heap - uses boost::shared_ptr<>).
+    request_type::pointer new_request = request_type::create(service_);
+    // Add the request to the set of existing requests.
+    requests_.insert(new_request);
+
+    start_accept(new_request);
+  }
+
+  void handle_request(request_type::pointer req
+                     , boost::system::error_code ec)
+  {
+    handler_(*req, ec);
+    if (ec)
+    {
+      //std::cerr<< "Request handled, but ended in error: " << ec.message()
+      //         << std::endl;
+    }
+    start_accept(req);
   }
 
 private:
@@ -181,7 +210,9 @@ try
                       , &rh, _1, _2)
           );
 
-  return s.run();
+  s.run();
+
+  return 0;
   
 }catch(boost::system::system_error& se){
   cerr<< "[fcgi] System error: " << se.what() << endl;
