@@ -40,7 +40,7 @@ local rule get-bin-dir ( protocol )
     }
     else
     {
-      return $(top)/$(protocol:L)"-bin" ;
+      return "$(top)/$(protocol:L)-bin" ;
     }
   }
 }
@@ -48,6 +48,43 @@ local rule get-bin-dir ( protocol )
 path-constant cgi-bin  : [ get-bin-dir "cgi" ] ; 
 path-constant fcgi-bin : [ get-bin-dir "fcgi" ] ;
 path-constant scgi-bin : [ get-bin-dir "scgi" ] ;
+
+#############################################################################
+# Rule to extract the directory for web documents (some servers call it
+# the htdocs folder). The amortization examples will want this to be set.
+#
+# User can pass either:
+# 
+# --htdocs=/path/to/htdocs
+#
+# on the bjam command line OR set the environment variable:
+# 
+# BOOST_CGI_HTDOCS_PATH
+#
+# Note that the command line will override the environment variable!
+#############################################################################
+local rule get-htdocs-dir ( )
+{
+  local dir = [ MATCH "^--htdocs=(.*)" : [ modules.peek : ARGV ] ] ;
+  if $(dir)
+  {
+    return $(dir) ;
+  }
+  else
+  {
+    dir = [ os.environ "BOOST_CGI_HTDOCS_PATH" ] ;
+    if $(dir)
+    {
+      return $(dir) ;
+    }
+    else
+    {
+      return "$(top)/htdocs" ;
+    }
+  }
+}
+
+path-constant htdocs : [ get-htdocs-dir ] ;
 
 
 use-project /boost/ : $(boost-root) ;

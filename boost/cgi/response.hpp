@@ -95,6 +95,7 @@ namespace cgi {
       ostream_.clear();
       headers_.clear();
       headers_terminated_ = false;
+      //buffer_->consume(
     }
 
     /// Return the response to the 'just constructed' state.
