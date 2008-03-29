@@ -40,10 +40,10 @@
 [def __tutorial__           [link boost.cgi.tutorial tutorial]]
 [def __reference__          [link /doc/html/cgi/reference.html reference]]
 
-[def __current_branch__ http://svn.boost.org/trac/boost/browser/sandbox/SOC/2007/cgi/branches/acceptor_work]
+[def __current_branch__ http://svn.boost.org/trac/boost/browser/sandbox/SOC/2007/cgi/branches/release]
 
-[def __examples__ [@http://svn.boost.org/trac/boost/browser/sandbox/SOC/2007/cgi/branches/acceptor_work/libs/cgi/example examples]]
-[def __amort_example__ [@http://svn.boost.org/trac/boost/browser/sandbox/SOC/2007/cgi/branches/acceptor_work/libs/cgi/example/acgi/amortization Amortization]]
+[def __examples__ [@http://svn.boost.org/trac/boost/browser/sandbox/SOC/2007/cgi/branches/release/libs/cgi/example examples]]
+[def __amort_example__ [@http://svn.boost.org/trac/boost/browser/sandbox/SOC/2007/cgi/branches/release/libs/cgi/example/acgi/amortization Amortization]]
 
 
 [def __GET__  `GET` ]
@@ -52,7 +52,7 @@
 [def __PUT__  `PUT` ]
 
 
-[def __Service__ [@http://asio.sourceforge.net/boost_asio_0_3_8/libs/asio/doc/html/boost_asio/reference/Service.html Service]]
+[def __Service__ [@http://asio.sourceforge.net/boost_asio_0_3_9/libs/asio/doc/html/boost_asio/reference/Service.html Service]]
 
 [/def __boost_thread__ #link#to#boost#thread#docs#]
 [/def __IoService__ #link#to#io#service#docs#]
@@ -117,4 +117,4 @@ These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sour
 
 [include:server_support user_guide/server_support.qbk]
 
-[/include acknowledgements.qbk]
+[include acknowledgements.qbk]

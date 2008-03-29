@@ -13,13 +13,13 @@ Streamed IO, likely to be similar to Boost.Asio's `basic_socket_stream<>` is req
 
 [h4 SCGI support.]
 
-Due to configuration issues, this isn't functional yet.
+I haven't managed to get apache/lighttpd configured properly for SCGI, so this isn't functional yet.
 
 [h4 FastCGI support.]
 
 FastCGI support is essential to any modern CGI library. There is currently ['no] known FastCGI library for C or C++ that aims to implement the complete [@http://www.fastcgi.com/devkit/doc/fcgi-spec.html FastCGI 1.0] specification. Providing support for multiplexing FastCGI daemons is one of this library's major goals.
 
-There are a couple of issues that have yet to be worked out, but in general the new framework is known to 'fit' with all the details of FastCGI and should lend itself to an efficient implementation. It's only partially working at the moment.
+There are a couple of issues that have yet to be worked out, but FastCGI is working in a basic way now.
 
 [h4 Access to error output streams]
 
@@ -106,32 +106,14 @@ Even though this library introduces very few new concepts, they are not currentl
 
 [h4 Support for environment Passed on Command Line]
 
-See section 4.4 of [@http://www.ietf.org/rfc/rfc3875].
+See section 4.4 of [@http://www.ietf.org/rfc/rfc3875]. Should be easy to do by modifying the `acgi::service` class.
 
 [h4 Support for Multi-part POST Forms]
 
-
-
-[h4 `operator[]` Overloading]
-
-What is currently:
-``
-request req;
-std::string a( req.form_("a") );
-map& forms = req.form_();
-``
-could become:
-``
-request req;
-std::string a(req[form_, "a"]);
-map& forms = req[form_];
-a = req[form_]["a"]; // better to the above, plus is more 'standard'
-``
+This has been added to the CGI part of the library, but it's very ugly and hackish. The idea is to create a `form_parser` class that can be used both internally and externally to parse multipart forms.
 
 [/h4 Removing aCGI/CGI Divide]
 
-[/h4 Support for wide characters]
-
-[/The library generally works on octets, but there should be some way to ]
+[/h4 Unicode Support]
 
 [endsect]

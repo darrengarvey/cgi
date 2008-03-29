@@ -11,32 +11,35 @@ import quickbook ;
 import doxygen ;
 
 # compile the doxygen sources here
-#doxygen cgi_dox
-#  :
+doxygen cgi_dox
+  :
 #   [ glob-tree ../../../boost/cgi/*.hpp : .svn ]
 #   [ glob-tree ../../../boost/libs/cgi/src/*.cpp : .svn ]
 
-#    [ glob ../../../boost/cgi/*.hpp ]
+    [ glob ../../../boost/cgi/*.hpp ]
+    [ glob ../../../boost/cgi/fcgi*.hpp ]
+    [ glob ../../../boost/cgi/acgi*.hpp ]
+    [ glob ../../../boost/cgi/cgi*.hpp ]
 #    [ glob ../../../boost/cgi/gateway_impl/*.hpp ]
 #    [ glob ../../../boost/cgi/gateway_service/*.hpp ]
-#    [ glob ../../../boost/cgi/http/*.hpp ]
+    [ glob ../../../boost/cgi/http/*.hpp ]
 #    [ glob ../../../boost/cgi/connections/*.hpp ]
 #    [ glob ../../../boost/cgi/request_impl/*.hpp ]
 #    [ glob ../../../boost/cgi/request_service/*.hpp ]
-#  :
+  :
 #    <doxygen:param>HIDE_UNDOC_MEMBERS=NO
-#    <doxygen:param>EXTRACT_PRIVATE=NO
+    <doxygen:param>EXTRACT_PRIVATE=NO
 #    #<doxygen:param>EXTRACT_ALL=YES
-#    <doxygen:param>SEARCH_INCLUDES=YES
+    <doxygen:param>SEARCH_INCLUDES=YES
 #    <doxygen:param>INCLUDE_PATH=$(BOOST_ROOT)
-#  ;
+  ;
 
 xml cgi_xml : src/cgi.qbk ;
 
 boostbook standalone
   :
     cgi_xml
-#    cgi_dox
+    cgi_dox
   :
     <doxygen.processor>doxproc
     <doxygen.doxproc.index>no
@@ -49,7 +52,7 @@ boostbook standalone
     # the depth (of sub-pages) the TOC shows
     <xsl:param>toc.max.depth=1
     # Path to the stylesheet
-    <xsl:param>html.stylesheet=../../../../../../../../boost/trunk/doc/html/boostbook.css
+    <xsl:param>html.stylesheet=../../../../../../boost/trunk/doc/html/boostbook.css
  
     # 
     <xsl:param>toc.section.depth=2

@@ -22,11 +22,15 @@ int main()
 
   return_(req, resp, 0); // write the response and 'return 0;'
 }
+``
 
 Example request:
+``
 example.com/program_name?name=Mr.+Allison
+``
 
-Output:
+Output (as viewed in a web browser):
+``
 Hello there, Universe. -- Mr. Allison
 
 ``
@@ -39,7 +43,7 @@ This CGI library is a reasonably high-level library for creating CGI, FastCGI or
 
 [h4 Concepts]
 
-The library provides abstractions which hide details of the vastly different specifications of CGI, FastCGI and SCGI. The main abstractions are, briefly:
+The library provides abstractions which hide details of the varying specifications of CGI, FastCGI and SCGI. The main abstractions are, briefly:
 
 [table
 [
@@ -72,17 +76,23 @@ The library provides abstractions which hide details of the vastly different spe
 
 [h4 Protcols]
 
-[:['See __protocol_details__ for more.]]
+[:['See __protocol_details__ for more.]] [/ **FIXME** ]
 
-In a nutshell, CGI is the simple and 'original' way of communicating with web servers. I'll assume you know what it is: one request per process and communication using standard input/output. A nice and simple way of making ['web pages that can change].
+In a nutshell, CGI is the simple and 'original' way of communicating with web servers. I'll assume you know what it is: one request per process and communication using standard input/output. A nice and simple way of making ['dynamic web pages].
 
-FastCGI was then developed as a means of allowing much more scalable CGI-like programs to be written. In fact, the FastCGI specification implies scalability was the main motivation for the protocol. Communication with the server works over sockets or pipes (only TCP sockets are supported for now). Each process and each connection can be used for handling multiple requests. In theory this means you could have a single monolithic process behind your HTTP server handling all incoming requests concurrently.
+[tip If you're new to CGI, have a look at this: [@http://hoohoo.ncsa.uiuc.edu/cgi/]]
 
-SCGI is essentially a simpler version - hence [*S]imple[*CGI] - of FastCGI but is still a significant step up from vanilla CGI, mainly because each process can handle multiple requests. Use of FastCGI is recommended over SCGI, but unfortunately support for FastCGI is unreliable and buggy with some servers and/or you may not have that option.
+__FastCGI__ was then developed as a means of allowing much more scalable CGI-like programs to be written. In fact, the FastCGI specification implies scalability was the main motivation for the protocol. Communication with the server works over sockets or pipes (only TCP sockets are supported for now). Each process and each connection can be used for handling multiple requests. In theory this means you could have a single monolithic process behind your HTTP server handling all incoming requests concurrently.
+
+[note
+  Some initial benchmarks show that simple FastCGI programs are 3-5x faster than their CGI counterparts. When using database connections and/or HTML templates, the gap should get even bigger.
+]
+
+__SCGI__ is essentially a simpler version of FastCGI - hence [*S]imple[*CGI] - but is still a significant step up from vanilla CGI, mainly because each process can handle multiple requests. Use of FastCGI is recommended over SCGI, but unfortunately support for FastCGI is unreliable and buggy with some servers and/or you may not have that option. [/ **FIXME**] SCGI support isn't included yet.
 
 [h4 Multiple Requests per Process]
 
-So I keep harping on about this, that's because it removes so many limitations of traditional CGI programming. Your programs can become servers, capable of handling an arbitrary number of requests with each invocation (assuming they don't crash, or leak memory!). This gives you the freedom to keep database connections open between requests or cache ready-parsed responses, for example. Processing of a client request can even be continued in the case of the client crashing - the `response` can then be stored and given to them when they return - saving precious CPU cycles.
+Having persistent processes is very handy. It removes so many of the limitations of traditional CGI programming; suddenly CGI programs aren't so different to desktop applications. CGI 'scripts' become FastCGI servers, capable of handling an arbitrary number of requests with each invocation (assuming they don't crash, or leak memory!). This gives you the freedom to keep database connections open between requests or cache ready-parsed responses, for example. Processing of a client request can even be continued in the case of the client crashing - the `response` can then be stored and given to them when they return - saving precious CPU cycles.
 
 The downside is added complexity: managing multiple requests and having to keep a tight reign on memory/resource consumption.
 

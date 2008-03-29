@@ -13,15 +13,13 @@ This section of the documentation is probably best read before the [link __tutor
 
 [include:server_config user_guide/server_configuration.qbk]
 
-[include:headers user_guide/headers.qbk]
-
 [endsect]
 
 [/include:protocols user_guide/protocols.qbk]
 
 [/include:tutorial user_guide/tutorial.qbk]
 
-[include:examples user_guide/examples.qbk]
+[include:examples ../../example/doc.qbk]
 
 [include user_guide/tutorial/tutorial.qbk]
 

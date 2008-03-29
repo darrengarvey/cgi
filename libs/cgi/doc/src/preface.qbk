@@ -23,7 +23,7 @@ Boost.CGI is an open-source library for writing CGI programs in Standard C++. Th
 
 [h3 Motivation]
 
-C++ isn't the language of choice for many CGI programmers, despite being a powerful one that can be used to produce scalable, maintainable and uncompromisingly efficient applications.
+C++ may not be the most common language used for CGI programming, but it is a powerful one that can be used to produce scalable, maintainable and uncompromisingly efficient applications.
 
 A discussion about the benefits of CGI programming in C++ is beyond the scope of this document and I've assumed you're here because you want to try C++ CGI programming, but here is a short list anyway:
 
@@ -31,9 +31,9 @@ A discussion about the benefits of CGI programming in C++ is beyond the scope of
 
 * C++ has a very large and professional user base, providing a wealth of expertise and experience.
 
-* Billions of lines of C++ code can be reused to reduce development/testing times.
+* Millions of lines of C++ code can be reused to reduce development/testing times.
 
-* In places where RAD (rapid application development) is of the utmost importance, scripting languages can still be used, for instance by using [link __boost_python__ Boost.Python] - though it could be argued that C++ and RAD are not mutually exclusive.
+* In places where RAD (rapid application development) is of the utmost importance, scripting languages can still be used, for instance by using [link __boost_python__ Boost.Python.
 
 * C++ is ['fast]. You can rest assured that the language will never be a bottleneck for your applications.
 
@@ -45,23 +45,47 @@ With web applications becoming increasingly complex and responsive (ie. asynchro
 
 The generally poor support for CGI programming for C++ - most libraries are either unmaintained, or don't take advantage of modern C++ capabilities - has driven the development of this library. [-moremoremore]
 
-[h3 How to use this manual]
+[section:using How to use this manual]
 
 [note
-At the moment, the Boost [@http://www.boost.org/more/lib_guide.htm#Guidelines style guidelines] aren't honoured properly or consistently. Please ignore this for now, as the ambiguity is intentional (['since this [*is not] a Boost library]) and is simple enough to rectify.
+At the moment, the Boost [@http://www.boost.org/more/lib_guide.htm#Guidelines style guidelines] aren't honoured properly or consistently. Please ignore this for now, as the ambiguity is half-intentional (['since this [*is not] a Boost library]). It's simple enough to rectify.
 ]
 
-Start with the introduction, then the tutorial. You can skip the 'scripting' section, as that is a quickstart and the information in it is repeated throughout the rest of the manual. The doxygen header reference is very ugly for now and is going to be heavily reworked and reorganised.
-
 [h4 Naming Conventions]
+
+[h5 Headers]
+
+[table What Headers to Include
+  [[Protocol] [`#include` line]]
+  [[All]      [`#include <boost/cgi.hpp>`]]
+  [[CGI]      [`#include <boost/cgi/cgi.hpp>`]]
+  [[aCGI]     [`#include <boost/cgi/acgi.hpp>`]]
+  [[FastCGI]  [`#include <boost/cgi/fcgi.hpp>`]]
+]
+
+[h5 Namespaces]
+
+The classes/functions that are shared between protocols are in the `cgi::common` namespace. Using the above headers dumps these into the relevant namespace.
+
+[table
+  [[Protocol] [`namespace`]]
+  [[CGI]      [`namespace boost::cgi`
+               `namespace cgi::cgi`]]
+  [[aCGI]     [`namespace boost::acgi`
+               `namespace cgi::acgi`]]
+  [[FastCGI]  [`namespace boost::fcgi`
+               `namespace cgi::fcgi`]]
+]
 
 [h5 Macros]
 
 Macros are prefixed with `BOOST_CGI_*` .
 
+[/ **FIXME**] There aren't any tested public macros yet, when there are they will be listed here.
+
 [h5 Code snippets]
 
-As you are probably used to, it is assumed that code snippets in this manual have the correct `#include`s and "`using namespace cgi;`" prepended to them. Information about the correct headers to include can be found [link __headers__ here].
+As you are probably used to, it is assumed that code snippets in this manual have the correct `#include`s and "`using namespace boost::<protocol>;`" prepended to them.
 
 [h3 Comments and Support]
 
@@ -70,5 +94,7 @@ Use cases, example requests, puzzles and problems should be sent to the mailing 
 ''' &#99;&#103;&#105;-&#116;&#97;&#108;&#107;&#32;&#64;&#32;&#108;&#105;&#115;&#116;&#115;&#46;&#115;&#102;&#32;&#92;&#46;\&#32;n&#101;&#116;'''
 
 or thereabouts.
+
+[endsect][/ using]
 
 [endsect]

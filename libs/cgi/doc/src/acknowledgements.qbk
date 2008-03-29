@@ -7,14 +7,39 @@
 
 [section Acknowledgements]
 
-Provided courtesy of the Google Summer of Code (GSoC '08)!
+The library in its current form was started as part of the Google Summer of Code (GSoC '07) - in my case a union of [@http://code.google.com/soc Google] collaborating with [@http://boost.org Boost]!
 
-Christopher Kohlhoff: for crafting Boost.Asio, which does most of the hard stuff. Chris mentored me through the GSoC (no mean feat!), without which this library would not be in your hands.
+People involved in the development of this library:
 
-Phil Endecott: for offering use-cases and encouragement at the start of the GSoC and for coming up with many further suggestions (such as the Client concept) in the months since.
+* [*Christopher Kohlhoff]: for crafting __asio__, which does most of the hard stuff. Chris mentored me through the GSoC (no mean feat!), without which this library would be neither in your hands, nor modelled the way it is.
 
-The Boost mailing lists: for so many deeply critical and objective comments about the library. :) That, is a relentless and ['Good Thing].
+* [*Phil Endecott]: for offering use-cases and encouragement at the start of the GSoC and for coming up with many further suggestions (such as the Client concept) in the months since.
 
-[-forgetting everyone's names:] Jeff Dunlap
+* [*Peter Simons]: His FastCGI library [@http://cryp.to/libfastcgi libfastcgi] provided initial motivation for this library. Also his article [@http://cryp.to/publications/fastcgi/ "FastCGI - The Forgotten Treasure"] is an good read for those not sold on FastCGI.
+
+Also many thanks to:
+
+* [*Jeff Dunlap]: for help with testing and for pushing the idea of supporting HTML templates. Jeff provided an online version of the amortization example which I aimed to replicate using this library and Google.cTemplate.
+
+* [*Jeff Garland]: for organising access to Boost's SVN repo, being involved in early discussion and probably being involved in my SoC application having any chance. :)
+
+* [*Christian Henning]: for help testing early code.
+
+The [*Boost mailing lists]: for so many helpful and objective comments about the library.
+
+Discussions on the Boost lists included:
+
+* *Martin Wille*
+* *Mathias Gaunard*
+* *Peter Foley*
+* *'Jose'*
+* *'Shams'*
+* *Peter Dimov*
+* *Simon Richter*
+* *Cris Frey*
+* *Sohail Somani*
+* *Jean-Christophe Roux*
+
+[-forgetting everyone's names:] Apologies to anyone missed... tell me, please!
 
 [endsect]
