@@ -1,0 +1,12 @@
+
+[section Server 1]
+
+This is a basic example demonstrating how using a `Server` can make your programs less dependent on a specific protocol.
+
+[import main.cpp]
+
+[fcgi_server1]
+
+[endsect][/ server_1]
+
+

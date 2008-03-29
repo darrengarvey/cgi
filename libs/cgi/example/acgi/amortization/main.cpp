@@ -7,6 +7,8 @@
 //
 ////////////////////////////////////////////////////////////////
 //
+//[acgi_amort
+//
 // Amortization Calculator
 // -----------------------
 //
@@ -116,7 +118,8 @@ void write_amortization_template(Request& req, response& resp)
     // header - followed by a blank line - first though!).
     std::string output;
     tmpl->Expand(&output, &dict);
-    std::cout<< output;
+    std::cout<< "Content-type: text/html\r\n\r\n"
+             << output;
   }else
   if (arg == "2")
   {
@@ -124,32 +127,37 @@ void write_amortization_template(Request& req, response& resp)
     // Should be expensive, but doesn't seem to impact performance hugely...
     std::string output;
     tmpl->Expand(&output, &dict);
-    resp<< output;
+    resp<< content_type("text/html")
+        << output;
   }else
-//  if (arg == "3")
-//  {
-//    // Expand the string to a vector<const_buffer>, which should minimise any
-//    // copying of data. This requires a modified version of Google.cTemplate, but
-//    // doesn't seem to add anything to performance. Will have to check if there's a
-//    // better way to do it. 
-//    std::string s;
-//    std::vector<boost::asio::const_buffer> out;
-//
-//   tmpl->Expand(&s, &out, &dict);
-//    write(req.client(), out);
-//  }else
+  //  if (arg == "3")
+  //  {
+  //    // Expand the string to a vector<const_buffer>, which should minimise any
+  //    // copying of data. This requires a modified version of Google.cTemplate, but
+  //    // doesn't seem to add anything to performance. Will have to check if there's a
+  //    // better way to do it. 
+  //    std::string s;
+  //    std::vector<boost::asio::const_buffer> out;
+  //
+  //   tmpl->Expand(&s, &out, &dict);
+  //    write(req.client(), out);
+  //  }else
   if (arg == "4")
   {
     // Write the output directly to the request's client.
+    std::string headers("Content-type: text/html\r\n\r\n");
+    write(req.client(), buffer(headers));
     std::string output;
     tmpl->Expand(&output, &dict);
     write(req.client(), buffer(output));
   }else
-   if (arg == "5")
+  if (arg == "5")
   {
     // An alternative to { arg == "1" }, which seems to be slightly faster.
     std::string output;
     tmpl->Expand(&output, &dict);
+    const char* headers = "Content-type: text/html\r\n\r\n";
+    std::cout.write(headers, strlen(headers));
     std::cout.write(output.c_str(), output.size());
   }else
   {
@@ -160,7 +168,6 @@ void write_amortization_template(Request& req, response& resp)
 int main()
 {
   try{
-    std::cout<< "Content-type: text/html\r\n\r\n"; // just for debugging
     service s;
     request req(s);
     req.load(true);
@@ -174,4 +181,5 @@ int main()
       << "ERROR!! BOOM!";
   }
 }
+//]
 

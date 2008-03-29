@@ -1,0 +1,14 @@
+
+project cgi.examples.fcgi.server4 ;
+
+exe fcgi_server4 : main.cpp ;
+
+install install
+  :
+    fcgi_server4
+  :
+    <location>$(fcgi-bin)
+  ;
+
+explicit install ;
+

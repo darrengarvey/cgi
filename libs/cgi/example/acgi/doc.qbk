@@ -1,0 +1,11 @@
+
+[section aCGI Examples]
+
+[include hello_world/doc.qbk]
+
+[include echo/doc.qbk]
+
+[include amortization/doc.qbk]
+
+[endsect][/ cgi_examples]
+

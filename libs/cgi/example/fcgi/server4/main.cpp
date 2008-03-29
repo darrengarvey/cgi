@@ -1,4 +1,4 @@
-//                 -- server2/main.hpp --
+//                 -- server4/main.hpp --
 //
 //           Copyright (c) Darren Garvey 2007.
 // Distributed under the Boost Software License, Version 1.0.
@@ -7,7 +7,7 @@
 //
 ////////////////////////////////////////////////////////////////
 //
-//[fcgi_server2
+//[fcgi_server4
 //
 // This example simply echoes all variables back to the user. ie.
 // the environment and the parsed GET, POST and cookie variables.
@@ -21,9 +21,6 @@
 // Unlike in the server1 example, the server class in this example uses
 // asynchronous functions, to increase throughput.
 //
-//
-// **FIXME**
-// This is slower than the server1 example, which is stupid.
 
 #include <fstream>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -34,56 +31,33 @@
 using namespace std;
 using namespace boost::fcgi;
 
-
-// This function writes the title and map contents to the ostream in an
-// HTML-encoded format (to make them easier on the eye).
-template<typename OStream, typename Map>
-void format_map(OStream& os, Map& m, const std::string& title)
-{
-  os<< "<h2>" << title << "</h2>";
-  if (m.empty()) os<< "NONE<br />";
-  for (typename Map::const_iterator i = m.begin(), end = m.end()
-      ; i != end; ++i)
-  {
-    os<< "<b>" << i->first << "</b> = <i>" << i->second << "</i><br />";
-  }
-}
-
 /// Handle one request and return.
 /**
  * If it returns != 0 then an error has occurred. Sets ec to the error_code
  * corresponding to the error.
  */
-int handle_request(fcgi::request& req, boost::system::error_code& ec)
-  {
-    // Construct a `response` object (makes writing/sending responses easier).
-    response resp;
+int handle_request(fcgi::request& req, fcgi::response& resp
+                  , boost::system::error_code& ec)
+{
+  // Responses in CGI programs require at least a 'Content-type' header. The
+  // library provides helpers for several common headers:
+  resp<< content_type("text/html")
+  // You can also stream text to a response object. 
+      << "Hello there, universe!<p />";
 
-    // Responses in CGI programs require at least a 'Content-type' header. The
-    // library provides helpers for several common headers:
-    resp<< content_type("text/html")
-    // You can also stream text to a response object. 
-        << "Hello there, universe!<p />";
+  // Use the function defined above to show some of the request data.
+  //format_map(req.env(), resp, "Environment Variables");
+  //format_map(req.GET(), resp, "GET Variables");
+  //format_map(req.cookie(), resp, "Cookie Variables");
 
-    // Use the function defined above to show some of the request data.
-    format_map(resp, req[env_data], "Environment Variables");
-    format_map(resp, req[get_data], "GET Variables");
-    format_map(resp, req[cookie_data], "Cookie Variables");
+  // Response headers can be added at any time before send/flushing it:
+  resp<< "content-length == " << content_length(resp.content_length())
+      << content_length(resp.content_length());
 
-    //log_<< "Handled request, handling another." << std::endl;
-
-    // This funky macro finishes up:
-    return_(resp, req, 0);
-    // It is equivalent to the below, where the third argument is represented by
-    // `program_status`:
-    //
-    // resp.send(req.client());
-    // req.close(resp.status(), program_status);
-    // return program_status;
-    //
-    // Note: in this case `program_status == 0`.
-  }
-
+  //log_<< "Handled request, handling another." << std::endl;
+  //
+  return 0;
+}
 
 /// The server is used to abstract away protocol-specific setup of requests.
 /**
@@ -100,8 +74,9 @@ public:
   typedef fcgi::service                         service_type;
   typedef fcgi::acceptor                        acceptor_type;
   typedef fcgi::request                         request_type;
+  typedef fcgi::response                        response_type;
   typedef boost::function<
-            int ( request_type&
+            int ( request_type&, response_type&
                 , boost::system::error_code&)
           >                                     function_type;
 
@@ -111,7 +86,7 @@ public:
     , acceptor_(service_)
   {}
 
-  void run(int num_threads = 0)
+  void run(int num_threads = 1)
   {
     // Create a new request (on the heap - uses boost::shared_ptr<>).
     request_type::pointer new_request = request_type::create(service_);
@@ -119,11 +94,14 @@ public:
     requests_.insert(new_request);
 
     start_accept(new_request);
+
+    // Run all asynchronous functions in `num_threads` threads.
     boost::thread_group tgroup;
     for(int i(num_threads); i != 0; --i)
     {
       tgroup.create_thread(boost::bind(&service_type::run, &service_));
     }
+    // Make sure we don't leave this function until all threads have exited.
     tgroup.join_all();
   }
 
@@ -146,11 +124,16 @@ public:
 
     req->load(ec, true);
 
+    boost::shared_ptr<response_type> new_response(new response_type);
+    responses_.insert(new_response);
+
     //req->async_load(boost::bind(&server::handle_request, this
     //                           , req, boost::asio::placeholders::error)
     //               , true);
 
-    service_.post(boost::bind(&server::handle_request, this, req, ec));
+    service_.post(boost::bind(&server::handle_request, this
+                             , req, new_response, ec)
+                 );
 
     // Create a new request (on the heap - uses boost::shared_ptr<>).
     request_type::pointer new_request = request_type::create(service_);
@@ -161,15 +144,18 @@ public:
   }
 
   void handle_request(request_type::pointer req
+                     , boost::shared_ptr<response_type> resp
                      , boost::system::error_code ec)
   {
-    handler_(*req, ec);
-    if (ec)
+    int program_status( handler_(*req, *resp, ec) );
+    if (ec
+     || resp->send(*req, ec)
+     || req->close(resp->status(), program_status, ec))
     {
-      //std::cerr<< "Request handled, but ended in error: " << ec.message()
-      //         << std::endl;
+      std::cerr<< "Couldn't send response/close request." << std::endl;
     }
-    start_accept(req);
+    else
+      start_accept(req);
   }
 
 private:
@@ -177,6 +163,7 @@ private:
   service_type service_;
   acceptor_type acceptor_;
   std::set<request_type::pointer> requests_;
+  std::set<boost::shared_ptr<response_type> > responses_;
 };
 
 int main()
@@ -184,8 +171,8 @@ try
 {
   server s(&handle_request);
 
-  // Run the server with 10 threads handling the asynchronous functions.
-  s.run(10);
+  // Run the server.
+  s.run();
 
   return 0;
   

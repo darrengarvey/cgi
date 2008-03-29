@@ -7,6 +7,8 @@
 //
 ////////////////////////////////////////////////////////////////
 //
+//[fcgi_amort
+//
 // Amortization Calculator
 // -----------------------
 //
@@ -185,7 +187,8 @@ int main()
   try{
 
     service s;
-    acceptor a(s, true);
+    acceptor a(s, true); // The true means default-initialise.
+                         // Unfortunately this only works on linux w. apache for now.
 
     accept_requests(a);
     
@@ -199,4 +202,5 @@ int main()
     std::cerr<< "ERROR!! BOOM!" << std::endl;
   }
 }
+//]
 

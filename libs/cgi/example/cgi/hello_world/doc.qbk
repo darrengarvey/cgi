@@ -1,0 +1,11 @@
+
+[section Hello world]
+
+[import main.cpp]
+
+[cgi_hello_world]
+
+See the [@../../example/cgi/hello_world/main.cpp full source listing].
+
+[endsect][/ hello_world]
+

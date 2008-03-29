@@ -1,0 +1,12 @@
+
+[section Server 3]
+
+This is essentially the same as the Server 1 example, but it runs handles mutiple requests ['simultaneously] by calling `server::run` in a number of threads.
+
+[import main.cpp]
+
+[fcgi_server3]
+
+[endsect][/ server_3]
+
+

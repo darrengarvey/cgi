@@ -1,0 +1,11 @@
+
+[section Echo]
+
+[import main.cpp]
+
+[cgi_echo]
+
+See the [@../../example/cgi/echo/main.cpp full source listing].
+
+[endsect][/ echo]
+

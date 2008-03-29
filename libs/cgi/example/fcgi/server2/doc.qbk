@@ -1,0 +1,14 @@
+
+[section Server 2]
+
+This is a very slight step up from the Server 1 example. It accepts new requests asynchronously, loads them synchronously and then handles them in a background thread while repeating the accept cycle.
+
+The asynchronous functions are run in ten background threads (see `server::run`).
+
+[import main.cpp]
+
+[fcgi_server2]
+
+[endsect][/ server_2]
+
+

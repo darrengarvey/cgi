@@ -7,6 +7,8 @@
 //
 ////////////////////////////////////////////////////////////////
 //
+//[acgi_echo
+//
 // This example simply echoes all variables back to the user. ie.
 // the environment and the parsed GET, POST and cookie variables.
 // Note that GET and cookie variables come from the environment
@@ -15,15 +17,14 @@
 
 #include <boost/cgi/acgi.hpp>
 #include <fstream>
-//#include <google/template.h>
 
 using namespace std;
 using namespace boost::acgi;
 
 // This function writes the title and map contents to the ostream in an
 // HTML-encoded format (to make them easier on the eye).
-template<typename MapT, typename OStreamT>
-void show_map_contents(MapT& m, OStreamT& os, const std::string& title)
+template<typename OStream, Ttypename MapT>
+void show_map_contents(OStreamT& os, MapT& m, const std::string& title)
 {
   os<< "<h3>" << title << "</h3>";
   if (m.empty()) os<< "NONE<br />";
@@ -52,7 +53,7 @@ int main()
       {
         response resp;
         resp
-        << content_type("text/plain")
+        << content_type("text/html")
         << "Error " << ec.value() << ": " << ec.message() << "<p />"
            "--Original message follows--"
            "<p />";
@@ -73,34 +74,43 @@ int main()
              "</form><p />"
              "boundary marker = " << req.boundary_marker() << "<p />";
 
-      show_map_contents(req.GET(), resp, "GET Variables");
-      show_map_contents(req.POST(), resp, "POST Variables");
-      show_map_contents(req.cookie(), resp, "Cookie Variables");
-      show_map_contents(req.env(), resp, "Environment Variables");
+      show_map_contents(resp, req[get_data],    "GET Variables");
+      show_map_contents(resp, req[post_data],   "POST Variables");
+      show_map_contents(resp, req[cookie_data], "Cookie Variables");
+      show_map_contents(resp, req[env_data],    "Environment Variables");
 
-      //resp<< content_type("text/html");
-      resp.send(req.client());
+      return_(resp, req, 0); // All ok.
 
-    }catch(boost::system::error_code& ec){
+    }
+    catch(boost::system::system_error& ec)
+    { // This is the type of error this library throws.
       response resp;
-      resp<< content_type("text/plain") << "Error " << ec.value() << ": "
-          << ec.message();
-    }catch(std::exception& e){
+      resp<< content_type("text/plain") << "Error " << ec.code() << ": "
+          << ec.what()
+          << http::internal_server_error; // note the status_code
+      return_(resp, req, 1);
+    }
+    catch(std::exception* e)
+    {
       response resp;
-      resp<< content_type("text/plain") << "Error: " << e.what();
+      resp<< content_type("text/plain") << "Error: " << e->what()
+          << http::internal_server_error;
       return_(resp, req, 2);
     }
 
+    // The request object will be destroyed before the next exception handlers
+    // are reached.
+
   }catch(std::exception* e){
-    std::cout
+    std::cerr
     << content_type("text/plain").content
     << "Exception: " << e->what();
-    //resp.send(req.client());
     return 3;
   }catch(...){
-    std::cout<< content_type("text/plain").content
+    std::cerr<< content_type("text/plain").content
              << "Unknown error.";
     return 4;
   }
- return 0;
 }
+//]
+

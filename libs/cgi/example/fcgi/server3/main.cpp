@@ -1,4 +1,4 @@
-//                 -- server2/main.hpp --
+//                 -- server3/main.hpp --
 //
 //           Copyright (c) Darren Garvey 2007.
 // Distributed under the Boost Software License, Version 1.0.
@@ -7,7 +7,7 @@
 //
 ////////////////////////////////////////////////////////////////
 //
-//[fcgi_server2
+//[fcgi_server3
 //
 // This example simply echoes all variables back to the user. ie.
 // the environment and the parsed GET, POST and cookie variables.
@@ -17,15 +17,11 @@
 // It is a demonstration of how a 'server' can be used to abstract
 // away the differences between FastCGI and CGI requests.
 //
-// This is very similar to the fcgi_echo and fcgi_server1 examples.
-// Unlike in the server1 example, the server class in this example uses
-// asynchronous functions, to increase throughput.
+// This is very similar to the fcgi_echo example.
 //
-//
-// **FIXME**
-// This is slower than the server1 example, which is stupid.
 
 #include <fstream>
+#include <boost/thread.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/program_options/environment_iterator.hpp>
 
@@ -33,21 +29,6 @@
 
 using namespace std;
 using namespace boost::fcgi;
-
-
-// This function writes the title and map contents to the ostream in an
-// HTML-encoded format (to make them easier on the eye).
-template<typename OStream, typename Map>
-void format_map(OStream& os, Map& m, const std::string& title)
-{
-  os<< "<h2>" << title << "</h2>";
-  if (m.empty()) os<< "NONE<br />";
-  for (typename Map::const_iterator i = m.begin(), end = m.end()
-      ; i != end; ++i)
-  {
-    os<< "<b>" << i->first << "</b> = <i>" << i->second << "</i><br />";
-  }
-}
 
 /// Handle one request and return.
 /**
@@ -61,14 +42,9 @@ int handle_request(fcgi::request& req, boost::system::error_code& ec)
 
     // Responses in CGI programs require at least a 'Content-type' header. The
     // library provides helpers for several common headers:
-    resp<< content_type("text/html")
+    resp<< content_type("text/plain")
     // You can also stream text to a response object. 
-        << "Hello there, universe!<p />";
-
-    // Use the function defined above to show some of the request data.
-    format_map(resp, req[env_data], "Environment Variables");
-    format_map(resp, req[get_data], "GET Variables");
-    format_map(resp, req[cookie_data], "Cookie Variables");
+        << "Hello there, universe!";
 
     //log_<< "Handled request, handling another." << std::endl;
 
@@ -84,7 +60,6 @@ int handle_request(fcgi::request& req, boost::system::error_code& ec)
     // Note: in this case `program_status == 0`.
   }
 
-
 /// The server is used to abstract away protocol-specific setup of requests.
 /**
  * This server only works with FastCGI, but as you can see in the
@@ -97,8 +72,6 @@ int handle_request(fcgi::request& req, boost::system::error_code& ec)
 class server
 {
 public:
-  typedef fcgi::service                         service_type;
-  typedef fcgi::acceptor                        acceptor_type;
   typedef fcgi::request                         request_type;
   typedef boost::function<
             int ( request_type&
@@ -111,71 +84,41 @@ public:
     , acceptor_(service_)
   {}
 
-  void run(int num_threads = 0)
+  int run()
   {
     // Create a new request (on the heap - uses boost::shared_ptr<>).
     request_type::pointer new_request = request_type::create(service_);
     // Add the request to the set of existing requests.
     requests_.insert(new_request);
-
-    start_accept(new_request);
-    boost::thread_group tgroup;
-    for(int i(num_threads); i != 0; --i)
+    
+    int ret(0);
+    for (;;)
     {
-      tgroup.create_thread(boost::bind(&service_type::run, &service_));
+      boost::system::error_code ec;
+
+      acceptor_.accept(*new_request, ec);
+
+      if (ec) 
+      {
+        std::cerr<< "Error accepting: " << ec.message() << std::endl;
+        return 5;
+      }
+  
+      // Load in the request data so we can access it easily.
+      new_request->load(ec, true); // The 'true' means read and parse POST data.
+
+      ret = handler_(*new_request, ec);
+
+      if (ret)
+        break;
     }
-    tgroup.join_all();
-  }
-
-  void start_accept(request_type::pointer& new_request)
-  {
-    acceptor_.async_accept(*new_request, boost::bind(&server::handle_accept
-                                                    , this, new_request
-                                                    , boost::asio::placeholders::error)
-                          );
-  }
-
-  void handle_accept(request_type::pointer req  
-                    , boost::system::error_code ec)
-  {
-    if (ec)
-    {
-      //std::cerr<< "Error accepting request: " << ec.message() << std::endl;
-      return;
-    }
-
-    req->load(ec, true);
-
-    //req->async_load(boost::bind(&server::handle_request, this
-    //                           , req, boost::asio::placeholders::error)
-    //               , true);
-
-    service_.post(boost::bind(&server::handle_request, this, req, ec));
-
-    // Create a new request (on the heap - uses boost::shared_ptr<>).
-    request_type::pointer new_request = request_type::create(service_);
-    // Add the request to the set of existing requests.
-    requests_.insert(new_request);
-
-    start_accept(new_request);
-  }
-
-  void handle_request(request_type::pointer req
-                     , boost::system::error_code ec)
-  {
-    handler_(*req, ec);
-    if (ec)
-    {
-      //std::cerr<< "Request handled, but ended in error: " << ec.message()
-      //         << std::endl;
-    }
-    start_accept(req);
+    return ret;
   }
 
 private:
   function_type handler_;
-  service_type service_;
-  acceptor_type acceptor_;
+  fcgi::service service_;
+  fcgi::acceptor acceptor_;
   std::set<request_type::pointer> requests_;
 };
 
@@ -184,10 +127,14 @@ try
 {
   server s(&handle_request);
 
-  // Run the server with 10 threads handling the asynchronous functions.
-  s.run(10);
-
-  return 0;
+  // Run the server in ten threads.
+  // => Handle ten requests simultaneously
+  boost::thread_group tgroup;
+  for(int i(10); i != 0; --i)
+  {
+    tgroup.create_thread(boost::bind(&server::run, &s));
+  }
+  tgroup.join_all();
   
 }catch(boost::system::system_error& se){
   cerr<< "[fcgi] System error: " << se.what() << endl;

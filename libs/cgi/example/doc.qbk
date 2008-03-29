@@ -1,0 +1,31 @@
+
+[section Examples]
+
+The examples can be built by going into their directory and typing `bjam`. If you have a server set up and wish to test the applications behind them, you can automatically copy them to your server's cgi-bin (or fcgi-bin or scgi-bin) one of two ways:
+
+[h4 Command Line]
+
+``$ bjam install --cgi-bin=/usr/lib/cgi-bin``
+
+Installs the CGI program (or set of programs) into `/usr/lib/cgi-bin`. If you want to install FastCGI examples from the `/libs/cgi/example/fcgi/` directory, for instance, type the above but replace `--cgi-bin=...` with `--fcgi-bin=...`.
+
+[h4 Environment Variables]
+
+Set the environment variable(s) `BOOST_CGI_BIN_PATH` (or `BOOST_FCGI_BIN_PATH`/`BOOST_SCGI_BIN_PATH`), then type:
+
+``$ bjam install``
+
+The example(s) will be installed into the relevant directory.
+
+[note
+  The command line option will override the environment variable, so you can use the environment variables for default installation.
+]
+
+[include cgi/doc.qbk]
+
+[include acgi/doc.qbk]
+
+[include fcgi/doc.qbk]
+
+[endsect]
+

@@ -1,0 +1,13 @@
+
+[section Amortization]
+
+This example uses Google.cTemplate to move HTML out of the program and into HTML template files, which would be easily editable by anyone familiar with HTML.
+
+[import main.cpp]
+
+[acgi_amort]
+
+See the [@../../example/acgi/amortization/main.cpp full source listing].
+
+[endsect][/ echo]
+
