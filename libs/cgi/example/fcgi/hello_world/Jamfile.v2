@@ -4,22 +4,18 @@
 #     (See accompanying file LICENSE_1_0.txt or copy 
 #        at http://www.boost.org/LICENSE_1_0.txt)
 
-project boost/cgi/example/cgi/echo ;
+project boost/cgi/example/fcgi/hello_world ;
 
-exe cgi_echo
-  : main.cpp
-    /boost/thread/
-    /boost/regex/
-  ;
-
+exe fcgi_hello_world : main.cpp /boost/regex/ ;
 
 # Our install rule (builds binaries and copies them to <location>)
 install install
- : cgi_echo
  :
- :
- <location>$(LOCATION)
+   fcgi_hello_world
+ : 
+   <location>$(fcgi-bin)
  ;
 
 # Only install example if you use `bjam install' or equivalent
 explicit install ;
+

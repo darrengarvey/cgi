@@ -23,12 +23,12 @@ using namespace boost::acgi;
 
 // This function writes the title and map contents to the ostream in an
 // HTML-encoded format (to make them easier on the eye).
-template<typename OStream, Ttypename MapT>
+template<typename OStreamT, typename MapT>
 void show_map_contents(OStreamT& os, MapT& m, const std::string& title)
 {
   os<< "<h3>" << title << "</h3>";
   if (m.empty()) os<< "NONE<br />";
-  for (typename MapT::iterator i = m.begin(); i != m.end(); ++i)
+  for (typename MapT::const_iterator i = m.begin(); i != m.end(); ++i)
   {
     os<< "<b>" << i->first << "</b> = <i>" << i->second << "</i><br />";
   }

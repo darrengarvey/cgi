@@ -4,18 +4,25 @@
 #     (See accompanying file LICENSE_1_0.txt or copy 
 #        at http://www.boost.org/LICENSE_1_0.txt)
 
-project boost.cgi.examples.acgi ;
+project boost/cgi/example/acgi ;
 
-# Install all acgi examples to the user-provided variable "cgi-bin"
+# By default, just build the examples
+build-project hello_world ;
+build-project echo ;
+build-project cookie_game ;
+build-project amortization ;
+
+# If the user explicitly passes "install" on the command line, build the
+# CGI examples and copy them to $(cgi-bin)
 install install
   :
     hello_world
     echo
     cookie_game
-    login
+    amortization
   :
     <location>$(cgi-bin)
   ;
 
-# Only install example if you use `bjam install' or equivalent
 explicit install ;
+

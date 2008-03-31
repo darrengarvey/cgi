@@ -1,31 +1,29 @@
-#             Copyright (c) 2007 Darren Garvey
+#           Copyright (c) 2007, 2008 Darren Garvey
 #
 # Distributed under the Boost Software License, Version 1.0.
 #     (See accompanying file LICENSE_1_0.txt or copy 
 #        at http://www.boost.org/LICENSE_1_0.txt)
 
-project boost/cgi/example/cgi
-  ;
+project boost/cgi/example/fcgi ;
 
 # By default, just build the examples
 build-project hello_world ;
 build-project echo ;
-#install stage
-#  :
-#    hello_world
-#    echo
-#  :
-#    <location>$(bin-dir)
-#  ;
+build-project server1 ;
+build-project server2 ;
+build-project server3 ;
 
 # If the user explicitly passes "install" on the command line, build the
-# CGI examples and copy them to $(cgi-bin)
+# FastCGI examples and copy them to $(fcgi-bin)
 install install
   :
     hello_world
     echo
+    server1
+    server2
+    server3
   :
-    <location>$(cgi-bin)
+    <location>$(fcgi-bin)
   ;
 
 explicit install ;

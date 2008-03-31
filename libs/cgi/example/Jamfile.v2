@@ -4,32 +4,43 @@
 #     (See accompanying file LICENSE_1_0.txt or copy 
 #        at http://www.boost.org/LICENSE_1_0.txt)
 
-project boost.cgi.examples
-  : requirements
+project boost/cgi/example
+: requirements
       <library>/boost/system/
       <library>/boost/thread/
   ;
 
-# Install all of the acgi examples
-install acgi
+# Build all of the cgi examples
+build-project cgi ;
+# Build all of the acgi examples
+build-project acgi ;
+# Build all of the fcgi examples
+build-project fcgi ;
+
+install cgi-install
+ : # sources
+   cgi//install
+ :
+   <location>$(cgi-bin)
+ ;
+
+install acgi-install
  : # sources
    acgi//install
  :
    <location>$(cgi-bin)
  ;
 
-explicit acgi ;
+install fcgi-install
+  :
+    fcgi//install
+  :
+    <location>$(fcgi-bin)
+  ;
 
-#install examples
-#  : # the sources
-#    ecgi
-#    acgi
-#    #reply
-#  : <location>/var/www/cgi-bin
-#  ;
+explicit cgi-install  ;
+explicit acgi-install ;
+explicit fcgi-install ;
 
-#install scgi
-#  : # the sources
-#    scgi
-#  : <location>/var/www/scgi-bin
-#  ;
+explicit install ;
+

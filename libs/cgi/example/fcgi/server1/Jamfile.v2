@@ -1,5 +1,5 @@
 
-project cgi.examples.fcgi.sync_server ;
+project boost/cgi/example/fcgi/server1 ;
 
 exe fcgi_server1 : main.cpp ;
 

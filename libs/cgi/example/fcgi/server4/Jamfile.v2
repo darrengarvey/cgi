@@ -1,5 +1,5 @@
 
-project cgi.examples.fcgi.server4 ;
+project boost/cgi/example/fcgi/server4 ;
 
 exe fcgi_server4 : main.cpp ;
 

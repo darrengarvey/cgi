@@ -4,8 +4,7 @@
 #     (See accompanying file LICENSE_1_0.txt or copy 
 #        at http://www.boost.org/LICENSE_1_0.txt)
 
-project boost.cgi.examples.acgi.hello_world
- ;
+project boost/cgi/example/acgi/hello_world ;
 
 exe acgi_hello_world : main.cpp /boost/regex/ ;
 

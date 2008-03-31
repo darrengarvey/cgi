@@ -5,7 +5,7 @@
 #        at http://www.boost.org/LICENSE_1_0.txt)
 
 # A symbolic name for this project.
-project boost.cgi.examples.acgi.amortization ;
+project boost/cgi/example/acgi/amortization ;
 
 import os ;
 
@@ -30,7 +30,7 @@ exe acgi_amort
   ;
 
 # Our install rule (builds binaries and copies them to <location>)
-install install
+install install-app
  :
    acgi_amort
    acgi_amort.tpl
@@ -48,5 +48,15 @@ install install-extra
    <location>$(htdocs)
  ;
 
+explicit install-app ;
+explicit install-extra ;
+
+install install
+  :
+    install-app
+    install-extra
+  ;
+
 # Only install example if you use `bjam install' or equivalent
 explicit install ;
+
