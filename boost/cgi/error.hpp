@@ -50,7 +50,14 @@ enum fcgi_errors
   // allowed.
   accepting_on_an_open_request,
 
-  invalid_socket
+  invalid_socket,
+
+  // Used in basic_connection<tags::stdio>
+  // **FIXME**
+  broken_pipe,
+
+  // **FIXME**
+  bad_read
 };
 
   namespace detail {

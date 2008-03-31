@@ -16,7 +16,6 @@
 
 #include "boost/cgi/detail/push_options.hpp"
 
-#include <iostream>
 #include <boost/noncopyable.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/assert.hpp>
@@ -29,7 +28,7 @@
 #include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/request_base.hpp"
 #include "boost/cgi/role_type.hpp"
-#include "boost/cgi/data_sink.hpp"
+#include "boost/cgi/data_source.hpp"
 #include "boost/cgi/status_type.hpp"
 #include "boost/cgi/is_async.hpp"
 #include "boost/cgi/connection_base.hpp"
@@ -647,6 +646,21 @@ namespace cgi {
     std::string boundary_marker()
     {
       return this->implementation.boundary_marker;
+    }
+
+    map_type& operator[](common::data_source source)
+    {
+      switch(source)
+      {
+      case get_data:    return this->implementation.get_vars_;
+      case post_data:   return this->implementation.post_vars_;
+      case cookie_data: return this->implementation.cookie_vars_;
+      case env_data:    return this->implementation.env_vars_;
+      case form_data:
+        std::string rm( request_method() );
+        if (rm == "GET") return this->implementation.get_vars_;
+        else if (rm == "POST") return this->implementation.post_vars_;
+      }
     }
   };
 

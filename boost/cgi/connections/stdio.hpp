@@ -9,9 +9,7 @@
 #ifndef CGI_STDIO_CONNECTION_IMPL_HPP_INCLUDED__
 #define CGI_STDIO_CONNECTION_IMPL_HPP_INCLUDED__
 
-#include <iostream>
-#include <istream>
-#include <ostream>
+#include <cstdio>
 #include <string>
 #include <boost/system/error_code.hpp>
 #include <boost/asio.hpp>
@@ -19,7 +17,7 @@
 #include "boost/cgi/basic_connection_fwd.hpp"
 #include "boost/cgi/tags.hpp"
 #include "boost/cgi/connection_base.hpp"
-#include "boost/cgi/data_sink.hpp"
+#include "boost/cgi/error.hpp"
 //#include "boost/cgi/io_service.hpp"
 
 namespace cgi {
@@ -75,6 +73,7 @@ namespace cgi {
       //         << "before = {" << std::endl
       //         << std::string(boost::asio::buffer_cast<char *>(buf), boost::asio::buffer_size(buf)) << std::endl
       //         << "}" << std::endl;
+      /*
       std::cin.read(boost::asio::buffer_cast<char *>(buf)
                    , boost::asio::buffer_size(buf));
       if (std::cin.fail() && !std::cin.eof())
@@ -87,6 +86,24 @@ namespace cgi {
       //         << std::string(boost::asio::buffer_cast<char *>(buf), boost::asio::buffer_size(buf)) << std::endl
       //         << "}" << std::endl;
       return std::cin.gcount();
+      */
+      if (!std::fgets(boost::asio::buffer_cast<char *>(buf)
+                     , boost::asio::buffer_size(buf)
+                     , stdin))
+      {
+        return ::cgi::error::bad_read;
+      }
+      int len( strlen(boost::asio::buffer_cast<char *>(buf)) );
+      // Not sure what to do about EOF yet.
+      //if (len < boost::asio::buffer_size(buf))
+      //{
+      //  return ::cgi::error::eof;
+      //}
+      std::cerr<< "Read data" << std::endl
+               << "after = {" << std::endl
+               << std::string(boost::asio::buffer_cast<char *>(buf), boost::asio::buffer_size(buf)) << std::endl
+               << "}" << std::endl;
+      return len;
     }
 
     template<typename ConstBufferSequence>
@@ -99,7 +116,16 @@ namespace cgi {
       {
         std::size_t buf_len = boost::asio::buffer_size(*i);
         bytes_transferred += buf_len;
-        std::cout.write(boost::asio::buffer_cast<const char*>(*i), buf_len);
+        int ret( fputs(boost::asio::buffer_cast<const char*>(*i), stdout) );
+        if (ret == EOF)
+        {
+          return ::cgi::error::broken_pipe;
+        }
+        //else
+        //if (ret < 0)
+        //{
+        //  return ::cgi::error::
+        //std::cout.write(boost::asio::buffer_cast<const char*>(*i), buf_len);
       }
       return bytes_transferred;
     }

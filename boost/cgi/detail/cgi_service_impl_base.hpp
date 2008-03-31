@@ -5,7 +5,6 @@
 
 #include <string>
 #include <cstdlib>
-#include <iostream>
 #include <boost/assert.hpp>
 #include <boost/regex.hpp>
 #include <boost/tokenizer.hpp>
@@ -30,9 +29,6 @@ namespace cgi {
 
 
  } // namespace detail
-
-  using std::cerr; // **FIXME**
-  using std::endl; // **FIXME**
 
 
   template<typename RequestImplType>
@@ -110,7 +106,7 @@ namespace cgi {
       {
         
         std::size_t bufsz( buf_.size() );
-        cerr<< "bufsz    = " << bufsz << endl;
+        //cerr<< "bufsz    = " << bufsz << endl;
 
         // Reserve more space if it's needed.
         // (this could be safer, referencing this against CONTENT_LENGTH)
@@ -119,13 +115,13 @@ namespace cgi {
           buf_.resize(bufsz + size);
         //}
 
-        cerr<< "Pre-read buffer (size: " << buf_.size() 
-            << "|capacity: " << buf_.capacity() << ") == {" << endl
-            << std::string(buf_.begin() + offset_, buf_.end()) << endl
+        //cerr<< "Pre-read buffer (size: " << buf_.size() 
+         //   << "|capacity: " << buf_.capacity() << ") == {" << endl
+        //    << std::string(buf_.begin() + offset_, buf_.end()) << endl
    //         << "-----end buffer-----" << endl
    //         << "-------buffer-------" << endl
   //          << std::string(&buf_[0], &buf_[buf_.size()]) << endl
-            << "}" << endl;
+        //    << "}" << endl;
             ;
         //return boost::asio::buffer(&(*(buf_.end())), size);
   //      return boost::asio::buffer(&(*(buf_.begin())) + bufsz, size);
@@ -473,7 +469,7 @@ namespace cgi {
       //parse_one_form_part(impl, ec);
       move_to_start_of_first_part(impl, ec);
       if (ec == boost::asio::error::eof) {
-        cerr<< " -- Parsing done -- " << endl;
+        //cerr<< " -- Parsing done -- " << endl;
         //return ec.clear();
         return boost::system::error_code();
       }
@@ -519,7 +515,7 @@ namespace cgi {
       }
       
       regex += ")(--)?[ ]*\\x0D\\x0A";
-      cerr<< "Regex: " << regex << endl;
+      //cerr<< "Regex: " << regex << endl;
       boost::regex re(regex);
       
       typedef typename
@@ -529,7 +525,7 @@ namespace cgi {
       boost::match_results<buffer_iter> matches;
 
       std::size_t offset = impl.offset_;
-      cerr<< "offset = " << offset << endl;
+      //cerr<< "offset = " << offset << endl;
 
       //int runs = 0;
       buffer_iter begin(impl.buf_.begin() + offset);
@@ -537,14 +533,14 @@ namespace cgi {
 
       for(;;)
       {
-        cerr<< "Starting regex_search" << endl;
+        //cerr<< "Starting regex_search" << endl;
         if (!boost::regex_search(begin, end, matches, re
                                 , boost::match_default
                                 | boost::match_partial))
         {
-          cerr<< "Can't match any of this. {" << endl
-              << std::string(begin, end) << endl
-              << "}" << endl;
+         // cerr<< "Can't match any of this. {" << endl
+          //    << std::string(begin, end) << endl
+          //    << "}" << endl;
           return boost::system::error_code(345, boost::system::system_category);
         }
         else
@@ -553,9 +549,9 @@ namespace cgi {
           {
             if (matches[i].length())
             {
-              cerr<< "[" << i << "] == {" << endl
-                  << matches[i] << endl
-                  << "}" << endl;
+            //  cerr<< "[" << i << "] == {" << endl
+            //      << matches[i] << endl
+            //      << "}" << endl;
             }
           }
           //  cerr<< "matches[0] = {" << endl
@@ -566,15 +562,15 @@ namespace cgi {
             impl.form_parts_.back().buffer_
              // = boost::range_iterator<;
              = std::make_pair(matches[1].first, matches[1].second);
-            cerr<< "Saved buffer (size: "
-                << std::distance(matches[1].first, matches[1].second)
-                << ") := { " << impl.form_parts_.back().name << ", " << matches[1] << " }" << endl;
+           // cerr<< "Saved buffer (size: "
+           //     << std::distance(matches[1].first, matches[1].second)
+           //     << ") := { " << impl.form_parts_.back().name << ", " << matches[1] << " }" << endl;
             impl.post_vars()[impl.form_parts_.back().name] = matches[1];
             impl.offset_ = offset + matches[0].length();
             //offset += matches[0].length();
             impl.pos_ = matches[0].second;
-            cerr<< "offset := " << offset << endl
-                << "impl.offset_ := " << impl.offset_ << endl;
+            //cerr<< "offset := " << offset << endl
+              //  << "impl.offset_ := " << impl.offset_ << endl;
 
             if (matches[3].matched)
               impl.stdin_parsed_ = true;
@@ -587,7 +583,7 @@ namespace cgi {
           }
           else
           {
-            cerr<< "Reading more data." << endl;
+            //cerr<< "Reading more data." << endl;
             std::size_t bytes_read = impl.client_.read_some(impl.prepare(64), ec);
             //impl.stdin_bytes_read_ += bytes_read;
             
@@ -599,13 +595,13 @@ namespace cgi {
 
             begin = impl.buf_.begin() + offset;
             end = impl.buf_.end();
-            cerr<< "Buffer (+" << bytes_read << ") == {" << endl
-                << std::string(begin, end) << endl
-                << "}" << endl;
+            //cerr<< "Buffer (+" << bytes_read << ") == {" << endl
+            //    << std::string(begin, end) << endl
+            //    << "}" << endl;
 
             if (ec)
             {
-              cerr<< "Error in parse_form_part_data()." << endl;
+              //cerr<< "Error in parse_form_part_data()." << endl;
               return ec;
             }
 
@@ -678,10 +674,10 @@ namespace cgi {
       > matches;
       
       std::size_t offset = impl.offset_;
-      cerr.flush();
+      //cerr.flush();
       impl.pos_ = impl.buf_.begin();
       int runs = 0;
-      cerr<< "Entering for() loop." << endl;
+      //cerr<< "Entering for() loop." << endl;
       std::size_t bytes_read = 0;
       for(;;)
       {
@@ -691,18 +687,18 @@ namespace cgi {
         if (!boost::regex_search(begin, end, matches, re
                                 , boost::match_default | boost::match_partial))
         {
-          cerr<< "No chance of a match, quitting." << endl;
+          //cerr<< "No chance of a match, quitting." << endl;
           impl.stdin_parsed_ = true;
           return ec;
         }
-        cerr<< "matches.str() == {" << endl
-            << matches.str() << endl
-            << "}" << endl
-            << matches.size() << " submatches" << endl;
-        for (unsigned i = matches.size(); i != 0; --i)
-        {
-          cerr<< "match[" << i << "] := { " << matches[i] << " }" << endl;
-        }
+        //cerr<< "matches.str() == {" << endl
+         //   << matches.str() << endl
+         //   << "}" << endl
+         //   << matches.size() << " submatches" << endl;
+       // for (unsigned i = matches.size(); i != 0; --i)
+       // {
+          //cerr<< "match[" << i << "] := { " << matches[i] << " }" << endl;
+        //}
         if (matches[0].matched)
         {
           common::form_part part;
@@ -715,13 +711,13 @@ namespace cgi {
            if (matches[i].str() == "name")
             {
               part.name = matches[i+1];
-              cerr<< "Saved name" << endl;
+          //    cerr<< "Saved name" << endl;
             }
             else
             {
               part.meta_data_[matches[i]]
                 = std::make_pair(matches[i+1].first, matches[i+1].second);
-              cerr<< "Part := { " << matches[i] << ", " << matches[i+1] << " }" << endl;
+           //   cerr<< "Part := { " << matches[i] << ", " << matches[i+1] << " }" << endl;
               //= boost::iterator_range<buffer_iter>(matches[3].first, matches[3].second);
             }
             impl.form_parts_.push_back(part);
@@ -738,7 +734,7 @@ namespace cgi {
            //cerr<< "Current buffer == {" << endl
            //    << impl.buffer_string() << endl
            //    << "}" << endl;
-           cerr<< "Leaving parse_form_part_meta_data()" << endl;
+           //cerr<< "Leaving parse_form_part_meta_data()" << endl;
            return ec;
          }
          else
@@ -747,18 +743,18 @@ namespace cgi {
          }
          
         }else{
-          cerr<< "Not read enough data yet, reading more." << endl;
+         // cerr<< "Not read enough data yet, reading more." << endl;
           bytes_read = impl.client_.read_some(impl.prepare(64), ec);
           if (ec)
           {
-            cerr<< "Error reading data: " << ec.message() << endl;
-            cerr<< "Leaving parse_form_part_meta_data()" << endl;
+          //  cerr<< "Error reading data: " << ec.message() << endl;
+           // cerr<< "Leaving parse_form_part_meta_data()" << endl;
             return ec;
           }
-          cerr<< "Read " << bytes_read << " bytes." << endl;
-          cerr<< "buffer = {" << endl
-              << impl.buffer_string() << endl
-              << "} or {" << endl;
+         // cerr<< "Read " << bytes_read << " bytes." << endl;
+          //cerr<< "buffer = {" << endl
+           //   << impl.buffer_string() << endl
+             // << "} or {" << endl;
               //<< std::string(impl.pos_, ;
           /*
           for (unsigned int i = 0; i < matches.size(); ++i)
@@ -777,13 +773,13 @@ namespace cgi {
           //offset = impl.buf_.end();
             if (++runs > 40)
             {
-              cerr<< "Run 40 times; bailing out." << endl;
+             // cerr<< "Run 40 times; bailing out." << endl;
               break;
             }
-          cerr<< "Waiting buffer (unparsed) == {" << endl << std::flush
-              << impl.buffer_string() << endl
-              << "}" << endl
-              << "offset     = " << offset     << endl;
+         // cerr<< "Waiting buffer (unparsed) == {" << endl << std::flush
+          //    << impl.buffer_string() << endl
+           //   << "}" << endl
+            //  << "offset     = " << offset     << endl;
         //if (bytes_read == 0)
         //  break;
        }
@@ -791,7 +787,7 @@ namespace cgi {
 
       //cerr<< "impl.part
 
-      cerr<< "Leaving parse_form_part_meta_data()" << endl;
+ //     cerr<< "Leaving parse_form_part_meta_data()" << endl;
       return ec;
     }
 
@@ -843,7 +839,7 @@ namespace cgi {
           //std::cerr<< " == buffer = " << std::string(impl.buf_.begin(), impl.buf_.end())
           //         << " == capacity = " << impl.buf_.capacity() << " ======= ";
           //impl.buf_.clear();
-          cerr<< "No chance of matching." << endl;
+   //       cerr<< "No chance of matching." << endl;
           offset = impl.buf_.size();
           //std::cerr<< "Buffer cleared." << endl;
           continue;
@@ -855,7 +851,7 @@ namespace cgi {
           //         << "matches[1] =={{ " << matches[1] << " }}=== " << std::endl
           //         << "matches[2] =={{ " << matches[2] << " }}=== " << std::endl;
           if (matches[2].matched){
-            cerr<< "Found boundary marker... OK!!" << endl;
+    //        cerr<< "Found boundary marker... OK!!" << endl;
             //cerr<< "[0] = " << matches[0].str() << endl;
             //cerr<< "[1] = " << matches[1].str() << endl;
             //impl.offset_ = matches[1].length();
@@ -871,15 +867,15 @@ namespace cgi {
             //    << "}" << endl;
             //cerr<< "bufsize = " << impl.buf_.size() << endl;
             //cerr<< "bufsize = " << impl.buf_.size() << endl;
-            cerr<< "buffer now (before erase) == {" << endl
-                << std::string(impl.buf_.begin(), impl.buf_.end()) << endl
-                << "}" << endl;
+      //      cerr<< "buffer now (before erase) == {" << endl
+        //        << std::string(impl.buf_.begin(), impl.buf_.end()) << endl
+          //      << "}" << endl;
             impl.buf_.erase(impl.buf_.begin(), matches[0].second);
             impl.offset_ = 0;
             impl.pos_ = impl.buf_.begin();
             return ec;
           } else {
-            cerr<< "not read enough data" << std::endl;
+          //  cerr<< "not read enough data" << std::endl;
       //std::cerr<< "; bytes_read = " << bytes_read
         //      << "; bufsize = " << impl.buf_.size() 
           //     << "; capacity = " << impl.buf_.capacity() << std::flush

@@ -68,7 +68,7 @@ namespace cgi {
     conn_ptr& connection()           { return connection_;     }
     //std::string& null_str()          { return null_str_;       }
 
-  protected:
+  public:
     //conn_ptr connection() { return connection_; }
 
     //friend class cgi_service_impl_base<RequestImpl>;

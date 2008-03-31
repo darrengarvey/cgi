@@ -14,11 +14,17 @@ namespace cgi {
   enum source
   { stdin_ };
 
- namespace data_source {
+ namespace common {
 
-   //struct stdin_ {};
-
- } // namespace data_source
+  enum data_source
+  { get_data
+  , post_data
+  , cookie_data
+  , env_data
+  , form_data
+  };
+ 
+ } // namespace common
 } // namespace cgi
 
 #endif // CGI_DATA_SOURCE_HPP_INCLUDED__
