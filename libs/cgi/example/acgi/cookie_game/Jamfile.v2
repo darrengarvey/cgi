@@ -4,15 +4,14 @@
 #     (See accompanying file LICENSE_1_0.txt or copy 
 #        at http://www.boost.org/LICENSE_1_0.txt)
 
-project boost.cgi.examples.acgi.cookie_game
-  ;
+project boost/cgi/example/acgi/cookie_game ;
 
-exe acgi : main.cpp ;
+exe acgi_cookie_game : main.cpp /boost/regex/ ;
 
 # Our install rule (builds binaries and copies them to <location>)
 install install 
   : 
-    acgi
+    acgi_cookie_game
   : 
     <location>$(cgi-bin)
   ;

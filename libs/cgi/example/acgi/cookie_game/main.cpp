@@ -60,7 +60,7 @@ int main()
   }
 
   // First, see if they have a cookie set
-  std::string& name = req.cookie()["name"];
+  std::string name = req[cookie_data]["name"];
   if (!name.empty())
   {
     resp<< header("Content-type", "text/html")
@@ -71,7 +71,7 @@ int main()
   }
 
   // Now we'll check if they sent us a name in a form
-  name = req.form("name");
+  name = req[form_data]["name"];
   if (!name.empty())
   {
     resp<< header("Content-type", "text/html")
@@ -92,7 +92,7 @@ int main()
   std::cerr.flush();
 
   resp<< "<form method='POST'>"
-         "<input name='name' type='text' value='" << req.form("name") << "'>"
+         "<input name='name' type='text' value='" << req[form_data]["name"] << "'>"
          "</input>"
          "<input type='submit'></input>"
          "</form>"
