@@ -547,15 +547,15 @@ namespace cgi {
     // **FIXME**
     void handle_admin_request(implementation_type& impl)
     {
-      std::cerr<< std::endl << "**FIXME** " << __FILE__ << ":" << __LINE__ 
-        << " handle_admin_request()" << std::endl;
+      //std::cerr<< std::endl << "**FIXME** " << __FILE__ << ":" << __LINE__ 
+      //  << " handle_admin_request()" << std::endl;
     }
 
     // **FIXME**
     void handle_other_request_header(implementation_type& impl)
     {
-      std::cerr<< std::endl << "**FIXME** " << __FILE__ << ":" << __LINE__ 
-        << " handle_other_request_header()" << std::endl;
+      //std::cerr<< std::endl << "**FIXME** " << __FILE__ << ":" << __LINE__ 
+      //  << " handle_other_request_header()" << std::endl;
     }
 
     // **FIXME**    
@@ -575,8 +575,8 @@ namespace cgi {
         return ec;
       }
       try {
-        std::cerr<< "**FIXME** request aborted (id = " << id
-          << ") but request not notified." << std::endl;
+        //std::cerr<< "**FIXME** request aborted (id = " << id
+        //  << ") but request not notified." << std::endl;
         //impl.client_.connection_->requests_.at(id - 1)->abort();
       }catch(...){
         ec = error::abort_request_record_recieved_for_invalid_request;
@@ -725,8 +725,8 @@ namespace cgi {
       }else
       if (!state)
       { // The header is confusing; something's wrong. Abort.
-        std::cerr<< "Bad header received (this isn't implemented properly yet"
-            << std::endl;
+        //std::cerr<< "Bad header received (this isn't implemented properly yet"
+        //    << std::endl;
         return error::bad_header_type;
       }
       // else route (ie. state == boost::indeterminate)

@@ -9,6 +9,11 @@
 #ifndef CGI_REQUEST_OSTREAM_HPP_INCLUDED__
 #define CGI_REQUEST_OSTREAM_HPP_INCLUDED__
 
+#if 0 
+
+// THIS FILE ISN'T USED!
+// **FIXME**
+ 
 /*********************************
 ISSUES:
 -------
@@ -357,5 +362,7 @@ namespace cgi {
 } // namespace cgi
 
 #include "boost/cgi/detail/pop_options.hpp"
+
+#endif 
 
 #endif // CGI_REQUEST_OSTREAM_HPP_INCLUDED__

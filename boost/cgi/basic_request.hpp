@@ -642,12 +642,6 @@ namespace cgi {
       this->service.set_status(this->implementation, status);
     }
 
-    // The boundary marker for multipart forms (this is likely a transient function).
-    std::string boundary_marker()
-    {
-      return this->implementation.boundary_marker;
-    }
-
     map_type& operator[](common::data_source source)
     {
       switch(source)
@@ -657,9 +651,11 @@ namespace cgi {
       case cookie_data: return this->implementation.cookie_vars_;
       case env_data:    return this->implementation.env_vars_;
       case form_data:
+      default:
         std::string rm( request_method() );
-        if (rm == "GET") return this->implementation.get_vars_;
+        if (rm == "GET")       return this->implementation.get_vars_;
         else if (rm == "POST") return this->implementation.post_vars_;
+        else                   return this->implementation.env_vars_;
       }
     }
   };

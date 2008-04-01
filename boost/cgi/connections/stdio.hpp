@@ -60,11 +60,11 @@ namespace cgi {
     std::size_t read_some(MutableBufferSequence buf
                          , boost::system::error_code& ec)
     {
-      if (std::cin.eof())
-      {
+      //if (std::cin.eof())
+      //{
         //ec = boost::asio::error::eof;
-        return boost::asio::error::eof;
-      }
+      //  return boost::asio::error::eof;
+      //}
       //if( buf.data() != in_.rdbuf() )
       //  return in_.read(buf.begin(), buf.size());
       //return buf.size();
@@ -81,29 +81,27 @@ namespace cgi {
         ec = boost::system::error_code(654, boost::system::system_category);
         return 0;
       }
-      //std::cerr<< "Read data" << std::endl
-      //         << "after = {" << std::endl
+      */
+      //std::cerr<< "before = {" << std::endl
       //         << std::string(boost::asio::buffer_cast<char *>(buf), boost::asio::buffer_size(buf)) << std::endl
       //         << "}" << std::endl;
-      return std::cin.gcount();
-      */
-      if (!std::fgets(boost::asio::buffer_cast<char *>(buf)
-                     , boost::asio::buffer_size(buf)
-                     , stdin))
+      
+      if (std::fread(boost::asio::buffer_cast<void *>(buf)
+                    , boost::asio::buffer_size(buf)
+                    , 1, stdin))
       {
-        return ::cgi::error::bad_read;
+        return strlen(boost::asio::buffer_cast<char *>(buf));
       }
-      int len( strlen(boost::asio::buffer_cast<char *>(buf)) );
-      // Not sure what to do about EOF yet.
-      //if (len < boost::asio::buffer_size(buf))
-      //{
-      //  return ::cgi::error::eof;
-      //}
-      std::cerr<< "Read data" << std::endl
-               << "after = {" << std::endl
-               << std::string(boost::asio::buffer_cast<char *>(buf), boost::asio::buffer_size(buf)) << std::endl
-               << "}" << std::endl;
-      return len;
+
+      if (std::feof(stdin))
+        ec = boost::asio::error::eof;
+      else
+      if (std::ferror(stdin))
+        ec = ::cgi::error::bad_read;
+      else
+        ec = ::cgi::error::broken_pipe;
+
+      return 0;
     }
 
     template<typename ConstBufferSequence>

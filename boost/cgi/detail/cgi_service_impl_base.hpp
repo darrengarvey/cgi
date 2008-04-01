@@ -50,105 +50,28 @@ namespace cgi {
     struct implementation_type
       : RequestImplType
     {
-      typedef boost::asio::const_buffers_1          const_buffers_type;
-      typedef boost::asio::mutable_buffers_1        mutable_buffers_type;
-      typedef typename RequestImplType::client_type client_type;
-      typedef std::vector<char>                     buffer_type;
-      //typedef std::list<std::string>::iterator      marker_list_type;
+      typedef boost::asio::const_buffers_1             const_buffers_type;
+      typedef boost::asio::mutable_buffers_1           mutable_buffers_type;
+      typedef typename RequestImplType::client_type    client_type;
+      typedef std::vector<char>                        buffer_type;
+      typedef detail::form_parser<implementation_type> form_parser_type;
 
       implementation_type()
-        : //buffer_()
-        //, istream_(&buffer_)
-          pos_()
-        , offset_(0)
-        , fp_(NULL)
+        : fp_(NULL)
       {
       }
 
       client_type client_;
 
-      std::string boundary_marker;
-      std::list<std::string> boundary_markers;
-      //std::vector<char> data_buffer_;
       // The number of characters left to read (ie. "content_length - bytes_read")
       std::size_t characters_left_;
       
-      //std::vector<char>::iterator read_pos_;
-      //boost::asio::streambuf buffer_;
-      //std::istream istream_;
-
       buffer_type buf_;
-      typename buffer_type::iterator pos_;
-      std::size_t offset_;
-      //boost::sub_match<typename buffer_type::iterator> offset_;
+
       std::vector<common::form_part> form_parts_;
       
-      detail::form_parser* fp_;
+      boost::scoped_ptr<form_parser_type> fp_;
 
-      /*
-      mutable_buffers_type prepare(typename buffer_type::iterator& pos, std::size_t size)
-      {
-        std::size_t bufsz( buf_.size() );
-
-        // Reserve more space if it's needed.
-        // (this could be safer, referencing this against CONTENT_LENGTH)
-        if ( (bufsz + size) >= buf_.capacity() )
-        {
-          buf_.resize(bufsz + size);
-        }
-
-        return boost::asio::buffer(&(buf_.begin()), size);
-  //      return boost::asio::buffer(&buf_[bufsz], size);
-      }
-      */
-
-      mutable_buffers_type prepare(std::size_t size)
-      {
-        
-        std::size_t bufsz( buf_.size() );
-        //cerr<< "bufsz    = " << bufsz << endl;
-
-        // Reserve more space if it's needed.
-        // (this could be safer, referencing this against CONTENT_LENGTH)
-        //if ( (bufsz + size) >= buf_.capacity() )
-        //{
-          buf_.resize(bufsz + size);
-        //}
-
-        //cerr<< "Pre-read buffer (size: " << buf_.size() 
-         //   << "|capacity: " << buf_.capacity() << ") == {" << endl
-        //    << std::string(buf_.begin() + offset_, buf_.end()) << endl
-   //         << "-----end buffer-----" << endl
-   //         << "-------buffer-------" << endl
-  //          << std::string(&buf_[0], &buf_[buf_.size()]) << endl
-        //    << "}" << endl;
-            ;
-        //return boost::asio::buffer(&(*(buf_.end())), size);
-  //      return boost::asio::buffer(&(*(buf_.begin())) + bufsz, size);
-        return boost::asio::buffer(&buf_[bufsz], size);
-      }
-
-      std::string buffer_string()
-      {
-        return std::string(buf_.begin() + offset_, buf_.end());
-        //return std::string(pos_, buf_.size());//buf_.end());
-      }
-      /*
-        // Silently ignore a request to grow the buffer greater than the
-        // content-length allows.
-        // Note: this will break if the contents of the buffer are ever changed
-        // (such as if data is url-decoded and inserted back into the buffer).
-        if (size >= characters_left_)
-        {
-          size = characters_left_;
-        }
-
-        data_buffer_.reserve(bufsz + size);
-        return boost::asio::buffer(data_buffer_.begin() + bufsz
-                                  , data_buffer_.capacity() - bufsz);
-      }
-      */
-      //boost::acgi::form_entry form_;
     };
 
     /// Return if the request is still open
@@ -419,39 +342,57 @@ namespace cgi {
       parse_url_encoded_form(implementation_type& impl
                             , boost::system::error_code& ec)
     {      
-      std::istream& is(std::cin);
-      char ch;
       std::string name;
       std::string str;
       map_type& post_map(impl.post_vars());
-
-      while( is.get(ch) && impl.characters_left_-- )
+      
+      char ch;
+      char ch1;
+      while( impl.characters_left_ )
       {
-          //std::cerr<< "; ch=" << ch << "; ";
-          switch(ch)
+        ch = getchar();
+        --impl.characters_left_;
+
+        switch(ch)
+        {
+        case '%': // unencode a hex character sequence
+          if (impl.characters_left_ >= 2)
           {
-          case '%': // unencode a hex character sequence
-              // note: function params are resolved in an undefined order!
-              str += detail::url_decode(is);
-              impl.characters_left_ -= 2; // this is dodgy **FIXME**
-              break;
-          case '+':
-              str.append(1, ' ');
-              break;
-          case ' ':
-              continue;
-          case '=': // the name is complete, now get the corresponding value
-              name = str;
-              str.clear();
-              break;
-          case '&': // we now have the name/value pair, so save it
-              post_map[name] = str;
-              str.clear();
-              name.clear();
-             break;
-          default:
-              str.append(1, ch);
+            ch = getchar();
+            ch1 = getchar();
+            if (std::isxdigit(ch) && std::isxdigit(ch1))
+            {
+              str.append(1, detail::hex_to_char(ch, ch1));
+            }
+            else // we don't have a hex sequence
+            {
+              str.append(1, '%').append(1, ch).append(1, ch1);
+            }
+            impl.characters_left_ -= 2;
           }
+          else // There aren't enough characters to make a hex sequence
+          {
+            str.append(1, '%');
+            --impl.characters_left_;
+          }
+          break;
+        case '+':
+            str.append(1, ' ');
+            break;
+        case ' ':
+            continue;
+        case '=': // the name is complete, now get the corresponding value
+            name = str;
+            str.clear();
+            break;
+        case '&': // we now have the name/value pair, so save it
+            post_map[name] = str;
+            str.clear();
+            name.clear();
+           break;
+        default:
+            str.append(1, ch);
+        }
       }
       // save the last param (it won't have a trailing &)
       if( !name.empty() )
@@ -465,6 +406,15 @@ namespace cgi {
     boost::system::error_code
       parse_multipart_form(implementation_type& impl, boost::system::error_code& ec)
     {
+      impl.fp_.reset
+      (
+        new typename implementation_type::form_parser_type
+                ( impl )
+      );
+      impl.fp_->parse(ec);
+      return ec;
+    }
+      /*
       parse_boundary_marker(impl, ec);
       //parse_one_form_part(impl, ec);
       move_to_start_of_first_part(impl, ec);
@@ -756,7 +706,7 @@ namespace cgi {
            //   << impl.buffer_string() << endl
              // << "} or {" << endl;
               //<< std::string(impl.pos_, ;
-          /*
+          / *
           for (unsigned int i = 0; i < matches.size(); ++i)
           {
             if (matches[i].length())
@@ -769,7 +719,7 @@ namespace cgi {
           cerr<< "-------buf------" << endl
               << std::string(begin, end) << endl
               << "----------------" << endl;
-          */
+          * /
           //offset = impl.buf_.end();
             if (++runs > 40)
             {
@@ -934,17 +884,17 @@ namespace cgi {
       // New boundary markers are added to the front of the list.
       impl.boundary_markers.push_front(match_results[1].str());
 
-      /*
+      / *
       cerr<< "full = " << content_type << endl
           << "full search string = " << match_results[0] << endl
           << "marker length = " << match_results[1].length() << endl
           << "marker = " << impl.boundary_marker << endl
           << "_[2] = " << match_results[2] << endl;
-          */
+          * /
      
       return ec;
     }
-
+*/
     /// Read and parse a single cgi POST meta variable (greedily)
     template<typename RequestImpl>
     boost::system::error_code
