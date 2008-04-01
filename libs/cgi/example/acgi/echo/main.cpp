@@ -71,8 +71,7 @@ int main()
               "<input type=hidden name=cmd value=multipart_test />"
               "<br />"
               "<input type=submit value=submit />"
-             "</form><p />"
-             "boundary marker = " << req.boundary_marker() << "<p />";
+             "</form><p />";
 
       show_map_contents(resp, req[get_data],    "GET Variables");
       show_map_contents(resp, req[post_data],   "POST Variables");
