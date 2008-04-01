@@ -25,7 +25,8 @@ try
   acceptor a(s);    // This is used to accept requests from the server.
   request req(s);   // Our request.
 
-  for (int i(50); i != 0; --i) // Handle 50 requests then exit.
+  for (;;) // Handle requests until something goes wrong
+           // (an exception will be thrown).
   {
     a.accept(req);
     response resp;    // A response object to make our lives easier.

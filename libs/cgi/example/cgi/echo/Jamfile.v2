@@ -15,10 +15,10 @@ exe cgi_echo
 
 # Our install rule (builds binaries and copies them to <location>)
 install install
- : cgi_echo
  :
+   cgi_echo
  :
- <location>$(LOCATION)
+   <location>$(cgi-bin)
  ;
 
 # Only install example if you use `bjam install' or equivalent

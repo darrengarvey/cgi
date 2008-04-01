@@ -1,6 +1,5 @@
 #include <boost/cgi/acgi.hpp>
 #include <boost/cgi/response.hpp>
-#include <iostream>
 
 #define SCRIPT_NAME "acgi_cookie_game"
 
@@ -87,9 +86,6 @@ int main()
   resp<< content_type("text/html")
       << "Hello there, Universe.<p />"
       << "What's your name?<br />";
-
-  std::cerr<< std::endl << "name = " << req.POST("name") << std::endl;
-  std::cerr.flush();
 
   resp<< "<form method='POST'>"
          "<input name='name' type='text' value='" << req[form_data]["name"] << "'>"
