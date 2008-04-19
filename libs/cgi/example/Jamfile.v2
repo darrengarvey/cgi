@@ -38,6 +38,8 @@ install fcgi-install
     <location>$(fcgi-bin)
   ;
 
+alias install : cgi//install acgi//install fcgi//install ;
+
 explicit cgi-install  ;
 explicit acgi-install ;
 explicit fcgi-install ;

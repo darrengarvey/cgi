@@ -19,25 +19,26 @@
 
 using namespace boost::cgi;
 
+//
 // This function writes the title and map contents to the ostream in an
 // HTML-encoded format (to make them easier on the eye).
+//
 template<typename OStreamT, typename MapT>
 void show_map_contents(OStreamT& os, MapT& m, const std::string& title)
 {
   os<< "<h3>" << title << "</h3>";
-  if (m.empty()) os<< "NONE<br />";
-  for (typename MapT::iterator i = m.begin(); i != m.end(); ++i)
-  {
-    os<< "<b>" << i->first << "</b> = <i>" << i->second << "</i><br />";
-  }
+  
+  if (m.empty())
+    os<< "NONE<br />";
+  else
+    for (typename MapT::const_iterator i = m.begin(); i != m.end(); ++i)
+      os<< "<b>" << i->first << "</b> = <i>" 
+                 << i->second << "</i><br />";
 }
 
 int main()
 {
-  request req;
-
-  req.load(true); // The 'true' means parse STDIN data too.
-
+  request req; // A basic CGI request auto-parses everything (including POST data).
   response resp;
 
   show_map_contents(resp, req[env_data], "Environment Variables");
