@@ -13,7 +13,7 @@
 #include <boost/tokenizer.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "url_decode.hpp"
+#include "boost/cgi/detail/url_decode.hpp"
 
 namespace cgi {
  namespace detail {
@@ -47,9 +47,9 @@ namespace cgi {
          name = current_token;
          current_token.clear();
        }else
-       if( *iter == "&" )
+       if( *iter == "&" || *iter == ";" )
        {
-         destination[name] = current_token;
+         destination[name.c_str()] = current_token;
          current_token.clear();
          name.clear();
        }else
@@ -58,7 +58,7 @@ namespace cgi {
        }
      }
      if( !name.empty() )
-       destination[name] = current_token;
+       destination[name.c_str()] = current_token;
 
      return ec;
    }

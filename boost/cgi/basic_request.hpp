@@ -38,7 +38,7 @@
 #include "boost/cgi/basic_request_fwd.hpp"
 #include "boost/cgi/basic_sync_io_object.hpp"
 #include "boost/cgi/basic_io_object.hpp"
-#include "boost/cgi/map.hpp"
+#include "boost/cgi/common/map.hpp"
 
 namespace cgi {
  namespace common {

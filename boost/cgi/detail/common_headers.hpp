@@ -13,7 +13,7 @@
 // headers can just include this after other headers.
 
 #include "boost/cgi/buffer.hpp"
-#include "boost/cgi/map.hpp"
+#include "boost/cgi/common/map.hpp"
 #include "boost/cgi/io_service.hpp"
 #include "boost/cgi/streambuf.hpp"
 #include "boost/cgi/basic_request.hpp"

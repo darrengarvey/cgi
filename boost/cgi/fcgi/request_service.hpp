@@ -12,7 +12,7 @@
 #include <boost/system/error_code.hpp>
 
 //#include "boost/cgi/scgi/request_impl.hpp"
-#include "boost/cgi/map.hpp"
+#include "boost/cgi/common/map.hpp"
 #include "boost/cgi/tags.hpp"
 #include "boost/cgi/read.hpp"
 #include "boost/cgi/role_type.hpp"
@@ -426,8 +426,9 @@ namespace cgi {
       return std::string();
       **/
 
-      if( _data.find(_name) != _data.end() )
-        return _data[_name];
+      if( _data.find(_name.c_str()) != _data.end() )
+        // **FIXME**
+        return _data[_name.c_str()];
       return "";
     }
 
@@ -650,7 +651,8 @@ namespace cgi {
         //std::cerr<< "[hw] name := " << name << std::endl;
         //std::cerr<< "[hw] data := " << data << std::endl;
 
-        impl.env_vars_[name] = data;
+        // **FIXME**
+        impl.env_vars_[name.c_str()] = data;
       }
 
       return ec;

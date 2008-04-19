@@ -37,7 +37,7 @@ namespace cgi {
      pair_t buffer_;
 
      std::string content_type; // must exist
-     std::string name; // Has to exist?
+     std::string name; // must exist (?) **FIXME**
 
      // Using a simple map while everything is changing. This will not copy the
      // values when it is properly implemented (it'll hold a pair of iterators 

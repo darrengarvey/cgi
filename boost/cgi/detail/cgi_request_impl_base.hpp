@@ -18,7 +18,7 @@
 #include "boost/cgi/connections/stdio.hpp"
 #include "boost/cgi/role_type.hpp"
 #include "boost/cgi/status_type.hpp"
-#include "boost/cgi/map.hpp"
+#include "boost/cgi/common/map.hpp"
 //#include
 
 // Make this ProtocolService-independent

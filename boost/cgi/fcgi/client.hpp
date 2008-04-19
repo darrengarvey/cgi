@@ -14,7 +14,7 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/asio/buffer.hpp>
 #include "boost/cgi/tags.hpp"
-#include "boost/cgi/map.hpp"
+#include "boost/cgi/common/map.hpp"
 #include "boost/cgi/io_service.hpp"
 #include "boost/cgi/basic_client.hpp"
 #include "boost/cgi/connections/shareable_tcp_socket.hpp"

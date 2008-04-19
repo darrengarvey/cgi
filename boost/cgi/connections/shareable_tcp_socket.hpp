@@ -63,8 +63,8 @@ namespace cgi {
     /** End FastCGI stuff      **/
 
     // A wrapper to provide condition_type::pointer
-    struct condition_type : public boost::condition
-    { typedef boost::shared_ptr<boost::condition> pointer; };
+    struct condition_type : public boost::condition_variable
+    { typedef boost::shared_ptr<boost::condition_variable> pointer; };
 
     basic_connection(io_service& ios)
       : sock_(ios)

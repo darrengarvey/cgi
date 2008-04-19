@@ -54,13 +54,6 @@ namespace cgi {
      return static_cast<char>(ret);
    }
 
-   /// Workaround for istreams, since the above can't be used directly
-   char url_decode(std::istream& is)
-   {
-     const char c1 = is.get();
-     return url_decode(c1, is.get());
-   }
-
    /// URL-decode a string
    std::string url_decode( const std::string& str )
    {

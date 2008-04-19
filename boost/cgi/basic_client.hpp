@@ -11,7 +11,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "boost/cgi/map.hpp"
+#include "boost/cgi/common/map.hpp"
 #include "boost/cgi/role_type.hpp"
 #include "boost/cgi/status_type.hpp"
 #include "boost/cgi/http/status_code.hpp"
@@ -143,6 +143,8 @@ namespace cgi {
   private:
     //io_service&                           io_service_;
     connection_ptr                        connection_;
+
+  public: // **FIXME**
     // we should never read more than content-length bytes.
     std::size_t                           bytes_left_;
   };

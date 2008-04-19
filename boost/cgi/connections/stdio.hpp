@@ -59,33 +59,7 @@ namespace cgi {
     template<typename MutableBufferSequence>
     std::size_t read_some(MutableBufferSequence buf
                          , boost::system::error_code& ec)
-    {
-      //if (std::cin.eof())
-      //{
-        //ec = boost::asio::error::eof;
-      //  return boost::asio::error::eof;
-      //}
-      //if( buf.data() != in_.rdbuf() )
-      //  return in_.read(buf.begin(), buf.size());
-      //return buf.size();
-      
-      //std::cerr<< "In stdio::read_some()" << std::endl
-      //         << "before = {" << std::endl
-      //         << std::string(boost::asio::buffer_cast<char *>(buf), boost::asio::buffer_size(buf)) << std::endl
-      //         << "}" << std::endl;
-      /*
-      std::cin.read(boost::asio::buffer_cast<char *>(buf)
-                   , boost::asio::buffer_size(buf));
-      if (std::cin.fail() && !std::cin.eof())
-      {
-        ec = boost::system::error_code(654, boost::system::system_category);
-        return 0;
-      }
-      */
-      //std::cerr<< "before = {" << std::endl
-      //         << std::string(boost::asio::buffer_cast<char *>(buf), boost::asio::buffer_size(buf)) << std::endl
-      //         << "}" << std::endl;
-      
+    {  
       if (std::fread(boost::asio::buffer_cast<void *>(buf)
                     , boost::asio::buffer_size(buf)
                     , 1, stdin))

@@ -9,15 +9,8 @@
 #ifndef CGI_MAP_HPP_INCLUDED__
 #define CGI_MAP_HPP_INCLUDED__
 
-#include <map>
-#include <string>
+#warning This file is deprecated, use common/map.hpp instead.
 
-namespace cgi {
- namespace common {
-
-  typedef std::map<std::string,std::string>    map;
-
- } // namespace common
-} // namespace cgi
+#include "boost/cgi/common/map.hpp"
 
 #endif // CGI_MAP_HPP_INCLUDED__

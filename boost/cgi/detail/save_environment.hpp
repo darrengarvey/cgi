@@ -12,7 +12,7 @@
 #include <map>
 #include <string>
 #include <cstdlib>
-#include "boost/cgi/map.hpp"
+#include "boost/cgi/common/map.hpp"
 
 // The process' environment
 #if BOOST_WORKAROUND(BOOST_MSVC, BOOST_TESTED_AT(1500))
@@ -48,7 +48,7 @@ namespace cgi {
        {
          std::string sa(*env, i);
          std::string sb((*env+i+1), j-i-1);
-         env_map[sa] = sb;
+         env_map[sa.c_str()] = sb;
        }
      }
    }
