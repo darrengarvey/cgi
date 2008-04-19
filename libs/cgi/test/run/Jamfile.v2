@@ -9,6 +9,7 @@ project boost/cgi/tests/run
     <library>/boost/test//boost_unit_test_framework/
     <library>/boost/system/
     <library>/boost/thread/
+    <library>/boost/regex/
   ;
 
 #local rule run-test( name )
@@ -24,11 +25,15 @@ test-suite run_test_suite
     
     [ run cookie.cpp ]
     [ run response.cpp  ]
+    [ run cgi_simple_request.cpp ]
+    [ run name_test.cpp ]
+    [ run map_test.cpp ]
   ;
 
 test-suite wget_test
   :
-    [ run wget.cpp : "--log_level=message" ]
+    #[ run wget.cpp : "--log_level=message" ]
+    [ run hello_world.cpp /boost/filesystem/ ]
   ;
 
 explicit wget_test ;
