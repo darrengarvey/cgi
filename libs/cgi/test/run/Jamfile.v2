@@ -26,6 +26,7 @@ test-suite run_test_suite
     [ run cookie.cpp ]
     [ run response.cpp  ]
     [ run cgi_simple_request.cpp ]
+    [ run acgi_simple_request.cpp ]
     [ run name_test.cpp ]
     [ run map_test.cpp ]
   ;
