@@ -122,18 +122,6 @@ namespace cgi {
         //{
           buffer_.resize(bufsz + size);
         //}
-        /*
-        cerr<< "Pre-read buffer (size: " << buffer_.size() 
-            << "|capacity: " << buffer_.capacity() << ") == {" << endl
-            << std::string(buffer_.begin(), buffer_.end()) << endl
-   //         << "-----end buffer-----" << endl
-   //         << "-------buffer-------" << endl
-  //          << std::string(&buf_[0], &buf_[buf_.size()]) << endl
-            << "}" << endl;
-            ;
-        */
-        //return boost::asio::buffer(&(*(buf_.end())), size);
-  //      return boost::asio::buffer(&(*(buf_.begin())) + bufsz, size);
         return boost::asio::buffer(&buffer_[bufsz], size);
       }
 
@@ -160,11 +148,9 @@ namespace cgi {
 
     void construct(implementation_type& impl)
     {
-      //std::cerr<< "request_service.hpp:83 Creating connection" << std::endl;
       impl.client_.set_connection(//new implementation_type::connection_type(this->io_service()));
         implementation_type::connection_type::create(this->io_service())
       );
-      //std::cerr<< "conn.is_open() == " << impl.client_.is_open() << std::endl;
     }
 
     void destroy(implementation_type& impl)
@@ -187,6 +173,11 @@ namespace cgi {
     bool is_open(implementation_type& impl)
     {
       return !impl.all_done_ && impl.client_.is_open();
+    }
+
+    int request_id(implementation_type& impl)
+    {
+      return impl.client_.request_id_;
     }
 
     /// Close the request.

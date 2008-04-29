@@ -254,6 +254,8 @@ namespace cgi {
       return keep_connection_;
     }
 
+    //int id() { return request_id_; }
+
   public:
     friend class fcgi_request_service;
     boost::uint16_t request_id_;

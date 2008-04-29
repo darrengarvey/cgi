@@ -100,6 +100,8 @@ namespace cgi {
       return impl.client_;
     }
 
+    int request_id(implementation_type& impl) { return 1; }
+
     int close(implementation_type& impl, http::status_code& http_s, int status)
     {
       impl.status() = closed;

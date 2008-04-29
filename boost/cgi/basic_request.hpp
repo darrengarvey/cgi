@@ -28,7 +28,7 @@
 #include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/request_base.hpp"
 #include "boost/cgi/role_type.hpp"
-#include "boost/cgi/data_source.hpp"
+#include "boost/cgi/common/source_enums.hpp"
 #include "boost/cgi/status_type.hpp"
 #include "boost/cgi/is_async.hpp"
 #include "boost/cgi/connection_base.hpp"
@@ -506,7 +506,7 @@ namespace cgi {
      * provide a meta_var_all() function which is greedy; the
      * ugly/long name there to discourage use.
      */
-    std::string var(const std::string& name, bool greedy = false)
+    std::string var(std::string const& name, bool greedy = false)
     {
       boost::system::error_code ec;
       std::string ret = var(name, ec, greedy);
@@ -620,43 +620,53 @@ namespace cgi {
       return this->service.get_role(this->implementation);
     }
 
-    /// Get the strand associated with the request (if any)
-    // Not sure if the strand concept should be kept separate or a member
-    // function like basic_request<>::wrap() should be provided: in the case of
-    // a synchronous request type the wrapping would still function as expected
-    // and there would be no need for protocol-specific code in user programs.
-      /*    boost::asio::strand* strand()
-    {
-      return this->implementation.strand();
-    }
-      */
-
-    /// Get the implementation type for the request
-    //implementation_type* impl()
-    //{
-    //  return &(this->implementation);
-    //}
-
-    void set_status(http::status_code status)
+    void set_status(http::status_code const& status)
     {
       this->service.set_status(this->implementation, status);
     }
 
-    map_type& operator[](common::data_source source)
+    ////////////////////////////////////////////////////////////
+    // Note on operator[]
+    // ------------------
+    // It is overloaded on different enum types to allow
+    // compile-time (I hope) retrieval of different data
+    // maps.
+    //
+    env_map& operator[](common::env_data_type const&)
     {
-      switch(source)
-      {
-      case get_data:    return this->implementation.get_vars_;
-      case post_data:   return this->implementation.post_vars_;
-      case cookie_data: return this->implementation.cookie_vars_;
-      case env_data:    return this->implementation.env_vars_;
-      case form_data:
-      default:
-        std::string rm( request_method() );
-        if (rm == "GET")       return this->implementation.get_vars_;
-        else if (rm == "POST") return this->implementation.post_vars_;
-        else                   return this->implementation.env_vars_;
-      }
+      return this->implementation.env_vars_;
+    }
+
+    get_map& operator[](common::get_data_type const&)
+    {
+      return this->implementation.get_vars_;
+    }
+
+    post_map& operator[](common::post_data_type const&)
+    {
+      return this->implementation.post_vars_;
+    }
+
+    cookie_map& operator[](common::cookie_data_type const&)
+    {
+      return this->implementation.cookie_vars_;
+    }
+
+    form_map& operator[](common::form_data_type const&)
+    {
+      if (request_method() == "GET")
+        return this->implementation.get_vars_;
+      else
+      if (request_method() == "POST")
+        return this->implementation.post_vars_;
+      else
+        return this->implementation.env_vars_;
+    }
+    ////////////////////////////////////////////////////////////
+
+    int id()
+    {
+      return this->service.request_id(this->implementation);
     }
   };
 

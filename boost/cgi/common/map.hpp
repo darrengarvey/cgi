@@ -9,6 +9,12 @@ namespace cgi {
 
   typedef std::map< ::cgi::common::name, std::string> map;
 
+  typedef map        env_map;
+  typedef map        get_map;
+  typedef map        post_map;
+  typedef map        form_map;
+  typedef map        cookie_map;
+
  } // namespace common
 } // namespace cgi
 
