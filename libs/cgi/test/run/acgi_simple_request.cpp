@@ -14,6 +14,8 @@
 #define BOOST_TEST_MODULE acgi_request_test
 #include <boost/test/unit_test.hpp>
 
+#include "request_test_template.hpp"
+
 void init_env()
 {
   using namespace std;
@@ -34,17 +36,16 @@ BOOST_AUTO_TEST_CASE( env_test )
   service s;
   request req(s, true);
 
-  // Check environment parsing
-  BOOST_CHECK( req[env_data].size() );
-  BOOST_CHECK_EQUAL( req[env_data]["HTTP_HOST"], "localhost" );
-  BOOST_CHECK_EQUAL( req[env_data]["EMPTY_VAR"], "" );
-  BOOST_CHECK_EQUAL( req[env_data]["UGLY_VAR"], "$££$^%%£&&^%@%26$ £_abcd" );
-  BOOST_CHECK_EQUAL( req[env_data]["QUERY_STRING"]
-                   , "hello=world&foo=bar&encoded=%22!%C2%A3$%^$*^hh%%thd@:~" );
-  // Check case-insensitive name comparing
-  BOOST_CHECK_EQUAL( req[env_data]["http_host"], "localhost" );
-  // Check helper function (need to test them all?)
-  BOOST_CHECK_EQUAL( req.script_name(), "some/test/script" );
+  TEST_ENV_DATA(req);
+}
+
+BOOST_AUTO_TEST_CASE( get_data_test )
+{
+  using namespace boost::acgi;
+  service s;
+  request req(s, true);
+
+  TEST_GET_DATA(req);
 }
 
 BOOST_AUTO_TEST_CASE( cookie_test )
@@ -54,12 +55,7 @@ BOOST_AUTO_TEST_CASE( cookie_test )
   {
     service s;
     request req(s, true);
-
-    // Check cookie parsing
-    BOOST_CHECK( req[cookie_data].size() );
-    BOOST_CHECK_EQUAL( req[cookie_data]["foo"], "bar" );
-    // Check case-insensitive name comparing
-    BOOST_CHECK_EQUAL( req[cookie_data]["FOO"], "bar" );
+    TEST_ONE_COOKIE(req);
   }
   
   {
@@ -68,8 +64,7 @@ BOOST_AUTO_TEST_CASE( cookie_test )
 
     service s;
     request req(s, true);
-    BOOST_CHECK_EQUAL( req[cookie_data]["foo"], "bar" );
-    BOOST_CHECK_EQUAL( req[cookie_data]["another_one"], "stuff" );
+    TEST_TWO_COOKIES(req);
   }
 
   {
@@ -78,24 +73,7 @@ BOOST_AUTO_TEST_CASE( cookie_test )
 
     service s;
     request req(s, true);
-    BOOST_CHECK_EQUAL( req[cookie_data]["foo"], "bar" );
-    BOOST_CHECK_EQUAL( req[cookie_data]["encoded"], "\"£$%^$*^hh%%thd@:" );
+    TEST_ENCODED_COOKIE(req);
   }
-}
-
-BOOST_AUTO_TEST_CASE( get_data_test )
-{
-  using namespace boost::acgi;
-  service s;
-  request req(s, true);
-
-  // Make sure the data is going to be parsed
-  BOOST_CHECK_EQUAL( req.request_method(), "GET" );
-
-  // Check GET data/query string parsing
-  BOOST_CHECK( req[get_data].size() );
-  BOOST_CHECK_EQUAL( req[get_data]["hello"], "world" );
-  BOOST_CHECK_EQUAL( req[get_data]["foo"], "bar" );
-  BOOST_CHECK_EQUAL( req[get_data]["encoded"], "\"!£$%^$*^hh%%thd@:~" );
 }
 

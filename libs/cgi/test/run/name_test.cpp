@@ -7,7 +7,7 @@
 
 using cgi::common::name;
 
-BOOST_AUTO_TEST_CASE( name_test )
+BOOST_AUTO_TEST_CASE( case_insensitive_cmp )
 {
   name n1("foo");
   name n2("FOO");
@@ -33,3 +33,18 @@ BOOST_AUTO_TEST_CASE( name_from_string )
   BOOST_CHECK_NE( s, n1.c_str() );
 }
 
+BOOST_AUTO_TEST_CASE( lt_compare )
+{
+  name n1("lexicographically_diddy");
+  name n2("lexicographically_large");
+
+  BOOST_CHECK( n1 < n2 );
+}
+
+BOOST_AUTO_TEST_CASE( adding_names )
+{
+  name FOO("FOO");
+  name foo("foo");
+
+  BOOST_CHECK_EQUAL( FOO + foo, foo + FOO );
+}
