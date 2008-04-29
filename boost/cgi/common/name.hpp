@@ -37,20 +37,24 @@ namespace cgi {
                        , const char* str2
                        , std::size_t num )
      {
-       if ( !(std::toupper(*str1) - std::toupper(*str2)) )
-         return 0;
+       if (num)
+         do {
+           if (std::toupper(*str1) != std::toupper(*str2))
+             return (std::toupper(*str1) - std::toupper(*str2));
+           ++str1;
+           ++str2;
+         } while (--num);
 
-       int d = 0;
-       while (--num && !(d = std::toupper(*++str1) - std::toupper(*++str2)))
-         ;
-       return d;
+       return 0;
      }
 
      static const char*
        find(const char* str, int n, char a)
      {
-       while( n-- > 0 && std::toupper(*str) != std::toupper(a) )
+       do {
+         std::toupper(*str) != std::toupper(a);
          ++str;
+       } while (--n);
        return str;
      }
 
