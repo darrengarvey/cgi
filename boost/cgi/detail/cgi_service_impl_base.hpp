@@ -30,6 +30,7 @@
 #include "boost/cgi/detail/throw_error.hpp"
 
 #include "boost/cgi/common/form_parser.hpp"
+#include "boost/cgi/common/request_base.hpp"
 
 namespace cgi {
 
@@ -41,6 +42,7 @@ namespace cgi {
 
   template<typename RequestImplType>
   class cgi_service_impl_base
+    : common::request_base<cgi_service_impl_base<RequestImplType> >
   {
   public:
     //typedef RequestImplType     implementation_type;
@@ -124,14 +126,14 @@ namespace cgi {
 
       const std::string& request_method = var(impl.env_vars(), "REQUEST_METHOD", ec);
       if (request_method == "GET")
-        parse_get_vars(impl, ec);
+        this->parse_get_vars(impl, ec);
       else
       if (request_method == "POST" && parse_stdin)
         parse_post_vars(impl, ec);
 
       if (ec) return ec;
 
-      parse_cookie_vars(impl, ec);
+      this->parse_cookie_vars(impl, ec);
       impl.status() = loaded;
 
       //BOOST_ASSERT(impl.status() >= loaded);
@@ -280,46 +282,6 @@ namespace cgi {
     }
 
   protected:
-    /// Read and parse the cgi GET meta variables
-    template<typename RequestImpl>
-    boost::system::error_code
-    parse_get_vars(RequestImpl& impl, boost::system::error_code& ec)
-    {
-      // Make sure the request is in a pre-loaded state
-      //BOOST_ASSERT (impl.status() <= unloaded);
-
-      std::string& vars = impl.env_vars()["QUERY_STRING"];
-      if (vars.empty())
-        return ec;
-
-      detail::extract_params(vars, impl.get_vars()
-                            , boost::char_separator<char>
-                                ("", "=&", boost::keep_empty_tokens)
-                            , ec);
-
-      return ec;
-    }
-
-    /// Read and parse the HTTP_COOKIE meta variable
-    template<typename RequestImpl>
-    boost::system::error_code
-    parse_cookie_vars(RequestImpl& impl, boost::system::error_code& ec)
-    {
-      // Make sure the request is in a pre-loaded state
-      //BOOST_ASSERT (impl.status() <= unloaded);
-
-      std::string& vars(impl.env_vars()["HTTP_COOKIE"]);
-      if (vars.empty())
-        return ec;
-
-      detail::extract_params(vars, impl.cookie_vars()
-                            , boost::char_separator<char>
-                                ("", "=;", boost::keep_empty_tokens)
-                            , ec);
-
-      return ec;
-    }
-
     /// Read and parse the cgi POST meta variables (greedily)
     template<typename RequestImpl>
     boost::system::error_code

@@ -72,8 +72,8 @@ namespace cgi {
           , role_type Role
           , typename Allocator>
   class basic_request
-    : public request_base
-    , public boost::mpl::if_c<is_async<typename RequestService::protocol_type>::value
+    : //public request_base
+     public boost::mpl::if_c<is_async<typename RequestService::protocol_type>::value
                              , basic_io_object<RequestService>
                              , basic_sync_io_object<RequestService>
                              >::type
