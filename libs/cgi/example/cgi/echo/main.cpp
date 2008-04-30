@@ -41,6 +41,8 @@ int main()
   request req; // A basic CGI request auto-parses everything (including POST data).
   response resp;
 
+  resp<< "Request id = " << req.id() << "<p/>";
+
   show_map_contents(resp, req[env_data], "Environment Variables");
   show_map_contents(resp, req[get_data], "GET Variables");
   show_map_contents(resp, req[post_data], "POST Variables");
