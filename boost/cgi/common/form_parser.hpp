@@ -19,6 +19,7 @@
 #include <boost/asio/error.hpp>
 #include <boost/function.hpp>
 #include <boost/system/error_code.hpp>
+#include <boost/algorithm/string/find.hpp>
 #include "boost/cgi/common/form_part.hpp"
 #include "boost/cgi/basic_client.hpp"
 
@@ -48,14 +49,14 @@ namespace cgi {
 
     mutable_buffers_type prepare(std::size_t size)
     {
-      std::size_t bufsz(impl_.buf_.size());
-      impl_.buf_.resize(bufsz + size);
-      return boost::asio::buffer(&impl_.buf_[bufsz], size);
+      std::size_t bufsz(impl_.buffer_.size());
+      impl_.buffer_.resize(bufsz + size);
+      return boost::asio::buffer(&impl_.buffer_[bufsz], size);
     }
       
     std::string buffer_string()
     {
-      return std::string(impl_.buf_.begin() + offset_, impl_.buf_.end());
+      return std::string(impl_.buffer_.begin() + offset_, impl_.buffer_.end());
     }
     
     boost::system::error_code 

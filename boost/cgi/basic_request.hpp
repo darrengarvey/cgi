@@ -261,34 +261,6 @@ namespace cgi {
       return this->service.client(this->implementation);
     }
 
-    /// Set the output for the request
-    /**
-     * Not Implemented Yet ******************
-     *
-     * Set the output sink as `stdout_`, `stderr_`, or `stdout_ | stderr_`
-     */
-    /*
-    void set_output(cgi::sink dest = stdout_)
-    {
-      boost::system::error_code ec;
-      this->service(this->implementation, dest, ec);
-      detail::throw_error(ec);
-    }
-    */
-/*
-    void read_some()
-    {
-      boost::system::error_code ec;
-      this->service.read_some(this->implementationementation,ec);
-      detail::throw_error(ec);
-    }
-
-    boost::system::error_code
-      read_some(boost::system::error_code& ec)
-    {
-      return this->service.read_some(this->implementationementation, ec);
-    }
-*/
     template<typename MutableBufferSequence>
     void read_some(const MutableBufferSequence& buf)
     {
@@ -318,12 +290,6 @@ namespace cgi {
     }
     */
 
-    /// Get a `cgi::map&` corresponding to all of the GET variables
-    map_type& GET()
-    {
-      return this->service.GET(this->implementation);
-    }
-
     /// Find the get meta-variable matching name
     /**
      * @throws `boost::system::system_error` if an error occurred. This may
@@ -347,12 +313,6 @@ namespace cgi {
     std::string GET(const std::string& name, boost::system::error_code& ec)
     {
       return this->service.GET(this->implementation, name, ec);
-    }
-
-    /// Get a `cgi::map&` corresponding to all of the POST variables
-    map_type& POST()
-    {
-      return this->service.POST(this->implementation);
     }
 
     /// Find the post meta-variable matching name
@@ -383,15 +343,6 @@ namespace cgi {
                           , bool greedy = true)
     {
       return this->service.POST(this->implementation, name, ec, greedy);
-    }
-
-    /// Get a `cgi::map&` corresponding to all of the form variables
-    map_type& form(bool greedy = true)
-    {
-		  boost::system::error_code ec;
-			map_type& data = this->service.form(this->implementation, ec, greedy);
-			detail::throw_error(ec);
-			return data;
     }
 
     /// Find the form variable matching name
@@ -429,12 +380,6 @@ namespace cgi {
         return "";
     }
 
-    /// Get a `cgi::map&` corresponding to all of the HTTP_COOKIE variables
-    map_type& cookie()
-    {
-      return this->service.cookie(this->implementation);
-    }
-
     /// Find the cookie meta-variable matching name
     /**
      * @throws `boost::system::system_error` if an error occurred. This may
@@ -459,12 +404,6 @@ namespace cgi {
     std::string cookie(const std::string& name, boost::system::error_code& ec)
     {
       return this->service.cookie(this->implementation, name, ec);
-    }
-
-    /// Get a `cgi::map&` corresponding to all of the environment variables
-    map_type& env()
-    {
-      return this->service.env(this->implementation);
     }
 
     /// Find the environment meta-variable matching name
@@ -632,38 +571,50 @@ namespace cgi {
     // compile-time (I hope) retrieval of different data
     // maps.
     //
+    /// Get a `common::env_map&` of all the environment variables.
     env_map& operator[](common::env_data_type const&)
     {
-      return this->implementation.env_vars_;
+      return this->implementation.env_vars();
     }
 
+    /// Get a `common::get_map&` of all the GET variables.
     get_map& operator[](common::get_data_type const&)
     {
-      return this->implementation.get_vars_;
+      return this->implementation.get_vars();
     }
 
+    /// Get a `common::post_map&` of all the POST variables.
     post_map& operator[](common::post_data_type const&)
     {
-      return this->implementation.post_vars_;
+      return this->implementation.post_vars();
     }
 
+    /// Get a `common::cookie_map&` of all the cookies.
     cookie_map& operator[](common::cookie_data_type const&)
     {
-      return this->implementation.cookie_vars_;
+      return this->implementation.cookie_vars();
     }
 
+    /// Get a `common::form_map&` of either the GET or POST variables.
     form_map& operator[](common::form_data_type const&)
     {
       if (request_method() == "GET")
-        return this->implementation.get_vars_;
+        return this->implementation.get_vars();
       else
       if (request_method() == "POST")
-        return this->implementation.post_vars_;
+        return this->implementation.post_vars();
       else
-        return this->implementation.env_vars_;
+        return this->implementation.env_vars();
     }
     ////////////////////////////////////////////////////////////
 
+    /// The id of this request.
+    /**
+     * This is 1 for CGI/aCGI requests, but may be != 1 for FastCGI requests.
+     * Note that for FastCGI requests, the id's are assigned on a
+     * *per-connection* policy, so in one application you may have several
+     * requests with the same id.
+     */
     int id()
     {
       return this->service.request_id(this->implementation);

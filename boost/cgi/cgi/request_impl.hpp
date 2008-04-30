@@ -41,7 +41,6 @@ namespace cgi {
     : public cgi_request_impl_base<common::stdio_connection>
   {
   public:
-    //typedef stdio_connection client_type;
     typedef ::cgi::common::basic_client<common::stdio_connection, tags::cgi> client_type;
 
     /// Constructor
@@ -61,41 +60,8 @@ namespace cgi {
     }
 
   protected:
-    friend class cgi_service_impl;//<cgi_request_impl>;
+    friend class cgi_service_impl;
   };
-
-  //template<> inline const std::string&
-  //cgi_request_impl::var<tags::ENV>(const std::string& name)
-  //{
-  //  return ::getenv(name.c_str());
-  //}
-
-  /// Get a request map of all the environment meta-variables (slow)
-  /**
-   * -- NOT IMPLEMENTED FOR NOW --
-   *
-   * In the case of a CGI request, the environment meta-data is usually stored
-   * in the process environment, which means there is no direct access to all
-   * of them as a map_type&. In other words, this function call will have to
-   * load all of the variables into memory and then return the map
-   */
-  //template<> inline cgi_request_impl::map_type&
-  //cgi_request_impl::var<tags::ENV>()
-  //{
-  //  throw std::logic_error("Can't get all environment vars as a map_type&");
-  //}
-
-  //template<> inline cgi_request_impl::map_type&
-  //cgi_request_impl::var<tags::HTTP>() { return http_map_; }
-
-  //template<> inline cgi_request_impl::map_type&
-  //cgi_request_impl::var<tags::COOKIE>() { return cookie_map_; }
-
-  //template<> inline cgi_request_impl::map_type&
-  //cgi_request_impl::var<tags::GET>() { return get_map_; }
-
-  //template<> inline cgi_request_impl::map_type&
-  //cgi_request_impl::var<tags::POST>() { return post_map_; }
 
 } // namespace cgi
 

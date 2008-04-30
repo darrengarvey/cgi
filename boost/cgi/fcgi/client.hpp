@@ -260,6 +260,7 @@ namespace cgi {
     friend class fcgi_request_service;
     boost::uint16_t request_id_;
     client_status status_;
+    std::size_t bytes_left_;
     //request_impl_type* current_request_;
     
     /// A marker to say if the final STDIN (and/or DATA) packets have been

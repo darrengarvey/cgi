@@ -26,11 +26,9 @@ namespace cgi {
   class cgi_request_service
    : public cgi_service_impl_base<cgi_request_impl>
   {
-    typedef ::cgi::common::map         map_type;
   public:
     typedef cgi_request_impl   impl_type;
     typedef tags::cgi          protocol_type;
-    //typedef cgi_service_impl_base<cgi_request_impl> base;
 
     cgi_request_service()
       : cgi_service_impl_base<cgi_request_impl>()

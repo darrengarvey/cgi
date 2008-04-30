@@ -19,7 +19,9 @@
 #include "boost/cgi/role_type.hpp"
 #include "boost/cgi/status_type.hpp"
 #include "boost/cgi/common/map.hpp"
-//#include
+
+#include <boost/fusion/include/vector.hpp>
+#include <boost/fusion/support.hpp>
 
 // Make this ProtocolService-independent
 
@@ -38,6 +40,7 @@ namespace cgi {
    */
   template<typename Connection>
   class cgi_request_impl_base
+    
   {
   public:
     typedef ::cgi::common::map                         map_type;
@@ -56,27 +59,16 @@ namespace cgi {
     {
     }
 
-    map_type& env_vars()             { return env_vars_;       }
-    map_type& get_vars()             { return get_vars_;       }
-    map_type& post_vars()            { return post_vars_;      }
-    map_type& cookie_vars()          { return cookie_vars_;    }
-
     bool stdin_parsed()              { return stdin_parsed_;   }
     http::status_code& http_status() { return http_status_;    }
     status_type& status()            { return request_status_; }
 
     conn_ptr& connection()           { return connection_;     }
-    //std::string& null_str()          { return null_str_;       }
 
   public:
     //conn_ptr connection() { return connection_; }
 
     //friend class cgi_service_impl_base<RequestImpl>;
-
-    map_type env_vars_;
-    map_type get_vars_;
-    map_type post_vars_;
-    map_type cookie_vars_;
 
   public:
     bool stdin_parsed_;

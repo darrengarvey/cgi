@@ -42,7 +42,7 @@ namespace cgi {
 
   template<typename RequestImplType>
   class cgi_service_impl_base
-    : common::request_base<cgi_service_impl_base<RequestImplType> >
+    : public common::request_base<cgi_service_impl_base<RequestImplType> >
   {
   public:
     //typedef RequestImplType     implementation_type;
@@ -59,11 +59,11 @@ namespace cgi {
 
     struct implementation_type
       : RequestImplType
+      , common::request_base<
+            cgi_service_impl_base<RequestImplType>
+        >::impl_base
     {
-      typedef boost::asio::const_buffers_1             const_buffers_type;
-      typedef boost::asio::mutable_buffers_1           mutable_buffers_type;
       typedef typename RequestImplType::client_type    client_type;
-      typedef std::vector<char>                        buffer_type;
       typedef detail::form_parser<implementation_type> form_parser_type;
 
       implementation_type()
@@ -76,12 +76,7 @@ namespace cgi {
       // The number of characters left to read (ie. "content_length - bytes_read")
       std::size_t characters_left_;
       
-      buffer_type buf_;
-
-      std::vector<common::form_part> form_parts_;
-      
       boost::scoped_ptr<form_parser_type> fp_;
-
     };
 
     /// Return if the request is still open
@@ -120,11 +115,11 @@ namespace cgi {
           , boost::system::error_code& ec)
     {
       detail::save_environment(impl.env_vars());
-      const std::string& cl = var(impl.env_vars(), "CONTENT_LENGTH", ec);
+      std::string const& cl = impl.env_vars()["CONTENT_LENGTH"];
       impl.characters_left_ = cl.empty() ? 0 : boost::lexical_cast<std::size_t>(cl);
       impl.client_.bytes_left() = impl.characters_left_;
 
-      const std::string& request_method = var(impl.env_vars(), "REQUEST_METHOD", ec);
+      std::string const& request_method = impl.env_vars()["REQUEST_METHOD"];
       if (request_method == "GET")
         this->parse_get_vars(impl, ec);
       else
@@ -139,69 +134,6 @@ namespace cgi {
       //BOOST_ASSERT(impl.status() >= loaded);
 
       return ec;
-    }
-
-    std::string&
-      var(map_type& meta_data, const std::string& name
-         , boost::system::error_code& ec)
-    {
-      return meta_data[name.c_str()];
-    }
-
-    std::string
-      GET(implementation_type& impl, const std::string& name
-         , boost::system::error_code& ec)
-    {
-      //BOOST_ASSERT(impl.status() >= loaded);
-      return var(impl.get_vars(), name, ec);
-    }
-
-    map_type&
-      GET(implementation_type& impl)
-    {
-      //BOOST_ASSERT(impl.status() >= loaded);
-      return impl.get_vars();
-    }
-
-    /// Find the post meta-variable matching name
-    /**
-     * @param greedy This determines whether more data can be read to find
-     * the variable. The default is true to cause least surprise in the common
-     * case of having not parsed any of the POST data.
-
-     -----------------------------------------------
-     Should this return a pair of iterators instead?
-     What about url_decoding?
-     -----------------------------------------------
-
-     */
-    std::string
-      POST(implementation_type& impl, const std::string& name
-          , boost::system::error_code& ec, bool greedy = true)
-    {
-      //BOOST_ASSERT(impl.status() >= loaded);
-      const std::string& val = var(impl.post_vars(), name, ec);
-      if (val.empty() && greedy && !ec)
-      {
-
-      }
-
-      return val;
-    }
-
-    map_type&
-      POST(implementation_type& impl)
-    {
-      //BOOST_ASSERT(impl.status() >= loaded);
-      return impl.post_vars();
-    }
-
-    // prefer this to the above
-    map_type&
-      POST(implementation_type& impl, boost::system::error_code& ec)
-    {
-      //BOOST_ASSERT(impl.status() >= loaded);
-      return impl.post_vars();
     }
 
     // TODO: use `greedy`
@@ -234,41 +166,6 @@ namespace cgi {
 			if (rm == "POST")
 			  return POST(impl, ec);
 		}
-
-    /// Find the cookie meta-variable matching name
-    std::string
-      cookie(implementation_type& impl, const std::string& name
-            , boost::system::error_code& ec)
-    {
-      //BOOST_ASSERT(impl.status() >= loaded);
-      return var(impl.cookie_vars(), name, ec);
-    }
-
-    map_type&
-      cookie(implementation_type& impl)
-    {
-      //BOOST_ASSERT(impl.status() >= loaded);
-      return impl.cookie_vars();
-    }
-
-
-    /// Find the environment meta-variable matching name
-    std::string
-      env(implementation_type& impl, const std::string& name
-         , boost::system::error_code& ec)
-    {
-      //BOOST_ASSERT(impl.status() >= loaded);
-      const char* c = ::getenv(name.c_str());
-      return c ? c : std::string();
-    }
-
-    map_type&
-      env(implementation_type& impl)
-    {
-      //BOOST_ASSERT(impl.status() >= loaded);
-      return impl.env_vars();
-    }
-
 
     role_type
       get_role(implementation_type& impl)

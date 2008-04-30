@@ -32,7 +32,6 @@ namespace cgi {
         connection_type, tags::acgi
       >
     client_type;
-    //typedef async_stdio_connection client_type;
 
     acgi_request_impl()
       : cgi_request_impl_base<connection_type>()

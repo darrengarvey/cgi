@@ -28,8 +28,6 @@ namespace cgi {
   {
   public:
     typedef acgi_request_service        type;
-    typedef acgi_request_impl           impl_type;
-    typedef ::cgi::common::map          map_type;
     typedef tags::acgi                  protocol_type;
     typedef acgi_service                protocol_service_type;
 

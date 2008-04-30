@@ -30,7 +30,7 @@ namespace cgi {
     boost::system::error_code
       form_parser<T>::parse(boost::system::error_code& ec)
     {
-      std::string content_type (impl_.env_vars_["CONTENT_TYPE"]);
+      std::string content_type (impl_.env_vars()["CONTENT_TYPE"]);
 
       BOOST_ASSERT(!content_type.empty());
 
@@ -94,7 +94,7 @@ namespace cgi {
             break;
         case '&': // we now have the name/value pair, so save it
             // **FIXME** have to have .c_str() ?
-            impl_.post_vars_[name.c_str()] = str;
+            impl_.post_vars()[name.c_str()] = str;
             str.clear();
             name.clear();
            break;
@@ -105,7 +105,7 @@ namespace cgi {
       // save the last param (it won't have a trailing &)
       if( !name.empty() )
           // **FIXME** have to have .c_str() ?
-          impl_.post_vars_[name.c_str()] = str;
+          impl_.post_vars()[name.c_str()] = str;
 
       return ec;
     }
@@ -175,8 +175,8 @@ namespace cgi {
       std::size_t offset = offset_;
 
       //int runs = 0;
-      buffer_iter begin(impl_.buf_.begin() + offset);
-      buffer_iter end(impl_.buf_.end());
+      buffer_iter begin(impl_.buffer_.begin() + offset);
+      buffer_iter end(impl_.buffer_.end());
 
       for(;;)
       {
@@ -194,7 +194,7 @@ namespace cgi {
              // = boost::range_iterator<;
              = std::make_pair(matches[1].first, matches[1].second);
             // **FIXME**
-            impl_.post_vars_[form_parts_.back().name.c_str()] = matches[1];
+            impl_.post_vars()[form_parts_.back().name.c_str()] = matches[1];
             //std::ofstream of("c:/cc/log/post_vars.log");
             //of<< "var == " << matches[1] << std::endl;
             offset_ = offset + matches[0].length();
@@ -217,8 +217,8 @@ namespace cgi {
               return ec;
             }
 
-            begin = impl_.buf_.begin() + offset;
-            end = impl_.buf_.end();
+            begin = impl_.buffer_.begin() + offset;
+            end = impl_.buffer_.end();
 
             if (ec)
               return ec;
@@ -285,14 +285,14 @@ namespace cgi {
       boost::match_results<buffer_iter> matches;
 
       std::size_t offset = offset_;
-      pos_ = impl_.buf_.begin();
+      pos_ = impl_.buffer_.begin();
       int runs = 0;
 
       std::size_t bytes_read = 0;
       for(;;)
       {
-        buffer_iter begin(impl_.buf_.begin() + offset);
-        buffer_iter end(impl_.buf_.end());
+        buffer_iter begin(impl_.buffer_.begin() + offset);
+        buffer_iter end(impl_.buffer_.end());
 
         if (!boost::regex_search(begin, end, matches, re
                                 , boost::match_default | boost::match_partial))
@@ -377,21 +377,21 @@ namespace cgi {
         bytes_read = impl_.client_.read_some(prepare(32), ec);
         if (ec || (bytes_read == 0))
           return ec;
-        buffer_iter begin(impl_.buf_.begin());// + offset);
-        buffer_iter end(impl_.buf_.end());
-        if (!boost::regex_search(begin, end //impl.buf_.begin(), impl.buf_.end()
+        buffer_iter begin(impl_.buffer_.begin());// + offset);
+        buffer_iter end(impl_.buffer_.end());
+        if (!boost::regex_search(begin, end //impl.buffer_.begin(), impl.buffer_.end()
                                 , matches, re, boost::match_default | boost::match_partial))
         {
-          offset = impl_.buf_.size();
+          offset = impl_.buffer_.size();
           continue;
         }
         else
         {
           if (matches[2].matched)
           {
-            impl_.buf_.erase(impl_.buf_.begin(), matches[0].second);
+            impl_.buffer_.erase(impl_.buffer_.begin(), matches[0].second);
             offset_ = 0;
-            pos_ = impl_.buf_.begin();
+            pos_ = impl_.buffer_.begin();
             return ec;
           }
           else
@@ -411,7 +411,7 @@ namespace cgi {
       form_parser<T>::parse_boundary_marker(boost::system::error_code& ec)
     {
       // get the meta-data appended to the content_type
-      std::string content_type_(impl_.env_vars_["CONTENT_TYPE"]);
+      std::string content_type_(impl_.env_vars()["CONTENT_TYPE"]);
       //BOOST_ASSERT(!content_type.empty());
 
       boost::regex re("; ?boundary=\"?([^\"\n\r]+)\"?");
