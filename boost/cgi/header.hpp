@@ -15,50 +15,34 @@
 namespace cgi {
  namespace common {
 
-  //template<typename StringT = std::string>
-  struct header
+  template<typename CharT>
+  struct basic_header
   {
-    typedef std::string string_type;
+    typedef CharT                             char_type;
+    typedef typename std::basic_string<CharT> string_type;
     
-    header()
+    basic_header()
       : content()
     {
     }
 
-    
-    /// Templated constructor to allow user-defined types to be converted
-    //template<typename T>
-    //header(T& t)
-    //  : content(t.to_string())
-    //{
-    //}
-    
-
-    //template<>
-    header(const string_type& _content)
+    basic_header(const string_type& _content)
       : content(_content)
     {
     }
 
-    header(const string_type& name, const string_type& val)
+    basic_header(const string_type& name, const string_type& val)
       : content(name + ": " + val)
     {
     }
 
-    //header(const std::string& name, const std::string& val)
-    //  : content(name + ": " + val)
-    //{
-    //}
-
     /// Construct an header from a cookie.
-    template<typename T>
-    header(const basic_cookie<T>& ck)
+    basic_header(const basic_cookie<char_type>& ck)
       : content("Set-cookie: " + ck.to_string())
     {
     }
 
     string_type content;
-
   };
 
 /*
@@ -77,56 +61,53 @@ namespace cgi {
 
 
   //{ Some shortcuts, to cut down on typing errors.
-  template<typename StringT>
-  header
-    content_type(StringT str)
+  template<typename CharT, typename StringT> basic_header<CharT>
+    content_type(StringT const& str)
   {
-    return header("Content-type", str);
+    return basic_header<CharT>("Content-type", str);
   }
 
-  template<typename StringT>
-  header
-    content_encoding(const StringT& str)
+  template<typename CharT> basic_header<CharT>
+    content_type(const CharT* str)
   {
-    return header("Content-encoding", str);
+    return basic_header<CharT>("Content-type", str);
   }
 
-  template<typename T>
-  header
+  template<typename CharT> basic_header<CharT>
+    content_encoding(std::basic_string<CharT> const& str)
+  {
+    return basic_header<CharT>("Content-encoding", str);
+  }
+
+  template<typename CharT, typename T> basic_header<CharT>
     content_length(const T& t)
   {
-    return header("Content-length", boost::lexical_cast<std::string>(t));
+    return basic_header<CharT>("Content-length",
+             boost::lexical_cast<std::basic_string<CharT> >(t));
   }
 
-  template<typename T, typename Traits, typename Alloc>
-  header
-    content_length(const std::basic_string<T, Traits, Alloc>& str)
+  template<typename CharT> basic_header<CharT>
+    content_length(std::basic_string<CharT> const& str)
   {
-    return header("Content-length", str);
-  }
-/*
-  template<typename StringT>
-  header<StringT>
-    location(const StringT& url)
-  {
-    return header<StringT>("Location", url);
+    return basic_header<CharT>("Content-length", str);
   }
 
-  header<std::string>
-    location(const std::string& url)
+  template<typename CharT> basic_header<CharT>
+    location(const CharT* url)
   {
-    return header<std::string>("Location", url);
-  }*/
-  //template<typename T>
-  header location(const std::string& url)
+    return basic_header<CharT>("Location", url);
+  }
+
+  template<typename CharT> basic_header<CharT>
+    location(std::basic_string<CharT> const& url)
   {
-    return header("Location", url);
+    return basic_header<CharT>("Location", url);
   }
   //}
 
   // typedefs for typical usage
-  //typedef basic_header<std::string>  header;
-  //typedef basic_header<std::wstring> wheader;
+  typedef basic_header<char>    header;
+  typedef basic_header<wchar_t> wheader;
 
  } // namespace common
 } // namespace cgi

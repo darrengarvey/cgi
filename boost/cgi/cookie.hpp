@@ -14,12 +14,13 @@
 #include <boost/tokenizer.hpp>
 
 namespace cgi {
+ namespace common {
 
-  template<typename String> struct basic_cookie;
+  template<typename CharT> struct basic_cookie;
   
   // typedefs for common usage
-  typedef basic_cookie<std::string> cookie;
-  typedef basic_cookie<std::wstring> wcookie;
+  typedef basic_cookie<char>    cookie;
+  typedef basic_cookie<wchar_t> wcookie;
 
   /// A `basic_cookie<>` object that can be (out-) streamed
   /**
@@ -32,10 +33,11 @@ namespace cgi {
    *   that takes an HttpCookie?
    * - Add from_string() ?
    */
-  template<typename String>
+  template<typename CharT>
   struct basic_cookie
   {
-    typedef String string_type;
+    typedef CharT                             char_type;
+    typedef typename std::basic_string<CharT> string_type;
 
     basic_cookie() {}
 
@@ -119,9 +121,9 @@ namespace cgi {
     */
 
     /// Make a string out of the cookie
-    std::string to_string()
+    string_type to_string()
     {
-      std::string str(name + "=" + value);
+      string_type str(name + "=" + value);
       if (!expires.empty()) str += ("; expires=" + expires);
       if (!path.empty()   ) str += ("; path="    + path);
       if (!domain.empty() ) str += ("; domain="  + domain);
@@ -131,14 +133,16 @@ namespace cgi {
     }
   };
 
-  template<typename OutStream, typename T>
-    OutStream& operator<<(OutStream& os, basic_cookie<T>& ck)
-  {
-    os<< ck.to_string();
-    return os;
-  }
-
+ } // namespace common
 } // namespace cgi
+
+
+template<typename OutStream, typename T>
+inline OutStream& operator<< (OutStream& os, cgi::common::basic_cookie<T>& ck)
+{
+  os<< ck.to_string();
+  return os;
+}
 
 #endif // CGI_COOKIE_HPP_INCLUDED__
 

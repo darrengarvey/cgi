@@ -60,12 +60,15 @@ namespace cgi {
  namespace common {
 
   /// The response class: a helper for responding to requests.
-  class response
+  template<typename T>
+  class basic_response
   {
   public:
-    typedef std::ostream ostream_type;
+    typedef T                              char_type;
+    typedef typename std::basic_string<T>  string_type;
+    typedef typename std::basic_ostream<T> ostream_type;
 
-    response(http::status_code sc = http::ok)
+    basic_response(http::status_code sc = http::ok)
       : buffer_(new ::cgi::streambuf())
       , ostream_(buffer_.get())
       , http_status_(sc)
@@ -78,14 +81,14 @@ namespace cgi {
      * Takes the buffer and uses it internally, does nothing with it on
      * destruction.
      */
-    response(::cgi::streambuf* buf, http::status_code sc = http::ok)
+    basic_response(::cgi::streambuf* buf, http::status_code sc = http::ok)
       : /*request_(NULL)
           , */ostream_(buf)
       , http_status_(sc)
     {
     }
 
-    ~response()
+    ~basic_response()
     {
     } 
 
@@ -106,13 +109,13 @@ namespace cgi {
     }
 
     // provide this too?
-    std::size_t write(const char* str, std::size_t len)
+    std::size_t write(const char_type* str, std::size_t len)
     {
       ostream_.write(str, len);
       return len;
     }
 
-    std::size_t write(const std::string& str)
+    std::size_t write(const string_type& str)
     {
       return write(str.c_str(), str.size());
     }
@@ -228,7 +231,7 @@ namespace cgi {
     void async_send(AsyncWriteStream& aws, Handler handler)
     {
       aws.io_service().post(
-        boost::bind(&response::do_async_send, aws, handler)
+        boost::bind(&basic_response<char_type>::do_async_send, aws, handler)
       );
     }
 
@@ -256,7 +259,8 @@ namespace cgi {
     }
 
     /// Set the status code associated with the response.
-    response& set_status(const http::status_code& num)
+    basic_response<char_type>&
+      set_status(const http::status_code& num)
     {
       http_status_ = num;
       return *this;
@@ -281,7 +285,8 @@ namespace cgi {
     }
 
     /// Add a header after appending the CRLF sequence.
-    response& set_header(const std::string& value)
+    basic_response<char_type>&
+      set_header(const string_type& value)
     {
       BOOST_ASSERT(!headers_terminated_);
       headers_.push_back(value + "\r\n");
@@ -289,7 +294,8 @@ namespace cgi {
     }
 
     /// Format and add a header given name and value, appending CRLF.
-    response& set_header(const std::string& name, const std::string& value)
+    basic_response<char_type>&
+      set_header(string_type const& name, string_type const& value)
     {
       BOOST_ASSERT(!headers_terminated_);
       headers_.push_back(name + ": " + value + "\r\n");
@@ -312,9 +318,18 @@ namespace cgi {
     {
       return headers_terminated_;
     }
+
+    // Is this really necessary?
+    void end_headers()
+    {
+      headers_terminated_ = true;
+    }
+
+    /// Get the ostream containing the response body.
+    ostream_type& ostream() { return ostream_; }
   protected:
     // Vector of all the headers, each followed by a CRLF
-    std::vector<std::string> headers_;
+    std::vector<string_type> headers_;
 
     // The buffer is a shared_ptr, so you can keep it cached elsewhere.
     boost::shared_ptr<common::streambuf> buffer_;
@@ -326,8 +341,8 @@ namespace cgi {
     // True if no more headers can be appended. 
     bool headers_terminated_;
 
-    template<typename T>
-    friend response& operator<<(response& resp, const T& t);
+    //template<typename T>
+    //friend response& operator<<(response& resp, const T& t);
 
     //template<typename A, typename B>
     //friend A& operator<<(A& resp, B b);
@@ -348,7 +363,7 @@ namespace cgi {
 
       //{ Construct a ConstBufferSequence out of the headers we have.
       //std::vector<boost::asio::const_buffer> headers;
-      typedef std::vector<std::string>::iterator iter;
+      typedef typename std::vector<string_type>::iterator iter;
       for (iter i(headers_.begin()), e(headers_.end()); i != e; ++i)
       {
         headers.push_back(common::buffer(*i));
@@ -360,11 +375,19 @@ namespace cgi {
     }
    };
 
+   /// Typedefs for typical usage.
+   typedef basic_response<char>    response;
+   typedef basic_response<wchar_t> wresponse; // **FIXME** (untested)
+
+ } // namespace common
+} // namespace cgi
+
   /// Generic ostream template
-  template<typename T>
-  response& operator<<(response& resp, const T& t)
+  template<typename charT, typename T>
+  inline cgi::common::basic_response<charT>&
+    operator<< (cgi::common::basic_response<charT>& resp, const T& t)
   {
-    resp.ostream_<< t;
+    resp.ostream()<< t;
     return resp;
   }
 
@@ -397,15 +420,17 @@ namespace cgi {
     }
   }*/
 
-  template<>
-  response& operator<<(response& resp, const ::cgi::common::header& hdr)
+  template<typename charT>
+  inline cgi::common::basic_response<charT>&
+    operator<< (cgi::common::basic_response<charT>& resp
+               , const ::cgi::common::header& hdr)
   {
     if (hdr.content.empty()) {
-      resp.headers_terminated_ = true;
+      resp.end_headers();
       return resp;
     }else{
       // We shouldn't allow headers to be sent after they're explicitly ended.
-      BOOST_ASSERT(!resp.headers_terminated_);
+      BOOST_ASSERT(!resp.headers_terminated());
       resp.set_header(hdr.content);
       return resp;
     }
@@ -422,23 +447,22 @@ namespace cgi {
    * http://tinyurl.com/33znkj), but this is outside the scope of this
    * library.
    */
-  template<typename T>
-  response& operator<<(response& resp, basic_cookie<T> ck)
+  template<typename charT, typename T>
+  inline cgi::common::basic_response<charT>& 
+    operator<<(cgi::common::basic_response<charT>& resp, cgi::common::basic_cookie<T> ck)
   {
     BOOST_ASSERT(!resp.headers_terminated());
     resp.set_header("Set-cookie", ck.to_string());
     return resp;
   }
 
-  template<typename T>
-  response& operator<<(response& resp, http::status_code status)
+  template<typename charT, typename T>
+  inline cgi::common::basic_response<charT>&
+    operator<<(cgi::common::basic_response<charT>& resp, cgi::http::status_code status)
   {
     BOOST_ASSERT(!resp.headers_terminated());
     return resp.set_status(status);
   }
-
- } // namespace common
-} // namespace cgi
 
 #undef BOOST_CGI_ADD_DEFAULT_HEADER
 
