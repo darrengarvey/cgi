@@ -14,6 +14,7 @@
 namespace cgi {
  namespace common {
 
+  /// Import the Boost.Asio overloads.
   using boost::asio::buffer;
 
  } // namespace common

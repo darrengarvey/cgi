@@ -33,44 +33,7 @@ namespace cgi {
   class request_base
   {
   public:
-    /// Find the environment meta-variable matching name
-    template<typename ImplType>
-    std::string& env(ImplType& impl, std::string const& name
-                    , boost::system::error_code& ec)
-    {
-      return impl.env_vars()[name.c_str()];
-    }
-
-    template<typename ImplType>
-    std::string& GET(ImplType& impl, std::string const& name
-                    , boost::system::error_code& ec)
-    {
-      return impl.get_vars()[name.c_str()];
-    }
-
-    /// Find the post meta-variable matching name
-    /**
-     * @param greedy This determines whether more data can be read to find
-     * the variable. The default is true to cause least surprise in the common
-     * case of having not parsed any of the POST data.
-     */
-    template<typename ImplType>
-    std::string& POST(ImplType& impl, std::string const& name
-                     , boost::system::error_code& ec, bool greedy)
-    {
-      // **FIXME** greedy isn't used: it may be unnecessary now though...
-      return impl.post_vars()[name.c_str()];
-    }
-
-    /// Find the cookie meta-variable matching name
-    template<typename ImplType>
-    std::string&
-      cookie(ImplType& impl, std::string const& name
-            , boost::system::error_code& ec)
-    {
-      return impl.cookie_vars()[name.c_str()];
-    }
-
+    /// Get the request ID of a FastCGI request, or 1.
     template<typename ImplType>
     int request_id(ImplType& impl)
     {
@@ -82,15 +45,12 @@ namespace cgi {
     // implementation_type and should be inherited by it.
     struct impl_base
     {
-      typedef std::vector<char>                 buffer_type;
+      typedef char                              char_type; // **FIXME**
+      typedef std::basic_string<char_type>      string_type;
+      typedef std::vector<char_type>            buffer_type;
       typedef boost::asio::const_buffers_1      const_buffers_type;
       typedef boost::asio::mutable_buffers_1    mutable_buffers_type;
  
-      common::env_map& env_vars()       { return boost::fusion::at_c<0>(vars_); }
-      common::get_map& get_vars()       { return boost::fusion::at_c<1>(vars_); }
-      common::post_map& post_vars()     { return boost::fusion::at_c<2>(vars_); }
-      common::cookie_map& cookie_vars() { return boost::fusion::at_c<3>(vars_); }
-
       typedef boost::fusion::vector<
           common::env_map, common::get_map
         , common::post_map, common::cookie_map
@@ -108,14 +68,12 @@ namespace cgi {
       // Make sure the request is in a pre-loaded state
       //BOOST_ASSERT (impl.status() <= unloaded);
 
-      std::string const& vars(impl.env_vars()["QUERY_STRING"]);
-      if (vars.empty())
-        return ec;
-
-      detail::extract_params(vars, impl.get_vars()
-                            , boost::char_separator<char>
-                                ("", "=&", boost::keep_empty_tokens)
-                            , ec);
+      std::string const& vars (env_vars(impl.vars_)["QUERY_STRING"]);
+      if (!vars.empty())
+        detail::extract_params(vars, get_vars(impl.vars_)
+                              , boost::char_separator<char>
+                                 ("", "=&", boost::keep_empty_tokens)
+                              , ec);
 
       return ec;
     }
@@ -128,14 +86,12 @@ namespace cgi {
       // Make sure the request is in a pre-loaded state
       //BOOST_ASSERT (impl.status() <= unloaded);
 
-      std::string const& vars(impl.env_vars()["HTTP_COOKIE"]);
-      if (vars.empty())
-        return ec;
-
-      detail::extract_params(vars, impl.cookie_vars()
-                            , boost::char_separator<char>
-                                ("", "=;", boost::keep_empty_tokens)
-                            , ec);
+      std::string const& vars (env_vars(impl.vars_)["HTTP_COOKIE"]);
+      if (!vars.empty())
+        detail::extract_params(vars, cookie_vars(impl.vars_)
+                              , boost::char_separator<char>
+                                  ("", "=;", boost::keep_empty_tokens)
+                              , ec);
 
       return ec;
     }

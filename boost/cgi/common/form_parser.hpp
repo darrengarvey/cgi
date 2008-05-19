@@ -11,17 +11,20 @@
 
 #include "boost/cgi/detail/push_options.hpp"
 
+///////////////////////////////////////////////////////////
 #include <set>
 #include <vector>
 #include <string>
+///////////////////////////////////////////////////////////
 #include <boost/regex.hpp>
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/function.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/algorithm/string/find.hpp>
+///////////////////////////////////////////////////////////
+#include "boost/cgi/common/map.hpp"
 #include "boost/cgi/common/form_part.hpp"
-#include "boost/cgi/basic_client.hpp"
 
 namespace cgi {
  namespace detail {
@@ -101,7 +104,9 @@ namespace cgi {
  } // namespace detail
 } // namespace cgi
 
-#include "boost/cgi/common/form_parser.ipp"
+#ifndef BOOST_CGI_BUILD_LIB
+#  include "boost/cgi/common/form_parser.ipp"
+#endif
 
 #endif // CGI_DETAIL_FORM_PARSER_HPP_INCLUDED__
 

@@ -11,6 +11,8 @@
 // The errors for everything are defined in here. ie. FastCGI,
 // CGI and SCGI errors.
 //
+// **FIXME** This is a mess.
+//
 ////////////////////////////////////////////////////////////////
 #ifndef CGI_ERROR_HPP_INCLUDED__
 #define CGI_ERROR_HPP_INCLUDED__
@@ -51,6 +53,9 @@ enum fcgi_errors
   accepting_on_an_open_request,
 
   invalid_socket,
+
+  // The CONTENT_TYPE for form data wasn't recognised.
+  invalid_form_type,
 
   // Used in basic_connection<tags::stdio>
   // **FIXME**

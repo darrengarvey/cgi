@@ -14,6 +14,7 @@
 #include <boost/fusion/support.hpp>
 ////////////////////////////////////////////////////////////////
 #include "boost/cgi/common/map.hpp"
+#include "boost/cgi/common/source_enums.hpp"
 #include "boost/cgi/common/request_base.hpp"
 #include "boost/cgi/tags.hpp"
 #include "boost/cgi/read.hpp"
@@ -191,10 +192,10 @@ namespace cgi {
       );
                 
       impl.buffer_.clear();
-      impl.get_vars().clear();
-      impl.post_vars().clear();
-      impl.cookie_vars().clear();
-      impl.env_vars().clear();
+      common::get_vars(impl.vars_).clear();
+      common::post_vars(impl.vars_).clear();
+      common::cookie_vars(impl.vars_).clear();
+      common::env_vars(impl.vars_).clear();
       impl.stdin_parsed_ = false;
       impl.http_status_ = http::no_content;
       impl.request_status_ = null;
@@ -264,7 +265,7 @@ namespace cgi {
         parse_packet(impl, ec);
       }
 
-      const std::string& request_method = env(impl, "REQUEST_METHOD", ec);
+      const std::string& request_method = env_vars(impl.vars_)["REQUEST_METHOD"];
       if (request_method == "GET")
         if (parse_get_vars(impl, ec))
           return ec;
@@ -489,7 +490,7 @@ namespace cgi {
         //std::cerr<< "[hw] data := " << data << std::endl;
 
         // **FIXME**
-        impl.env_vars()[name.c_str()] = data;
+        env_vars(impl.vars_)[name.c_str()] = data;
       }
 
       return ec;

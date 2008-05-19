@@ -114,12 +114,12 @@ namespace cgi {
       load(implementation_type& impl, bool parse_stdin
           , boost::system::error_code& ec)
     {
-      detail::save_environment(impl.env_vars());
-      std::string const& cl = impl.env_vars()["CONTENT_LENGTH"];
+      detail::save_environment(env_vars(impl.vars_));
+      std::string const& cl = env_vars(impl.vars_)["CONTENT_LENGTH"];
       impl.characters_left_ = cl.empty() ? 0 : boost::lexical_cast<std::size_t>(cl);
       impl.client_.bytes_left() = impl.characters_left_;
 
-      std::string const& request_method = impl.env_vars()["REQUEST_METHOD"];
+      std::string const& request_method = env_vars(impl.vars_)["REQUEST_METHOD"];
       if (request_method == "GET")
         this->parse_get_vars(impl, ec);
       else
@@ -135,7 +135,7 @@ namespace cgi {
 
       return ec;
     }
-
+/*
     // TODO: use `greedy`
     std::string
       form(implementation_type& impl, const std::string& name
@@ -166,7 +166,7 @@ namespace cgi {
 			if (rm == "POST")
 			  return POST(impl, ec);
 		}
-
+*/
     role_type
       get_role(implementation_type& impl)
     {
