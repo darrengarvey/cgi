@@ -18,6 +18,7 @@ BOOST_AUTO_TEST_CASE( cookie_constructor_delete )
   // delete the cookie. ie. set its value to NULL and give it a date
   // in the past
   using namespace cgi;
+  using cgi::common::cookie;
   using namespace std;
 
   string ex("Fri, 05-Jun-1989 15:30:00 GMT");
@@ -38,6 +39,7 @@ BOOST_AUTO_TEST_CASE( cookie_constructor_full )
 {
   // Check the full version of the constructor works (simple test)
   using namespace cgi;
+  using cgi::common::cookie;
   using namespace std;
 
   string ex("Wed, 03-Oct-2007 16:26:06 GMT");
@@ -62,6 +64,7 @@ BOOST_AUTO_TEST_CASE( cookie_stream_operator )
   // delete the cookie. ie. set its value to NULL and give it a date
   // in the past
   using namespace cgi;
+  using cgi::common::cookie;
   using namespace std;
 
   string cookie_content(

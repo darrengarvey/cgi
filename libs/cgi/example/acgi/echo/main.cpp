@@ -17,6 +17,7 @@
 
 #include <boost/cgi/acgi.hpp>
 #include <fstream>
+#include <cstdio>
 
 using namespace std;
 using namespace boost::acgi;
@@ -27,12 +28,24 @@ template<typename OStreamT, typename MapT>
 void show_map_contents(OStreamT& os, MapT& m, const std::string& title)
 {
   os<< "<h3>" << title << "</h3>";
-  if (m.empty()) os<< "NONE<br />";
-  for (typename MapT::const_iterator i = m.begin(); i != m.end(); ++i)
-  {
-    os<< "<b>" << i->first << "</b> = <i>" << i->second << "</i><br />";
-  }
+  if (m.empty())
+    os<< "NONE<br />";
+  else
+    for (typename MapT::const_iterator i = m.begin(); i != m.end(); ++i)
+    {
+      os<< "<b>" << i->first << "</b> = <i>" << i->second << "</i><br />";
+    }
 }
+
+std::size_t process_id()
+{
+#if defined(BOOST_WINDOWS)
+  return _getpid();
+#else
+  return getpid();
+#endif
+}
+
 
 int main()
 {
@@ -52,20 +65,21 @@ int main()
       if (ec)
       {
         response resp;
-        resp
-        << content_type("text/html")
-        << "Error " << ec.value() << ": " << ec.message() << "<p />"
-           "--Original message follows--"
-           "<p />";
+        resp<< content_type("text/html")
+            << "Error " << ec.value() << ": " << ec.message() << "<p />"
+               "--Original message follows--"
+               "<p />";
         resp.send(req.client());
       }
 
       response resp;
       resp<< content_type("text/html")
+          << "Request ID = " << req.id() << "<br />"
+          << "Process ID = " << process_id() << "<br />"
           << "<form method=POST enctype='multipart/form-data'>"
-              "<input type=text name=name value='" << req.POST("name") << "' />"
+              "<input type=text name=name value='" << req[post]["name"] << "' />"
               "<br />"
-              "<input type=text name=hello value='" << req.POST("hello") << "' />"
+              "<input type=text name=hello value='" << req[post]["hello"] << "' />"
               "<br />"
               "<input type=file name=user_file />"
               "<input type=hidden name=cmd value=multipart_test />"
@@ -73,10 +87,10 @@ int main()
               "<input type=submit value=submit />"
              "</form><p />";
 
-      show_map_contents(resp, req[get_data],    "GET Variables");
-      show_map_contents(resp, req[post_data],   "POST Variables");
-      show_map_contents(resp, req[cookie_data], "Cookie Variables");
-      show_map_contents(resp, req[env_data],    "Environment Variables");
+      show_map_contents(resp, req[env],     "Environment Variables");
+      show_map_contents(resp, req[get],     "GET Variables");
+      show_map_contents(resp, req[post],    "POST Variables");
+      show_map_contents(resp, req[cookies], "Cookie Variables");
 
       return_(resp, req, 0); // All ok.
 
@@ -101,12 +115,12 @@ int main()
     // are reached.
 
   }catch(std::exception* e){
-    std::cerr
+    std::cout
     << content_type("text/plain").content
     << "Exception: " << e->what();
     return 3;
   }catch(...){
-    std::cerr<< content_type("text/plain").content
+    std::cout<< content_type("text/plain").content
              << "Unknown error.";
     return 4;
   }

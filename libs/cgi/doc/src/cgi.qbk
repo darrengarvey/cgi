@@ -117,4 +117,6 @@ These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sour
 
 [include:server_support user_guide/server_support.qbk]
 
+[include troubleshooting.qbk]
+
 [include acknowledgements.qbk]

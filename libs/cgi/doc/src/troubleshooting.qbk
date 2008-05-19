@@ -1,0 +1,53 @@
+
+[section Troubleshooting]
+
+[section Internal Server Errors]
+
+Every CGI programmer knows of the dreaded "500: Internal Server Error". It is such a generic error that it is usually completely useless. There are however some techniques that can be used to diagnose problems: they are not ideal, but can usually help in some way.
+
+[section:exceptions_and_asserts Uncaught Exceptions and Failed Asserts]
+
+An uncaught exception or a failed assert can cause your program to terminate unexpectedly, before you manage to output anything. One way to see if this is happening is to put your entire `main()` function in a `try {} catch(...) {}` block. Then - either in the body of `catch(...)` or at the very start of `main()` - you should try writing something to `std::cerr` (any protocol) or `std::cout` (CGI/aCGI only). The following is a template:
+
+``
+main()
+try
+{
+  // In almost all cases std::cerr is available (check your server's error logs).
+  std::cerr<< "Program started ok..." << std::endl << std::flush;
+
+  std::cout<< "Content-type: text/plain\r\n\r\n" // the required content-type header
+           << "TESTING"
+           << std::flush; // make sure you flush the buffer as soon as possible!
+
+  // ...
+
+}catch(...){
+  std::cerr<< "Caught exception in main()" << std::endl << std::flush;
+  std::cout<< "Content-type: text/plain\r\n\r\n"
+           << "Caught exception!" << std::flush;
+}
+``
+
+[endsect] [/ exceptions_and_asserts]
+
+[section Static Linking]
+
+Because this library depends on compiled libraries, you may find that your application crashes before it even starts running. If you find you can't even write to std::cerr at the very start of your program then you may have a runtime linking problem.
+
+The easiest way around this is to statically link your program. If you're using `bjam` you can use the command:
+
+``
+bjam link=static runtime-link=static
+``
+
+[tip
+  To check what directories are searched for libraries, try one of the echo examples on your server and look for a variable like `LIB_DIR` or `LIB`.
+]
+
+[endsect] [/ static_linking]
+
+[endsect] [/ internal_server_error]
+
+[endsect] [/ troubleshooting]
+

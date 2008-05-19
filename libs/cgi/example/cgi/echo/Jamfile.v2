@@ -7,9 +7,10 @@
 project boost/cgi/example/cgi/echo ;
 
 exe cgi_echo
-  : main.cpp
-    /boost/thread/
-    /boost/regex/
+  :
+    main.cpp
+  :
+    <library>/boost/cgi/
   ;
 
 

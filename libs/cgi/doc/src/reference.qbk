@@ -7,8 +7,57 @@
 
 [section:ref Reference]
 
+[xinclude:doxygen cgi_dox.xml]
+
+[section:quick Quick Reference]
+
 Reference coming...
 
-[/include request_objects.qbk]
+Requests
+  - Request Data
+      - environment
+        - operator[""]
+        - operator[env][""]
+        - member functions
+          - script_name()
+          - request_method()
+          - content_length()
+          - content_encoding()
+          - etc...
+      - GET
+      - POST
+      - form (transparent GET/POST)
+      - cookie
+  - constructors
+  - load()
+  - async_load()
+  - close()
+  - clear()
+  - id()
+  - client()
 
-[endsect]
+Acceptor
+  - constructors
+  - accept()
+  - async_accept()
+  - cancel()
+
+
+Service
+  - run()
+  - stop()
+  - reset()
+  - get_io_service()
+
+Responses
+  - operator<<
+  - send()
+  - clear()
+  - data()
+  - content_length()
+
+
+[endsect] [/ quick]
+
+[endsect] [/ ref]
+

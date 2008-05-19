@@ -3,13 +3,19 @@
 # user-supplied variables (ie. using modules.peek, I think)
 
 project boost/cgi
+  : build-dir
+      $(top)/bin.v2
   : usage-requirements
       <include>$(top)
       <include>$(boost-root)
       <library>/boost/thread/
       <library>/boost/system/
+      <library>/boost/regex/
       <define>_CRT_SECURE_NO_WARNINGS
       <define>_SCL_SECURE_NO_WARNINGS
   ;
 
 
+alias boost_cgi ;
+
+#lib boost_cgi : $(top)/boost/cgi/common/form_parser.cpp ;

@@ -18,7 +18,6 @@
 
 void init_env()
 {
-  using namespace std;
   setenv("HTTP_HOST", "localhost", 1);
   setenv("SCRIPT_NAME", "some/test/script", 1);
   setenv("EMPTY_VAR", "", 1);

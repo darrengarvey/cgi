@@ -49,3 +49,19 @@
     BOOST_CHECK_EQUAL( req[cookie_data]["foo"], "bar" );                        \
     BOOST_CHECK_EQUAL( req[cookie_data]["encoded"], "\"£$%^$*^hh%%thd@:" );
 
+
+#include <string>
+#include <cstdlib>
+#include <boost/config.hpp>
+
+#ifdef BOOST_MSVC
+  // MSVC doesn't support setenv, but it does support putenv
+  void setenv(std::string const& name, std::string const& val, int reset = 0)
+  {
+    if (putenv((name + val).c_str()) != 0)
+    {
+      std::cerr<< "Error adding environment variable." << std::endl;
+    }
+  }
+#endif
+
