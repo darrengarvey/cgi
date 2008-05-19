@@ -1,11 +1,56 @@
 import os ;
 import modules ;
 
-path-constant BOOST_BUILD_PATH : [ os.environ BOOST_BUILD_PATH ] ;
+local rule get-boost-root ( )
+{
+  local boost-root = [ MATCH "^--boost-root=(.*)" : [ modules.peek : ARGV ] ] ;
+  if $(boost-root)
+  {
+    return $(boost-root) ;
+  }
+  else
+  {
+    boost-root = [ os.environ BOOST_ROOT ] ;
+    if $(boost-root)
+    {
+      return $(boost-root) ;
+    }
+    else
+    {
+      ERROR "Can't find your Boost source. Either set the environment " ;
+      ERROR "variable BOOST_ROOT or pass --boost-root=/path/to/source on the " ;
+      ERROR "command line." ;
+    }
+  }
+}
+
+# Get the boost root
+path-constant boost-root : [ get-boost-root ] ;
+
+local rule get-bbv2-path ( boost-root * )
+{
+  local bbv2-path = [ os.environ BOOST_BUILD_PATH ] ;
+  if $(bbv2-path)
+  {
+    return $(bbv2-path) ;
+  }
+  else
+  if $(boost-root)
+  {
+    return "$(boost-root)/tools/build/v2" ;
+  }
+  else
+  {
+    ERROR "Can't find Boost Build. Please set either the environment variable " ;
+    ERROR "BOOST_ROOT (to your boost sources) or BOOST_BUILD_PATH (to boost build's " ;
+    ERROR "sources - usually located in BOOST_ROOT/tools/build/v2." ;
+  }
+}
+
+path-constant BOOST_BUILD_PATH : [ get-bbv2-path ] ;
 
 path-constant top : . ;
 path-constant include-dir : /usr/local/include ;
-path-constant boost-root : [ os.environ BOOST_ROOT ] ;
 
 # A relative path to boost (for documentation stuff)
 path-constant boost-root-relative : $(top)/../../../../boost/trunk/ ;
@@ -40,7 +85,7 @@ local rule get-bin-dir ( protocol )
     }
     else
     {
-      return "$(top)/$(protocol:L)-bin" ;
+      return "$(top)/libs/cgi/example/$(protocol:L)-bin" ;
     }
   }
 }
@@ -90,13 +135,4 @@ path-constant htdocs : [ get-htdocs-dir ] ;
 use-project /boost/ : $(boost-root) ;
 use-project /boost/cgi/ : $(top)/libs/cgi/build ;
 
-
-project cgi
-  : build-dir
-      $(top)/bin.v2
-  : requirements
-      <include>$(boost-root)
-      <include>$(top)
-      <define>_CRT_SECURE_NO_WARNINGS
-      <define>_SCL_SECURE_NO_WARNINGS
-  ;
+project anon : build-dir bin.v2 ;

@@ -28,8 +28,8 @@ using namespace boost::fcgi;
 #define LOG_FILE "/var/www/log/fcgi_echo.txt"
 
 //
-// This function writes the title and map contents to the ostream in an
-// HTML-encoded format (to make them easier on the eye).
+// Write the title and map contents to the ostream in an HTML-encoded
+// format (to make them easier on the eye).
 //
 template<typename Map, typename OStream>
 void format_map(OStream& os, Map& m, const std::string& title)
@@ -41,6 +41,15 @@ void format_map(OStream& os, Map& m, const std::string& title)
   {
     os<< "<b>" << i->first << "</b> = <i>" << i->second << "</i><br />";
   }
+}
+
+std::size_t process_id()
+{
+#if defined(BOOST_WINDOWS)
+  return _getpid();
+#else
+  return getpid();
+#endif
 }
 
 /// This function accepts and handles a single request.
@@ -71,6 +80,7 @@ int handle_request(Request& req, LogStream& of)
   // You can also stream text to a response object. 
       << "Hello there, universe!<p />"
       << "Request id = " << req.id() << "<p />"
+      << "Process id = " << process_id() << "<p />"
       << "<form method=POST enctype='multipart/form-data'>"
           "<input type=text name=name value='" << req.POST("name") << "' />"
           "<br />"
