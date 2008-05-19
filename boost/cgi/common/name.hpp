@@ -15,7 +15,8 @@
 
 #include <string>
 #include <ostream>
-#include <map>
+#include <cstdlib>
+#include <ctype.h>
 
 namespace cgi {
  namespace common {
@@ -25,13 +26,13 @@ namespace cgi {
      : std::char_traits<CharT>
    {
      static bool eq(char c1, char c2)
-     { return std::toupper(c1) == std::toupper(c2); }
+     { return toupper(c1) == toupper(c2); }
 
      static bool ne(char c1, char c2)
-     { return std::toupper(c1) != std::toupper(c2); }
+     { return toupper(c1) != toupper(c2); }
 
      static bool lt(char c1, char c2)
-     { return std::toupper(c1) < std::toupper(c2); }
+     { return toupper(c1) < toupper(c2); }
 
      static int compare( const char* str1
                        , const char* str2
@@ -39,8 +40,8 @@ namespace cgi {
      {
        if (num)
          do {
-           if (std::toupper(*str1) != std::toupper(*str2))
-             return (std::toupper(*str1) - std::toupper(*str2));
+           if (toupper(*str1) != toupper(*str2))
+             return (toupper(*str1) - toupper(*str2));
            ++str1;
            ++str2;
          } while (--num);
@@ -52,7 +53,7 @@ namespace cgi {
        find(const char* str, int n, char a)
      {
        do {
-         std::toupper(*str) != std::toupper(a);
+         toupper(*str) != toupper(a);
          ++str;
        } while (--n);
        return str;
@@ -63,17 +64,17 @@ namespace cgi {
    // typedef for typical usage.
    typedef std::basic_string<char, ichar_traits<char> > name;
 
-   // Overload allowing output using standard streams.
-   template <typename CharT, typename Traits>
-   std::basic_ostream<CharT, Traits>&
-     operator<< (std::basic_ostream<CharT, Traits>& os
-                , const std::basic_string<CharT, ichar_traits<CharT> >& str)
-   {
-     return os<< str.c_str();
-   } 
-
  } // namespace common
 } // namespace cgi
+
+// Allow output using standard streams (conserves original case).
+template <typename CharT, typename Traits>
+std::basic_ostream<CharT, Traits>&
+  operator<< (std::basic_ostream<CharT, Traits>& os
+             , const std::basic_string<CharT, ichar_traits<CharT> >& str)
+{
+  return os<< str.c_str();
+} 
 
 #endif // BOOST_CGI_COMMON_NAME_HPP_INCLUDED__
 
