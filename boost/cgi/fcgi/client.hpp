@@ -16,18 +16,18 @@
 #include <boost/asio/buffer.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/tags.hpp"
-#include "boost/cgi/common/map.hpp"
-#include "boost/cgi/common/io_service.hpp"
-#include "boost/cgi/basic_client.hpp"
-#include "boost/cgi/connections/shareable_tcp_socket.hpp"
-#include "boost/cgi/fcgi/specification.hpp"
 #include "boost/cgi/read.hpp"
-#include "boost/cgi/common/buffer.hpp"
 #include "boost/cgi/error.hpp"
-//#include "boost/cgi/fcgi/request_fwd.hpp"
-#include "boost/cgi/detail/protocol_traits.hpp"
+#include "boost/cgi/common/map.hpp"
+#include "boost/cgi/basic_client.hpp"
+#include "boost/cgi/common/buffer.hpp"
+#include "boost/cgi/common/io_service.hpp"
 #include "boost/cgi/basic_request_fwd.hpp"
-//#error BOOST_HAS_RVALUE_REFS
+#include "boost/cgi/fcgi/specification.hpp"
+#include "boost/cgi/detail/throw_error.hpp"
+#include "boost/cgi/detail/protocol_traits.hpp"
+#include "boost/cgi/connections/shareable_tcp_socket.hpp"
+
 namespace cgi {
  namespace common {
 
