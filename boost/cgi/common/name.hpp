@@ -62,20 +62,20 @@ namespace cgi {
    };
 
    // typedef for typical usage.
-   typedef std::basic_string<char, ichar_traits<char> > name;
+   typedef std::basic_string<char, ichar_traits<char> >       name;
+   typedef std::basic_string<wchar_t, ichar_traits<wchar_t> > wname;
+
+  // Allow output using standard streams (conserves original case).
+  template <typename CharT, typename Traits>
+  std::basic_ostream<CharT, Traits>&
+    operator<< (std::basic_ostream<CharT, Traits>& os
+               , std::basic_string<CharT, ichar_traits<CharT> > const& str)
+  {
+    return os<< str.c_str();
+  } 
 
  } // namespace common
 } // namespace cgi
-
-// Allow output using standard streams (conserves original case).
-template <typename CharT, typename Traits>
-std::basic_ostream<CharT, Traits>&
-  operator<< (std::basic_ostream<CharT, Traits>& os
-             , const std::basic_string<CharT
-             , cgi::common::ichar_traits<CharT> >& str)
-{
-  return os<< str.c_str();
-} 
 
 #endif // BOOST_CGI_COMMON_NAME_HPP_INCLUDED__
 
