@@ -14,3 +14,10 @@
 //#pragma warning (disable:4996)
 
 //#endif
+
+#if defined(BOOST_CGI_BUILD_LIB)
+#   define BOOST_CGI_INLINE
+#else
+#   define BOOST_CGI_INLINE inline
+#endif
+

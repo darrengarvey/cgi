@@ -11,21 +11,20 @@
 
 #include <map>
 #include <string>
-#include <boost/noncopyable.hpp>
+///////////////////////////////////////////////////////////
 #include <boost/shared_ptr.hpp>
-
+#include <boost/noncopyable.hpp>
+#include <boost/fusion/support.hpp>
+#include <boost/fusion/include/vector.hpp>
+///////////////////////////////////////////////////////////
+#include "boost/cgi/role_type.hpp"
+#include "boost/cgi/common/map.hpp"
+#include "boost/cgi/status_type.hpp"
 #include "boost/cgi/http/status_code.hpp"
 #include "boost/cgi/connections/stdio.hpp"
-#include "boost/cgi/role_type.hpp"
-#include "boost/cgi/status_type.hpp"
-#include "boost/cgi/common/map.hpp"
-
-#include <boost/fusion/include/vector.hpp>
-#include <boost/fusion/support.hpp>
-
-// Make this ProtocolService-independent
 
 namespace cgi {
+ namespace detail {
 
   //Forward declaration
   template<typename T>
@@ -54,16 +53,16 @@ namespace cgi {
       : stdin_parsed_(false)
       , stdin_data_read_(false)
       , stdin_bytes_left_(-1)
-      , http_status_(http::ok)
-      , request_status_(unloaded)
+      , http_status_(common::http::ok)
+      , request_status_(common::unloaded)
     {
     }
 
-    bool stdin_parsed()              { return stdin_parsed_;   }
-    http::status_code& http_status() { return http_status_;    }
-    status_type& status()            { return request_status_; }
+    bool stdin_parsed()                      { return stdin_parsed_;   }
+    common::http::status_code& http_status() { return http_status_;    }
+    status_type& status()                    { return request_status_; }
 
-    conn_ptr& connection()           { return connection_;     }
+    conn_ptr& connection()                   { return connection_;     }
 
   public:
     //conn_ptr connection() { return connection_; }
@@ -76,12 +75,14 @@ namespace cgi {
     std::size_t stdin_bytes_left_;
   protected:
 
-    http::status_code http_status_;
+    common::http::status_code http_status_;
     status_type request_status_;
 
     conn_ptr connection_;
   };
 
+ } // namespace detail
 } // namespace cgi
 
 #endif // CGI_CGI_REQUEST_IMPL_BASE_HPP_INCLUDED__
+

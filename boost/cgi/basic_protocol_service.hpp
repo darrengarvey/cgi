@@ -11,11 +11,12 @@
 
 #include <set>
 #include <queue>
+///////////////////////////////////////////////////////////
 #include <boost/shared_ptr.hpp>
 #include <boost/asio/strand.hpp>
 #include <boost/detail/workaround.hpp>
-
-#include "boost/cgi/io_service.hpp"
+///////////////////////////////////////////////////////////
+#include "boost/cgi/common/io_service.hpp"
 #include "boost/cgi/io_service_provider.hpp"
 #include "boost/cgi/basic_request_fwd.hpp"
 #include "boost/cgi/detail/protocol_traits.hpp"

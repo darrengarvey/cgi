@@ -9,22 +9,6 @@
 #ifndef CGI_IO_SERVICE_HPP_INCLUDED__
 #define CGI_IO_SERVICE_HPP_INCLUDED__
 
-//#if _MSC_VER > 1020
-//#pragma once
-//#endif
-
-#include <boost/asio/io_service.hpp>
-
-namespace cgi {
- namespace common {
-
-  using boost::asio::io_service;
-
- } // namespace common
-
-  // This should go?
-  using boost::asio::io_service;
-
-} // namespace cgi
+#include "boost/cgi/common/io_service.hpp"
 
 #endif // CGI_IO_SERVICE_HPP_INCLUDED__

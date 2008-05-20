@@ -9,18 +9,13 @@
 #ifndef CGI_STATUS_TYPE_HPP_INCLUDED__
 #define CGI_STATUS_TYPE_HPP_INCLUDED__
 
+#include "boost/cgi/common/status_type.hpp"
+
 namespace cgi {
 
-  enum status_type
-    { null
-    , unloaded
-    , activated
-    , loaded
-    , ok = loaded
-    , aborted
-    , closed
-    };
+  using namespace common;
 
 } // namespace cgi
 
 #endif // CGI_STATUS_TYPE_HPP_INCLUDED__
+

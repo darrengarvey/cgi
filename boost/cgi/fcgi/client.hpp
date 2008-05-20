@@ -10,17 +10,19 @@
 #define CGI_FCGI_CLIENT_HPP_INCLUDED__
 
 #include <vector>
+///////////////////////////////////////////////////////////
 #include <boost/shared_ptr.hpp>
 #include <boost/logic/tribool.hpp>
 #include <boost/asio/buffer.hpp>
+///////////////////////////////////////////////////////////
 #include "boost/cgi/tags.hpp"
 #include "boost/cgi/common/map.hpp"
-#include "boost/cgi/io_service.hpp"
+#include "boost/cgi/common/io_service.hpp"
 #include "boost/cgi/basic_client.hpp"
 #include "boost/cgi/connections/shareable_tcp_socket.hpp"
 #include "boost/cgi/fcgi/specification.hpp"
 #include "boost/cgi/read.hpp"
-#include "boost/cgi/buffer.hpp"
+#include "boost/cgi/common/buffer.hpp"
 #include "boost/cgi/error.hpp"
 //#include "boost/cgi/fcgi/request_fwd.hpp"
 #include "boost/cgi/detail/protocol_traits.hpp"

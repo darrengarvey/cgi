@@ -13,32 +13,27 @@
 
 #include <string>
 #include <cstdlib>
+///////////////////////////////////////////////////////////
 #include <boost/assert.hpp>
 #include <boost/regex.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/algorithm/string/find.hpp>
-
-#include "boost/cgi/common/map.hpp"
-#include "boost/cgi/basic_client.hpp"
+///////////////////////////////////////////////////////////
 #include "boost/cgi/role_type.hpp"
+#include "boost/cgi/common/map.hpp"
 #include "boost/cgi/status_type.hpp"
-#include "boost/cgi/detail/extract_params.hpp"
-#include "boost/cgi/detail/save_environment.hpp"
+#include "boost/cgi/basic_client.hpp"
 #include "boost/cgi/common/form_part.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
-
 #include "boost/cgi/common/form_parser.hpp"
 #include "boost/cgi/common/request_base.hpp"
+#include "boost/cgi/detail/extract_params.hpp"
+#include "boost/cgi/detail/save_environment.hpp"
 
 namespace cgi {
-
- namespace detail {
-
-
- } // namespace detail
-
+// **FIXME** Wrong namespace (should be cgi::detail?).
 
   template<typename RequestImplType>
   class cgi_service_impl_base
@@ -87,7 +82,7 @@ namespace cgi {
      */
     bool is_open(implementation_type& impl)
     {
-      return impl.status() >= aborted;
+      return impl.status() >= common::aborted;
     }
 
     /// Return the connection associated with the request
@@ -99,9 +94,10 @@ namespace cgi {
 
     int request_id(implementation_type& impl) { return 1; }
 
-    int close(implementation_type& impl, http::status_code& http_s, int status)
+    int close(implementation_type& impl, common::http::status_code& http_s
+             , int status)
     {
-      impl.status() = closed;
+      impl.status() = common::closed;
       impl.http_status() = http_s;
       return status;
     }
@@ -129,7 +125,7 @@ namespace cgi {
       if (ec) return ec;
 
       this->parse_cookie_vars(impl, ec);
-      impl.status() = loaded;
+      impl.status() = common::loaded;
 
       //BOOST_ASSERT(impl.status() >= loaded);
 
@@ -174,7 +170,7 @@ namespace cgi {
     }
 
     /// Set the http status (this does nothing for aCGI)
-    void set_status(implementation_type& impl, http::status_code&)
+    void set_status(implementation_type& impl, common::http::status_code&)
     {
     }
 

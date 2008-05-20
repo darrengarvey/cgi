@@ -71,7 +71,8 @@ namespace cgi {
 template <typename CharT, typename Traits>
 std::basic_ostream<CharT, Traits>&
   operator<< (std::basic_ostream<CharT, Traits>& os
-             , const std::basic_string<CharT, ichar_traits<CharT> >& str)
+             , const std::basic_string<CharT
+             , cgi::common::ichar_traits<CharT> >& str)
 {
   return os<< str.c_str();
 } 

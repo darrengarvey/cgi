@@ -13,19 +13,19 @@
 
 #include <string>
 ///////////////////////////////////////////////////////////
-#include <boost/foreach.hpp>
 #include <boost/bind.hpp>
+#include <boost/foreach.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/common/cookie.hpp"
 #include "boost/cgi/common/header.hpp"
-#include "boost/cgi/basic_request_fwd.hpp"
 #include "boost/cgi/http/status_code.hpp"
 #include "boost/cgi/common/streambuf.hpp"
+#include "boost/cgi/basic_request_fwd.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
 
 /// This mess outputs a default Content-type header if the user hasn't set any.
 /** **FIXME** Not implemented; not sure if it should be...
- * BOOST_CGI_ADD_DEFAULT_HEADER should not persiste into user-code.
+ * BOOST_CGI_ADD_DEFAULT_HEADER should not persiste beyond this file.
  *
  * It basically works like (default first):
  *
@@ -64,14 +64,15 @@ namespace cgi {
     typedef typename std::basic_string<T>  string_type;
     typedef typename std::basic_ostream<T> ostream_type;
 
-    basic_response(http::status_code sc = http::ok);
+    basic_response(common::http::status_code sc = common::http::ok);
 
     /// Construct with a particular buffer
     /**
      * Takes the buffer and uses it internally, does nothing with it on
      * destruction.
      */
-    basic_response(::cgi::streambuf* buf, http::status_code sc = http::ok);
+    basic_response(::cgi::common::streambuf* buf,
+        common::http::status_code sc = common::http::ok);
 
     ~basic_response();
 
@@ -151,7 +152,7 @@ namespace cgi {
       set_status(const http::status_code& num);
 
     /// Get the status code associated with the response.
-    common::http::status_code& status();
+    http::status_code& status();
 
     /// Allow more headers to be added (WARNING: avoid using this).
     void unterminate_headers();
@@ -187,7 +188,7 @@ namespace cgi {
 
     ostream_type ostream_;
 
-    common::http::status_code http_status_;
+    http::status_code http_status_;
 
     // True if no more headers can be appended. 
     bool headers_terminated_;

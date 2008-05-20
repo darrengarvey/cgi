@@ -9,20 +9,21 @@
 #ifndef CGI_FCGI_REQUEST_SERVICE_HPP_INCLUDED__
 #define CGI_FCGI_REQUEST_SERVICE_HPP_INCLUDED__
 
+#include <boost/fusion/support.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/fusion/include/vector.hpp>
-#include <boost/fusion/support.hpp>
 ////////////////////////////////////////////////////////////////
-#include "boost/cgi/common/map.hpp"
-#include "boost/cgi/common/source_enums.hpp"
-#include "boost/cgi/common/request_base.hpp"
 #include "boost/cgi/tags.hpp"
 #include "boost/cgi/read.hpp"
 #include "boost/cgi/role_type.hpp"
-#include "boost/cgi/io_service.hpp"
-#include "boost/cgi/detail/throw_error.hpp"
-#include "boost/cgi/detail/service_base.hpp"
+#include "boost/cgi/common/map.hpp"
 #include "boost/cgi/fcgi/client.hpp"
+#include "boost/cgi/http/status_code.hpp"
+#include "boost/cgi/common/io_service.hpp"
+#include "boost/cgi/detail/throw_error.hpp"
+#include "boost/cgi/common/source_enums.hpp"
+#include "boost/cgi/common/request_base.hpp"
+#include "boost/cgi/detail/service_base.hpp"
 #include "boost/cgi/common/form_parser.hpp"
 
 namespace cgi {
@@ -81,7 +82,7 @@ namespace cgi {
       implementation_type()
         : client_()
         , stdin_parsed_(false)
-        , http_status_(http::no_content)
+        , http_status_(::cgi::common::http::no_content)
         , request_status_(unloaded)
         , request_role_(spec_detail::ANY)
         , all_done_(false)
@@ -93,7 +94,7 @@ namespace cgi {
       client_type client_;
 
       bool stdin_parsed_;
-      http::status_code http_status_;
+      ::cgi::common::http::status_code http_status_;
       status_type request_status_;
       fcgi::spec_detail::role_t request_role_;
 
@@ -167,7 +168,7 @@ namespace cgi {
     }
 
     /// Close the request.
-    int close(implementation_type& impl, http::status_code& hsc
+    int close(implementation_type& impl, ::cgi::common::http::status_code& hsc
               , int program_status)
     {
       impl.all_done_ = true;
@@ -175,7 +176,7 @@ namespace cgi {
       return program_status;
     }
 
-    int close(implementation_type& impl, http::status_code& hsc
+    int close(implementation_type& impl, ::cgi::common::http::status_code& hsc
              , int program_status, boost::system::error_code& ec)
     {
       impl.all_done_ = true;
@@ -186,8 +187,8 @@ namespace cgi {
     void clear(implementation_type& impl)
     {
       BOOST_ASSERT
-      (   impl.request_status_ < activated
-       && impl.request_status_ > ok
+      (   impl.request_status_ < common::activated
+       && impl.request_status_ > common::ok
        && "Are you trying to clear() a request without closing it?"
       );
                 
