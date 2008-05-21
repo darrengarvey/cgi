@@ -9,10 +9,8 @@
 #ifndef CGI_CGI_SERVICE_HPP_INCLUDED__
 #define CGI_CGI_SERVICE_HPP_INCLUDED__
 
+#include "boost/cgi/common/basic_protocol_service_fwd.hpp" // order matters
 #include "boost/cgi/tags.hpp"
-//#include "boost/cgi/gateway_impl/acgi_gateway_impl.hpp"
-//#include "boost/cgi/gateway_service/acgi_gateway_service.hpp"
-#include "boost/cgi/basic_protocol_service_fwd.hpp"
 
 namespace cgi {
 
@@ -46,6 +44,6 @@ namespace cgi {
 
 } // namespace cgi
 
-#include "boost/cgi/basic_protocol_service.hpp"
+#include "boost/cgi/common/basic_protocol_service.hpp"
 
 #endif // CGI_CGI_SERVICE_HPP_INCLUDED__

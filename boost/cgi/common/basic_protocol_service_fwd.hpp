@@ -13,14 +13,14 @@
 #pragma once
 #endif
 
-#include "boost/cgi/io_service_provider.hpp"
+#include "boost/cgi/common/io_service_provider_fwd.hpp"
 
 namespace cgi {
  namespace common {
 
   template<
     typename Protocol,
-    typename IoServiceProvider = io_service_provider<>
+    typename IoServiceProvider = common::io_service_provider<>
   >
   class basic_protocol_service;
 
@@ -28,3 +28,4 @@ namespace cgi {
 } // namespace cgi
 
 #endif // CGI_BASIC_PROTOCOL_SERVICE_FWD_HPP_INCLUDED__
+

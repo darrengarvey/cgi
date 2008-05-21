@@ -16,29 +16,30 @@
 
 #include "boost/cgi/detail/push_options.hpp"
 
-#include <boost/noncopyable.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/assert.hpp>
-#include <boost/system/error_code.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/asio/io_service.hpp>
+#include <boost/system/error_code.hpp>
 #include <boost/asio/basic_io_object.hpp>
-
-#include "boost/cgi/detail/throw_error.hpp"
-#include "boost/cgi/detail/protocol_traits.hpp"
-#include "boost/cgi/request_base.hpp"
-#include "boost/cgi/role_type.hpp"
-#include "boost/cgi/common/source_enums.hpp"
-#include "boost/cgi/status_type.hpp"
+///////////////////////////////////////////////////////////
+// **FIXME** Half of these are probably useless
 #include "boost/cgi/is_async.hpp"
-#include "boost/cgi/connection_base.hpp"
-#include "boost/cgi/http/status_code.hpp"
-#include "boost/cgi/request_service.hpp"
-#include "boost/cgi/basic_protocol_service_fwd.hpp"
-#include "boost/cgi/basic_request_fwd.hpp"
-#include "boost/cgi/basic_sync_io_object.hpp"
-#include "boost/cgi/basic_io_object.hpp"
 #include "boost/cgi/common/map.hpp"
+//#include "boost/cgi/request_base.hpp"
+#include "boost/cgi/connection_base.hpp"
+#include "boost/cgi/request_service.hpp"
+#include "boost/cgi/basic_io_object.hpp"
+#include "boost/cgi/common/role_type.hpp"
+#include "boost/cgi/http/status_code.hpp"
+#include "boost/cgi/basic_request_fwd.hpp"
+#include "boost/cgi/detail/throw_error.hpp"
+#include "boost/cgi/common/status_type.hpp"
+#include "boost/cgi/common/source_enums.hpp"
+#include "boost/cgi/basic_sync_io_object.hpp"
+#include "boost/cgi/detail/protocol_traits.hpp"
+#include "boost/cgi/common/basic_protocol_service_fwd.hpp"
 
 namespace cgi {
  namespace common {

@@ -12,20 +12,20 @@
 #include "boost/cgi/detail/push_options.hpp"
 
 #include <boost/ref.hpp>
-#include <boost/static_assert.hpp>
 #include <boost/bind.hpp>
-#include <boost/asio.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/asio.hpp> // **FIXME**
 #include <boost/thread.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/system/error_code.hpp>
 ///////////////////////////////////////////////////////////
-#include "boost/cgi/common/io_service.hpp"
-#include "boost/cgi/detail/throw_error.hpp"
-#include "boost/cgi/detail/protocol_traits.hpp"
-#include "boost/cgi/basic_protocol_service_fwd.hpp"
-#include "boost/cgi/detail/service_base.hpp"
 #include "boost/cgi/fcgi/request.hpp"
+#include "boost/cgi/import/io_service.hpp"
+#include "boost/cgi/detail/throw_error.hpp"
+#include "boost/cgi/detail/service_base.hpp"
+#include "boost/cgi/detail/protocol_traits.hpp"
+#include "boost/cgi/common/basic_protocol_service_fwd.hpp"
 
 namespace cgi {
    

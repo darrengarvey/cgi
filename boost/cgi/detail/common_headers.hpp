@@ -12,18 +12,17 @@
 // #include all protocol-independent headers only. Protocol-specific
 // headers can just include this after other headers.
 
-#include "boost/cgi/common/buffer.hpp"
-#include "boost/cgi/common/map.hpp"
-#include "boost/cgi/io_service.hpp"
-#include "boost/cgi/common/streambuf.hpp"
-#include "boost/cgi/basic_request.hpp"
-//#include "boost/cgi/basic_request_acceptor.hpp"
-#include "boost/cgi/common/response.hpp"
 //#include "boost/cgi/logger.hpp"
-#include "boost/cgi/read.hpp"
-#include "boost/cgi/write.hpp"
+#include "boost/cgi/common/map.hpp"
+#include "boost/cgi/import/read.hpp"
+#include "boost/cgi/import/write.hpp"
+#include "boost/cgi/basic_request.hpp"
+#include "boost/cgi/import/buffer.hpp"
 #include "boost/cgi/common/header.hpp"
 #include "boost/cgi/common/return.hpp"
+#include "boost/cgi/common/response.hpp"
+#include "boost/cgi/import/streambuf.hpp"
 #include "boost/cgi/http/status_code.hpp"
+#include "boost/cgi/import/io_service.hpp"
 
 #endif // CGI_CGI_CGI_HPP_INCLUDED__

@@ -15,12 +15,12 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
 ///////////////////////////////////////////////////////////
-#include "boost/cgi/role_type.hpp"
 #include "boost/cgi/common/map.hpp"
-#include "boost/cgi/status_type.hpp"
 #include "boost/cgi/basic_client.hpp"
+#include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/http/status_code.hpp"
 #include "boost/cgi/connections/stdio.hpp"
+#include "boost/cgi/common/status_type.hpp"
 #include "boost/cgi/detail/cgi_request_impl_base.hpp"
 
 // Make this ProtocolService-independent

@@ -21,12 +21,12 @@
 #include <boost/system/error_code.hpp>
 #include <boost/algorithm/string/find.hpp>
 ///////////////////////////////////////////////////////////
-#include "boost/cgi/role_type.hpp"
 #include "boost/cgi/common/map.hpp"
-#include "boost/cgi/status_type.hpp"
 #include "boost/cgi/basic_client.hpp"
+#include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/common/form_part.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
+#include "boost/cgi/common/status_type.hpp"
 #include "boost/cgi/common/form_parser.hpp"
 #include "boost/cgi/common/request_base.hpp"
 #include "boost/cgi/detail/extract_params.hpp"

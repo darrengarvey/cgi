@@ -14,12 +14,12 @@
 #include <boost/fusion/include/vector.hpp>
 ////////////////////////////////////////////////////////////////
 #include "boost/cgi/tags.hpp"
-#include "boost/cgi/read.hpp"
-#include "boost/cgi/role_type.hpp"
 #include "boost/cgi/common/map.hpp"
 #include "boost/cgi/fcgi/client.hpp"
+#include "boost/cgi/import/read.hpp"
 #include "boost/cgi/http/status_code.hpp"
-#include "boost/cgi/common/io_service.hpp"
+#include "boost/cgi/common/role_type.hpp"
+#include "boost/cgi/import/io_service.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
 #include "boost/cgi/common/source_enums.hpp"
 #include "boost/cgi/common/request_base.hpp"
@@ -83,7 +83,7 @@ namespace cgi {
         : client_()
         , stdin_parsed_(false)
         , http_status_(::cgi::common::http::no_content)
-        , request_status_(unloaded)
+        , request_status_(common::unloaded)
         , request_role_(spec_detail::ANY)
         , all_done_(false)
       {
@@ -95,7 +95,7 @@ namespace cgi {
 
       bool stdin_parsed_;
       ::cgi::common::http::status_code http_status_;
-      status_type request_status_;
+      common::status_type request_status_;
       fcgi::spec_detail::role_t request_role_;
 
       bool all_done_;
@@ -198,8 +198,8 @@ namespace cgi {
       common::cookie_vars(impl.vars_).clear();
       common::env_vars(impl.vars_).clear();
       impl.stdin_parsed_ = false;
-      impl.http_status_ = http::no_content;
-      impl.request_status_ = null;
+      impl.http_status_ = common::http::no_content;
+      impl.request_status_ = common::null;
       impl.request_role_ = spec_detail::ANY;
       impl.all_done_ = false;
 
@@ -260,7 +260,7 @@ namespace cgi {
 
       while(!ec 
         && impl.client_.status() < completion_condition
-        && impl.request_status_ != loaded)
+        && impl.request_status_ != common::loaded)
       {
         //impl.client_.parse_packet(impl, ec);
         parse_packet(impl, ec);
@@ -411,7 +411,7 @@ namespace cgi {
     {
       if (id == fcgi::spec::get_request_id(impl.header_buf_))
       {
-        impl.request_status_ = aborted;
+        impl.request_status_ = common::aborted;
         return ec;
       }
       try {

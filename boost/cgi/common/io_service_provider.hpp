@@ -15,18 +15,13 @@
 
 #include "boost/cgi/detail/push_options.hpp"
 
-//#include <list>
-//#include <boost/ref.hpp>
-//#include <boost/bind.hpp>
-//#include <boost/thread.hpp>
-//#include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
-
-#include "boost/cgi/io_service.hpp"
-#include "boost/cgi/io_service_provider_fwd.hpp"
-
+///////////////////////////////////////////////////////////
+#include "boost/cgi/import/io_service.hpp"
+#include "boost/cgi/common/io_service_provider_fwd.hpp"
 
 namespace cgi {
+ namespace common {
 
   /// Hold a set number of io_services and return them based on the Policy
   /**
@@ -269,9 +264,14 @@ namespace cgi {
     //boost::asio::io_service::strand strand_;
   };
       */
+ } // namespace common
 
+ // **FIXME**
+ using common::io_service_provider;
+  
 } // namespace cgi
 
 #include "boost/cgi/detail/pop_options.hpp"
 
 #endif // CGI_IO_SERVICE_PROVIDER_HPP_INCLUDED__
+

@@ -16,10 +16,13 @@
 #include "boost/cgi/tags.hpp"
 
 namespace cgi {
+ namespace common {
 
-  template<typename = tags::single_service>
-  class io_service_provider;
+   template<typename = tags::single_service>
+   class io_service_provider;
 
+ } // namespace common
 } // namespace cgi
 
 #endif // CGI_IO_SERVICE_PROVIDER_FWD_HPP_INCLUDED__
+

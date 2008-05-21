@@ -12,7 +12,7 @@
 #include "boost/cgi/tags.hpp"
 #include "boost/cgi/connections/stdio.hpp"
 #include "boost/cgi/connections/async_stdio.hpp"
-#include "boost/cgi/basic_protocol_service_fwd.hpp"
+#include "boost/cgi/common/basic_protocol_service_fwd.hpp"
 
 namespace cgi {
 

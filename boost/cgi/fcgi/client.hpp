@@ -16,12 +16,12 @@
 #include <boost/asio/buffer.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/tags.hpp"
-#include "boost/cgi/read.hpp"
 #include "boost/cgi/error.hpp"
 #include "boost/cgi/common/map.hpp"
+#include "boost/cgi/import/read.hpp"
 #include "boost/cgi/basic_client.hpp"
-#include "boost/cgi/common/buffer.hpp"
-#include "boost/cgi/common/io_service.hpp"
+#include "boost/cgi/import/buffer.hpp"
+#include "boost/cgi/import/io_service.hpp"
 #include "boost/cgi/basic_request_fwd.hpp"
 #include "boost/cgi/fcgi/specification.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
@@ -47,7 +47,7 @@ namespace cgi {
   class basic_client<common::shareable_tcp_connection, Protocol>
   {
   public:
-    typedef ::cgi::io_service                 io_service_type;
+    typedef ::cgi::common::io_service         io_service_type;
     typedef ::cgi::common::map                map_type;
     typedef Protocol                          protocol_type;
     typedef common::shareable_tcp_connection  connection_type;

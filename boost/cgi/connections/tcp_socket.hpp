@@ -11,11 +11,11 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/asio/ip/tcp.hpp>
-
+///////////////////////////////////////////////////////////
 #include "boost/cgi/tags.hpp"
-#include "boost/cgi/io_service.hpp"
 #include "boost/cgi/connection_base.hpp"
 #include "boost/cgi/basic_connection.hpp"
+#include "boost/cgi/import/io_service.hpp"
 #include "boost/cgi/detail/push_options.hpp"
 
 namespace cgi {

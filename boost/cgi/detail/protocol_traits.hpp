@@ -17,10 +17,11 @@
 #define CGI_REQUEST_TRAITS_HPP_INCLUDED__
 
 #include <boost/shared_ptr.hpp>
+///////////////////////////////////////////////////////////
+#include "boost/cgi/common/basic_protocol_service_fwd.hpp"
 #include "boost/cgi/tags.hpp"
 #include "boost/cgi/basic_request_fwd.hpp"
 #include "boost/cgi/basic_connection_fwd.hpp"
-#include "boost/cgi/basic_protocol_service_fwd.hpp"
 
 namespace cgi {
 

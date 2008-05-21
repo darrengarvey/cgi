@@ -10,7 +10,7 @@
 #define CGI_FCGI_SERVICE_HPP_INCLUDED__
 
 #include "boost/cgi/tags.hpp"
-#include "boost/cgi/basic_protocol_service.hpp"
+#include "boost/cgi/common/basic_protocol_service.hpp"
 
 namespace cgi {
 

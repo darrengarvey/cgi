@@ -15,11 +15,12 @@
 ///////////////////////////////////////////////////////////
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
+#include <boost/shared_ptr.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/common/cookie.hpp"
 #include "boost/cgi/common/header.hpp"
 #include "boost/cgi/http/status_code.hpp"
-#include "boost/cgi/common/streambuf.hpp"
+#include "boost/cgi/import/streambuf.hpp"
 #include "boost/cgi/basic_request_fwd.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
 

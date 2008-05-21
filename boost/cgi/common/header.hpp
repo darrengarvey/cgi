@@ -15,6 +15,8 @@
 namespace cgi {
  namespace common {
 
+  template<typename CharT> class basic_cookie; // **FIXME** (maybe)
+
   // **FIXME** (could include response_fwd.hpp really)...
   template<typename CharT> class basic_response;
 

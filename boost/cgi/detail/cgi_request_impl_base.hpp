@@ -17,11 +17,11 @@
 #include <boost/fusion/support.hpp>
 #include <boost/fusion/include/vector.hpp>
 ///////////////////////////////////////////////////////////
-#include "boost/cgi/role_type.hpp"
 #include "boost/cgi/common/map.hpp"
-#include "boost/cgi/status_type.hpp"
+#include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/http/status_code.hpp"
 #include "boost/cgi/connections/stdio.hpp"
+#include "boost/cgi/common/status_type.hpp"
 
 namespace cgi {
  namespace detail {
@@ -60,7 +60,7 @@ namespace cgi {
 
     bool stdin_parsed()                      { return stdin_parsed_;   }
     common::http::status_code& http_status() { return http_status_;    }
-    status_type& status()                    { return request_status_; }
+    common::status_type& status()            { return request_status_; }
 
     conn_ptr& connection()                   { return connection_;     }
 
@@ -76,7 +76,7 @@ namespace cgi {
   protected:
 
     common::http::status_code http_status_;
-    status_type request_status_;
+    common::status_type request_status_;
 
     conn_ptr connection_;
   };

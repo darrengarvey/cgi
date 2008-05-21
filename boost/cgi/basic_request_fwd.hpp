@@ -10,10 +10,10 @@
 #define CGI_BASIC_REQUEST_FWD_HPP_INCLUDED__
 
 #include <memory>
-
-#include "request_service_fwd.hpp"
-#include "role_type.hpp"
-#include "basic_protocol_service_fwd.hpp"
+///////////////////////////////////////////////////////////
+#include "boost/cgi/common/role_type.hpp"
+#include "boost/cgi/request_service_fwd.hpp"
+#include "boost/cgi/common/basic_protocol_service_fwd.hpp"
 
 namespace cgi {
  namespace common {
@@ -28,3 +28,4 @@ namespace cgi {
 } // namespace cgi
 
 #endif // CGI_BASIC_REQUEST_FWD_HPP_INCLUDED__
+

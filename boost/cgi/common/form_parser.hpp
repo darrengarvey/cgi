@@ -105,7 +105,7 @@ namespace cgi {
 } // namespace cgi
 
 #ifndef BOOST_CGI_BUILD_LIB
-#  include "boost/cgi/common/form_parser.ipp"
+#  include "boost/cgi/impl/form_parser.ipp"
 #endif
 
 #endif // CGI_DETAIL_FORM_PARSER_HPP_INCLUDED__

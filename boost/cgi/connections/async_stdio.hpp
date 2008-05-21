@@ -15,7 +15,7 @@
 #include <boost/enable_shared_from_this.hpp>
 
 #include "boost/cgi/connections/stdio.hpp"
-#include "boost/cgi/io_service.hpp"
+#include "boost/cgi/import/io_service.hpp"
 #include "boost/cgi/tags.hpp"
 
 namespace cgi {
