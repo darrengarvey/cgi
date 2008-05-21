@@ -21,17 +21,16 @@
 // Unlike in the server1 example, the server class in this example uses
 // asynchronous functions, to increase throughput.
 //
-//
-// **FIXME**
-// This is slower than the server1 example, which is stupid.
 
 #include <fstream>
+///////////////////////////////////////////////////////////
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/program_options/environment_iterator.hpp>
-
-#include <boost/cgi/fcgi.hpp>
+///////////////////////////////////////////////////////////
+#include "boost/cgi/fcgi.hpp"
 
 using namespace std;
+using namespace boost;
 using namespace boost::fcgi;
 
 
@@ -55,34 +54,34 @@ void format_map(OStream& os, Map& m, const std::string& title)
  * corresponding to the error.
  */
 int handle_request(fcgi::request& req, boost::system::error_code& ec)
-  {
-    // Construct a `response` object (makes writing/sending responses easier).
-    response resp;
+{
+  // Construct a `response` object (makes writing/sending responses easier).
+  response resp;
 
-    // Responses in CGI programs require at least a 'Content-type' header. The
-    // library provides helpers for several common headers:
-    resp<< content_type("text/html")
-    // You can also stream text to a response object. 
-        << "Hello there, universe!<p />";
+  // Responses in CGI programs require at least a 'Content-type' header. The
+  // library provides helpers for several common headers:
+  resp<< content_type("text/html")
+  // You can also stream text to a response object. 
+      << "Hello there, universe!<p />";
 
-    // Use the function defined above to show some of the request data.
-    format_map(resp, req[env_data], "Environment Variables");
-    format_map(resp, req[get_data], "GET Variables");
-    format_map(resp, req[cookie_data], "Cookie Variables");
+  // Use the function defined above to show some of the request data.
+  format_map(resp, req[env_data], "Environment Variables");
+  format_map(resp, req[get_data], "GET Variables");
+  format_map(resp, req[cookie_data], "Cookie Variables");
 
-    //log_<< "Handled request, handling another." << std::endl;
+  //log_<< "Handled request, handling another." << std::endl;
 
-    // This funky macro finishes up:
-    return_(resp, req, 0);
-    // It is equivalent to the below, where the third argument is represented by
-    // `program_status`:
-    //
-    // resp.send(req.client());
-    // req.close(resp.status(), program_status);
-    // return program_status;
-    //
-    // Note: in this case `program_status == 0`.
-  }
+  // This funky macro finishes up:
+  return_(resp, req, 0);
+  // It is equivalent to the below, where the third argument is represented by
+  // `program_status`:
+  //
+  // resp.send(req.client());
+  // req.close(resp.status(), program_status);
+  // return program_status;
+  //
+  // Note: in this case `program_status == 0`.
+}
 
 
 /// The server is used to abstract away protocol-specific setup of requests.
@@ -192,8 +191,8 @@ try
 }catch(boost::system::system_error& se){
   cerr<< "[fcgi] System error: " << se.what() << endl;
   return 1313;
-}catch(exception& e){
-  cerr<< "[fcgi] Exception: " << e.what() << endl;
+}catch(std::exception* e){
+  cerr<< "[fcgi] Exception: " << e->what() << endl;
   return 666;
 }catch(...){
   cerr<< "[fcgi] Uncaught exception!" << endl;

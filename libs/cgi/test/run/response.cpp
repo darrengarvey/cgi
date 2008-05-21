@@ -13,7 +13,7 @@
 #define BOOST_TEST_MODULE response_test
 #include <boost/test/unit_test.hpp>
 
-#include "boost/cgi/response.hpp"
+#include "boost/cgi/common/response.hpp"
 
 using namespace std;
 using namespace boost;

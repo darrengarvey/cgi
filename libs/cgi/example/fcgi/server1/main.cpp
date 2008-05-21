@@ -20,8 +20,8 @@
 // This is very similar to the fcgi_echo example.
 //
 
-#include <boost/cgi/fcgi.hpp>
-#include "server.hpp"
+#include "boost/cgi/fcgi.hpp"
+#include "./server.hpp"
 
 using namespace std;
 using namespace boost::fcgi;
@@ -41,7 +41,7 @@ void format_map(OStream& os, Map& m, const std::string& title)
 }
 
 /// The handle_request function handles a single request.
-int handle_request(fcgi::request& req, boost::system::error_code& ec)
+int handle_request(request& req, boost::system::error_code& ec)
 {
   // Construct a `response` object (makes writing/sending responses easier).
   response resp;
@@ -60,7 +60,7 @@ int handle_request(fcgi::request& req, boost::system::error_code& ec)
   resp<< "<h3>Response Length</h3>" << resp.content_length()
       // response::content_length() returns the length of the *body*
       // of the response (ie. not including the headers).
-      << content_length(resp.content_length());
+      << content_length(resp);
 
   // This funky macro finishes up:
   return_(resp, req, 0);

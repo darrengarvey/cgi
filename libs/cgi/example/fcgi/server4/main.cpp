@@ -29,6 +29,7 @@
 #include <boost/cgi/fcgi.hpp>
 
 using namespace std;
+using namespace boost;
 using namespace boost::fcgi;
 
 /// Handle one request and return.

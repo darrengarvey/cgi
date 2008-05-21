@@ -6,6 +6,7 @@
 
 project boost/cgi/example
 : requirements
+      <library>/boost/cgi/
       <library>/boost/system/
       <library>/boost/thread/
   ;

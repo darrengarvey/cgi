@@ -1,4 +1,4 @@
-#include <boost/cgi/response.hpp>
+#include <boost/cgi/common/response.hpp>
 
 int main(int, char**)
 {

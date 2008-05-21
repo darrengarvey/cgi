@@ -9,7 +9,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <sstream>
-#include "boost/cgi/cookie.hpp"
+#include "boost/cgi/common/cookie.hpp"
 
 
 BOOST_AUTO_TEST_CASE( cookie_constructor_delete )

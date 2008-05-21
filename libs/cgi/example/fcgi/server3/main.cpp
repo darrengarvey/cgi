@@ -21,13 +21,15 @@
 //
 
 #include <fstream>
+///////////////////////////////////////////////////////////
 #include <boost/thread.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/program_options/environment_iterator.hpp>
-
-#include <boost/cgi/fcgi.hpp>
+///////////////////////////////////////////////////////////
+#include "boost/cgi/fcgi.hpp"
 
 using namespace std;
+using namespace boost;
 using namespace boost::fcgi;
 
 /// Handle one request and return.
@@ -139,8 +141,8 @@ try
 }catch(boost::system::system_error& se){
   cerr<< "[fcgi] System error: " << se.what() << endl;
   return 1313;
-}catch(exception& e){
-  cerr<< "[fcgi] Exception: " << e.what() << endl;
+}catch(std::exception* e){
+  cerr<< "[fcgi] Exception: " << e->what() << endl;
   return 666;
 }catch(...){
   cerr<< "[fcgi] Uncaught exception!" << endl;

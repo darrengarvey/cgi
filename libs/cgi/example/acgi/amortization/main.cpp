@@ -38,10 +38,10 @@ std::string string_from_currency(std::string amt)
 template<typename Request>
 void fill_amortization_dictionary(google::TemplateDictionary& dict, Request& req)
 {
-  std::string tmp( req.POST("LoanAmt") );
+  std::string tmp( req[post]["LoanAmt"] );
   dict.SetValue("LoanAmt", tmp.empty() ? "$250,000" : tmp);
 
-  tmp = req.POST("YearlyIntRate");
+  tmp = req[post]["YearlyIntRate"];
   dict.SetValue("YearlyIntRate", tmp.empty() ? "6.000" : tmp);
 
   boost::array<std::string, 8> year_opts
@@ -52,13 +52,13 @@ void fill_amortization_dictionary(google::TemplateDictionary& dict, Request& req
     dict.SetValueAndShowSection("TermYrs", year, "SELECT_TERM_YEARS");
   }
 
-  if (req.POST("Amortize").empty())
+  if (req[post]["Amortize"].empty())
     dict.ShowSection("NotAmortize");
   else
   {
-    double P = boost::lexical_cast<double>(string_from_currency(req.POST("LoanAmt")));
-    double i = boost::lexical_cast<double>(req.POST("YearlyIntRate")) / 1200;
-    double n = boost::lexical_cast<double>(req.POST("TermYrs")) * 12;
+    double P = boost::lexical_cast<double>(string_from_currency(req[post]["LoanAmt"]));
+    double i = boost::lexical_cast<double>(req[post]["YearlyIntRate"]) / 1200;
+    double n = boost::lexical_cast<double>(req[post]["TermYrs"]) * 12;
     double monthly_payments = (P*i) / (1 - std::pow((1+i), -n));
     
     google::TemplateDictionary* sub_dict = dict.AddSectionDictionary("RegPmtSummary");
@@ -103,7 +103,7 @@ void write_amortization_template(Request& req, response& resp)
   google::Template* tmpl
     = google::Template::GetTemplate("example.tpl", google::STRIP_WHITESPACE);
 
-  std::string arg(req.GET("arg"));
+  std::string arg(req[get]["arg"]);
   if (arg.empty())
     arg = "4"; // Make this the default
 

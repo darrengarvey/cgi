@@ -13,7 +13,6 @@
 //
 
 #include <boost/cgi/acgi.hpp>
-#include <boost/cgi/return.hpp>
 
 using namespace std;
 using namespace boost::acgi;

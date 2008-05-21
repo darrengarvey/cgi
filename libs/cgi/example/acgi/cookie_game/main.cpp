@@ -1,5 +1,4 @@
 #include <boost/cgi/acgi.hpp>
-#include <boost/cgi/response.hpp>
 
 #define SCRIPT_NAME "acgi_cookie_game"
 
@@ -49,17 +48,17 @@ int main()
 
   response resp;
 
-  if (req.GET("reset") == "true")
+  if (req[get]["reset"] == "true")
   {
-    resp<< cookie("name")
-        << location(req.script_name())
-        << content_type("text/plain");
+    resp<< cookie("name").to_string()
+        << location (req.script_name()) // redirect them.
+        << content_type ("text/plain");
     resp.send(req.client());
     return 0;
   }
 
   // First, see if they have a cookie set
-  std::string name = req[cookie_data]["name"];
+  std::string name = req[cookies]["name"];
   if (!name.empty())
   {
     resp<< header("Content-type", "text/html")
@@ -74,7 +73,7 @@ int main()
   if (!name.empty())
   {
     resp<< header("Content-type", "text/html")
-        << cookie("name", name)
+        << cookie("name", name).to_string()
         << "Hello there, " << "<a href=''>" << name << "</a>";
     resp.send(req.client());
     return 0;

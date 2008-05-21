@@ -7,57 +7,58 @@
 
 [section:ref Reference]
 
-[xinclude:doxygen cgi_dox.xml]
+[xinclude ../cgi_dox.xml]
 
-[section:quick Quick Reference]
+[h2 Quick Reference]
 
 Reference coming...
 
 Requests
-  - Request Data
-      - environment
-        - operator[""]
-        - operator[env][""]
-        - member functions
-          - script_name()
-          - request_method()
-          - content_length()
-          - content_encoding()
-          - etc...
-      - GET
-      - POST
-      - form (transparent GET/POST)
-      - cookie
-  - constructors
-  - load()
-  - async_load()
-  - close()
-  - clear()
-  - id()
-  - client()
+
+  * Request Data
+      * environment
+        * operator[""] (operator[] on the environment map)
+        * operator[env] (request meta-data)
+        * operator[get] (GET data)
+        * operator[post] (POST data)
+        * operator[cookies] (cookie data)
+        * member functions
+          * script_name()
+          * request_method()
+          * content_length()
+          * content_encoding()
+          * etc...
+  * constructors
+  * load()
+  * async_load()
+  * close()
+  * clear()
+  * id()
+  * client()
 
 Acceptor
-  - constructors
-  - accept()
-  - async_accept()
-  - cancel()
+
+  * constructors
+  * accept()
+  * async_accept()
+  * cancel()
 
 
 Service
-  - run()
-  - stop()
-  - reset()
-  - get_io_service()
+
+  * run()
+  * stop()
+  * reset()
+  * get_io_service()
 
 Responses
-  - operator<<
-  - send()
-  - clear()
-  - data()
-  - content_length()
 
+  * operator<<
+  * send()
+  * clear()
+  * data()
+  * content_length()
 
-[endsect] [/ quick]
 
 [endsect] [/ ref]
 

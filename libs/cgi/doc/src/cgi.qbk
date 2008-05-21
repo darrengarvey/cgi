@@ -111,7 +111,9 @@ These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sour
 
 [/include:ug user_guide.qbk]
 
-[xinclude ../cgi_dox.xml]
+[/xinclude ../cgi_dox.xml]
+
+[include:reference reference.qbk]
 
 [include:future future_development.qbk]
 
