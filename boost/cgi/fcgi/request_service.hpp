@@ -129,7 +129,7 @@ namespace cgi {
     typedef type::implementation_type::protocol_type  protocol_type;
     typedef type::implementation_type::request_type   request_type;
 
-    fcgi_request_service(::cgi::io_service& ios)
+    fcgi_request_service(::cgi::common::io_service& ios)
       : detail::service_base<fcgi_request_service>(ios)
     {
     }

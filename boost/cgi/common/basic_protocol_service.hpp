@@ -109,7 +109,7 @@ namespace cgi {
      * The order in which the underlying io_services are returned is determined
      * by what policy the IoServiceProvider uses.
      */
-    ::cgi::io_service& io_service()
+    ::cgi::common::io_service& io_service()
     {
       return ios_provider_.get_io_service();
     }

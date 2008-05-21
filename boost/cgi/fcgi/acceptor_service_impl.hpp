@@ -126,7 +126,7 @@ namespace cgi {
        type::implementation_type::endpoint_type          endpoint_type;
  
 
-     explicit acceptor_service_impl(::cgi::io_service& ios)
+     explicit acceptor_service_impl(::cgi::common::io_service& ios)
        : detail::service_base< ::cgi::fcgi::acceptor_service_impl<Protocol_> >(ios)
        , acceptor_service_(boost::asio::use_service<acceptor_service_type>(ios))
        //, endpoint(boost::asio::ip::tcp::v4())

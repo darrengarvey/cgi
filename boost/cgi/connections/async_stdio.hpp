@@ -31,7 +31,7 @@ namespace cgi {
     typedef basic_connection<tags::async_stdio> type;
     typedef boost::shared_ptr<type>             pointer;
 
-    basic_connection(::cgi::io_service& ios)
+    basic_connection(::cgi::common::io_service& ios)
       : basic_connection<tags::stdio>()
       , io_service_(ios)
     {
@@ -47,7 +47,7 @@ namespace cgi {
       is_open_ = false;
     }
 
-    static pointer create(::cgi::io_service& ios)
+    static pointer create(::cgi::common::io_service& ios)
     {
       return pointer(new basic_connection<tags::async_stdio>(ios));
     }
@@ -119,7 +119,7 @@ namespace cgi {
     }
 
   private:
-    ::cgi::io_service& io_service_;
+    ::cgi::common::io_service& io_service_;
   };
 
   typedef basic_connection<tags::async_stdio> async_stdio_connection;

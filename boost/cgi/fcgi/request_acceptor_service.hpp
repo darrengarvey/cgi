@@ -46,7 +46,7 @@ namespace cgi {
     /// The unique service identifier
     //static boost::asio::io_service::id id;
 
-    fcgi_request_acceptor_service(::cgi::io_service& ios)
+    fcgi_request_acceptor_service(::cgi::common::io_service& ios)
       : detail::service_base<fcgi_request_acceptor_service<protocol_type> >(ios)
       , service_impl_(ios)
     {

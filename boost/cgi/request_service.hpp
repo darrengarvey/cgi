@@ -50,7 +50,7 @@ namespace cgi {
     //{
     //}
 
-    request_service(::cgi::io_service& ios)
+    request_service(::cgi::common::io_service& ios)
       : detail::service_base<request_service<Protocol> >(ios)
       , service_impl_(boost::asio::use_service<service_impl_type>(ios))
     {
