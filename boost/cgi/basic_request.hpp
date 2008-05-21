@@ -27,10 +27,8 @@
 // **FIXME** Half of these are probably useless
 #include "boost/cgi/is_async.hpp"
 #include "boost/cgi/common/map.hpp"
-//#include "boost/cgi/request_base.hpp"
 #include "boost/cgi/connection_base.hpp"
 #include "boost/cgi/request_service.hpp"
-#include "boost/cgi/basic_io_object.hpp"
 #include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/http/status_code.hpp"
 #include "boost/cgi/basic_request_fwd.hpp"
@@ -38,6 +36,7 @@
 #include "boost/cgi/common/status_type.hpp"
 #include "boost/cgi/common/source_enums.hpp"
 #include "boost/cgi/basic_sync_io_object.hpp"
+#include "boost/cgi/import/basic_io_object.hpp"
 #include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/common/basic_protocol_service_fwd.hpp"
 

@@ -23,6 +23,7 @@
 #include "boost/cgi/import/buffer.hpp"
 #include "boost/cgi/common/cookie.hpp"
 #include "boost/cgi/common/header.hpp"
+#include "boost/cgi/common/response.hpp"
 #include "boost/cgi/http/status_code.hpp"
 #include "boost/cgi/import/streambuf.hpp"
 #include "boost/cgi/basic_request_fwd.hpp"

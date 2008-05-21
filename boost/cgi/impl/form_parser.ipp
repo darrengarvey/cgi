@@ -9,6 +9,7 @@
 #ifndef CGI_DETAIL_FORM_PARSER_IPP_INCLUDED__
 #define CGI_DETAIL_FORM_PARSER_IPP_INCLUDED__
 
+#include "boost/cgi/error.hpp"
 #include "boost/cgi/basic_client.hpp"
 #include "boost/cgi/common/form_parser.hpp"
 #include "boost/cgi/detail/url_decode.hpp"
