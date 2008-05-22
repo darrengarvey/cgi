@@ -16,7 +16,7 @@
 #include <boost/asio/ip/basic_endpoint.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/detail/throw_error.hpp"
-#include <boost/cgi/common/basic_protocol_service.hpp>
+#include "boost/cgi/common/basic_protocol_service.hpp"
 
 namespace cgi {
  namespace common {

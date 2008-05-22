@@ -1,4 +1,4 @@
-//             -- basic_sync_io_object.hpp --
+//          -- detail/basic_sync_io_object.hpp --
 //
 //            Copyright (c) Darren Garvey 2007.
 // Distributed under the Boost Software License, Version 1.0.
@@ -6,13 +6,13 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 //
 ////////////////////////////////////////////////////////////////
-#ifndef CGI_BASIC_SYNC_IO_OBJECT_HPP_INCLUDED__
-#define CGI_BASIC_SYNC_IO_OBJECT_HPP_INCLUDED__
+#ifndef CGI_DETAIL_BASIC_SYNC_IO_OBJECT_HPP_INCLUDED__
+#define CGI_DETAIL_BASIC_SYNC_IO_OBJECT_HPP_INCLUDED__
 
 #include <boost/noncopyable.hpp>
 
 namespace cgi {
- namespace common {
+ namespace detail {
 
   /// basic_io_object alternative when an io_service isn't used
   template<typename Service>
@@ -38,7 +38,8 @@ namespace cgi {
     implementation_type implementation;
   };
 
- } // namespace common
+ } // namespace detail
 } // namespace cgi
 
-#endif // CGI_BASIC_SYNC_IO_OBJECT_HPP_INCLUDED__
+#endif // CGI_DETAIL_BASIC_SYNC_IO_OBJECT_HPP_INCLUDED__
+

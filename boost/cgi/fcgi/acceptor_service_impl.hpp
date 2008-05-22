@@ -25,7 +25,7 @@
 #include "boost/cgi/detail/throw_error.hpp"
 #include "boost/cgi/detail/service_base.hpp"
 #include "boost/cgi/detail/protocol_traits.hpp"
-#include "boost/cgi/common/basic_protocol_service_fwd.hpp"
+#include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 
 namespace cgi {
    
@@ -73,7 +73,7 @@ namespace cgi {
     * which takes a ProtocolService (**LINK**). If the protocol isn't async then
     * the class can be used without a ProtocolService.
     */
-   template<typename Protocol_ = ::cgi::fcgi_>
+   template<typename Protocol_ = ::cgi::common::fcgi_>
    class acceptor_service_impl
      : public detail::service_base< ::cgi::fcgi::acceptor_service_impl<Protocol_> >
    {

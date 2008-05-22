@@ -13,7 +13,7 @@
 #pragma once
 #endif
 
-#include "boost/cgi/tags.hpp"
+#include "boost/cgi/common/tags.hpp"
 
 namespace cgi {
  namespace common {

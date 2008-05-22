@@ -13,8 +13,8 @@
 #include <boost/system/error_code.hpp>
 #include <boost/fusion/include/vector.hpp>
 ////////////////////////////////////////////////////////////////
-#include "boost/cgi/tags.hpp"
 #include "boost/cgi/common/map.hpp"
+#include "boost/cgi/common/tags.hpp"
 #include "boost/cgi/fcgi/client.hpp"
 #include "boost/cgi/import/read.hpp"
 #include "boost/cgi/http/status_code.hpp"
@@ -68,7 +68,7 @@ namespace cgi {
     struct implementation_type
       : common::request_base<fcgi_request_service>::impl_base
     {
-      typedef ::cgi::fcgi_                      protocol_type;
+      typedef ::cgi::common::fcgi_              protocol_type;
       typedef ::cgi::fcgi::client               client_type;
       typedef client_type::connection_type      connection_type;
       typedef client_type::header_buffer_type   header_buffer_type;
@@ -722,3 +722,4 @@ namespace cgi {
 } // namespace cgi
 
 #endif // CGI_FCGI_REQUEST_SERVICE_HPP_INCLUDED__
+

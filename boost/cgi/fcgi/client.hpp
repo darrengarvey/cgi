@@ -15,16 +15,16 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/asio/buffer.hpp>
 ///////////////////////////////////////////////////////////
-#include "boost/cgi/tags.hpp"
 #include "boost/cgi/error.hpp"
 #include "boost/cgi/common/map.hpp"
+#include "boost/cgi/common/tags.hpp"
 #include "boost/cgi/import/read.hpp"
 #include "boost/cgi/basic_client.hpp"
 #include "boost/cgi/import/buffer.hpp"
 #include "boost/cgi/import/io_service.hpp"
-#include "boost/cgi/basic_request_fwd.hpp"
 #include "boost/cgi/fcgi/specification.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
+#include "boost/cgi/fwd/basic_request_fwd.hpp"
 #include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/connections/shareable_tcp_socket.hpp"
 
@@ -296,7 +296,7 @@ namespace cgi {
 namespace fcgi {
     typedef
       common::basic_client<
-        common::shareable_tcp_connection, ::cgi::fcgi_
+        common::shareable_tcp_connection, ::cgi::common::fcgi_
       >
     client;
 } // namespace fcgi

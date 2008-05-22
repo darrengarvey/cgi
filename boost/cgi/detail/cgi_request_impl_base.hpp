@@ -42,11 +42,11 @@ namespace cgi {
     
   {
   public:
-    typedef ::cgi::common::map                         map_type;
-    typedef Connection                         connection_type;
+    typedef ::cgi::common::map                                map_type;
+    typedef Connection                                        connection_type;
     typedef 
-      common::basic_client<Connection, tags::acgi>     client_type;
-    typedef typename connection_type::pointer  conn_ptr;
+      common::basic_client<Connection, common::tags::acgi>    client_type;
+    typedef typename connection_type::pointer                 conn_ptr;
 
     /// Constructor
     cgi_request_impl_base()

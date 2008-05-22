@@ -9,11 +9,10 @@
 #ifndef CGI_FCGI_REQUEST_HPP_INCLUDED__
 #define CGI_FCGI_REQUEST_HPP_INCLUDED__
 
-#include "boost/cgi/tags.hpp"
-#include "boost/cgi/basic_request_fwd.hpp"
-//#include "boost/cgi/request_service_fwd.hpp"
+#include "boost/cgi/common/tags.hpp"
 #include "boost/cgi/fcgi/service.hpp"
 #include "boost/cgi/fcgi/request_service.hpp"
+#include "boost/cgi/fwd/basic_request_fwd.hpp"
 
 namespace cgi {
  namespace fcgi {
@@ -28,6 +27,6 @@ namespace cgi {
  } // namespace fcgi
 } // namespace cgi
 
-//#include "boost/cgi/basic_request.hpp"
+#include "boost/cgi/basic_request.hpp"
 
 #endif // CGI_FCGI_REQUEST_HPP_INCLUDED__

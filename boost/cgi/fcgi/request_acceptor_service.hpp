@@ -17,7 +17,7 @@
 #include "boost/cgi/detail/service_base.hpp"
 #include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/fcgi/acceptor_service_impl.hpp"
-#include "boost/cgi/common/basic_protocol_service_fwd.hpp"
+#include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 
 namespace cgi {
 
@@ -29,7 +29,7 @@ namespace cgi {
    * which takes a ProtocolService (**LINK**). If the protocol isn't async then
    * the class can be used without a ProtocolService.
    */
-  template<typename Protocol_ = fcgi_>
+  template<typename Protocol_ = common::fcgi_>
   class fcgi_request_acceptor_service
     : public detail::service_base<fcgi_request_acceptor_service<Protocol_> >
   {
@@ -46,7 +46,7 @@ namespace cgi {
     /// The unique service identifier
     //static boost::asio::io_service::id id;
 
-    fcgi_request_acceptor_service(::cgi::common::io_service& ios)
+    fcgi_request_acceptor_service(common::io_service& ios)
       : detail::service_base<fcgi_request_acceptor_service<protocol_type> >(ios)
       , service_impl_(ios)
     {

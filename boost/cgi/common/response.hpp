@@ -21,8 +21,8 @@
 #include "boost/cgi/common/header.hpp"
 #include "boost/cgi/http/status_code.hpp"
 #include "boost/cgi/import/streambuf.hpp"
-#include "boost/cgi/basic_request_fwd.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
+#include "boost/cgi/fwd/basic_request_fwd.hpp"
 
 /// This mess outputs a default Content-type header if the user hasn't set any.
 /** **FIXME** Not implemented; not sure if it should be...

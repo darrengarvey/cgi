@@ -30,7 +30,7 @@ namespace cgi {
     typedef common::async_stdio_connection connection_type;
     typedef
       ::cgi::common::basic_client<
-        connection_type, tags::acgi
+        connection_type, common::tags::acgi
       >
     client_type;
 

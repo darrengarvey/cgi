@@ -18,7 +18,7 @@
 #include <boost/noncopyable.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/import/io_service.hpp"
-#include "boost/cgi/common/io_service_provider_fwd.hpp"
+#include "boost/cgi/fwd/io_service_provider_fwd.hpp"
 
 namespace cgi {
  namespace common {

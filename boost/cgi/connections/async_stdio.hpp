@@ -13,10 +13,10 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/enable_shared_from_this.hpp>
-
+///////////////////////////////////////////////////////////
+#include "boost/cgi/common/tags.hpp"
 #include "boost/cgi/connections/stdio.hpp"
 #include "boost/cgi/import/io_service.hpp"
-#include "boost/cgi/tags.hpp"
 
 namespace cgi {
  namespace common {
@@ -31,7 +31,7 @@ namespace cgi {
     typedef basic_connection<tags::async_stdio> type;
     typedef boost::shared_ptr<type>             pointer;
 
-    basic_connection(::cgi::common::io_service& ios)
+    basic_connection(common::io_service& ios)
       : basic_connection<tags::stdio>()
       , io_service_(ios)
     {

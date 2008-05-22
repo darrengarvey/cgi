@@ -25,20 +25,19 @@
 #include <boost/asio/basic_io_object.hpp>
 ///////////////////////////////////////////////////////////
 // **FIXME** Half of these are probably useless
-#include "boost/cgi/is_async.hpp"
 #include "boost/cgi/common/map.hpp"
-#include "boost/cgi/connection_base.hpp"
-#include "boost/cgi/request_service.hpp"
+#include "boost/cgi/common/is_async.hpp"
 #include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/http/status_code.hpp"
-#include "boost/cgi/basic_request_fwd.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
 #include "boost/cgi/common/status_type.hpp"
 #include "boost/cgi/common/source_enums.hpp"
-#include "boost/cgi/basic_sync_io_object.hpp"
+#include "boost/cgi/fwd/basic_request_fwd.hpp"
+#include "boost/cgi/common/request_service.hpp"
 #include "boost/cgi/import/basic_io_object.hpp"
 #include "boost/cgi/detail/protocol_traits.hpp"
-#include "boost/cgi/common/basic_protocol_service_fwd.hpp"
+#include "boost/cgi/detail/basic_sync_io_object.hpp"
+#include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 
 namespace cgi {
  namespace common {
@@ -72,11 +71,11 @@ namespace cgi {
           , role_type Role
           , typename Allocator>
   class basic_request
-    : //public request_base
-     public boost::mpl::if_c<is_async<typename RequestService::protocol_type>::value
-                             , basic_io_object<RequestService>
-                             , basic_sync_io_object<RequestService>
-                             >::type
+    : public boost::mpl::if_c<
+                 is_async<typename RequestService::protocol_type>::type::value
+               , basic_io_object<RequestService>
+               , detail::basic_sync_io_object<RequestService>
+               >::type
   {
   public:
     typedef basic_request<RequestService, ProtocolService
@@ -94,7 +93,7 @@ namespace cgi {
 
     // Throws
     basic_request(bool load_now = true, bool parse_post = true)
-      : basic_sync_io_object<service_type>()
+      : detail::basic_sync_io_object<service_type>()
     {
       if (load_now) load(parse_post);//this->service.load(this->implementation, true, ec);
     }
@@ -103,7 +102,7 @@ namespace cgi {
     basic_request(boost::system::error_code& ec
                  , const bool load_now = true
                  , const bool parse_post = true)
-      : basic_sync_io_object<service_type>()
+      : detail::basic_sync_io_object<service_type>()
     {
       if (load_now) load(ec, parse_post);//this->service.load(this->implementation, true, ec);
     }
@@ -214,7 +213,7 @@ namespace cgi {
      *
      * @returns The value of program_status
      */
-    int close(http::status_code http_status = http::ok
+    int close(common::http::status_code http_status = http::ok
              , int program_status = 0)
     {
       //BOOST_ASSERT( request_status_ != status_type::ended );
@@ -224,7 +223,7 @@ namespace cgi {
                                 , program_status);
     }
 
-    int close(http::status_code http_status
+    int close(common::http::status_code http_status
              , int program_status
              , boost::system::error_code& ec)
     {
@@ -384,7 +383,7 @@ namespace cgi {
       return this->service.get_role(this->implementation);
     }
 
-    void set_status(http::status_code const& status)
+    void set_status(common::http::status_code const& status)
     {
       this->service.set_status(this->implementation, status);
     }

@@ -17,10 +17,9 @@
 #include <string>
 ///////////////////////////////////////////////////////////
 #include <boost/regex.hpp>
-#include <boost/asio/buffer.hpp>
-#include <boost/asio/error.hpp>
 #include <boost/function.hpp>
-#include <boost/system/error_code.hpp>
+#include <boost/asio/error.hpp>
+#include <boost/asio/buffer.hpp>
 #include <boost/algorithm/string/find.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/common/map.hpp"

@@ -11,8 +11,8 @@
 
 #include "service.hpp"
 #include "request_service.hpp"
-#include "boost/cgi/tags.hpp"
-#include "boost/cgi/basic_request_fwd.hpp"
+#include "boost/cgi/common/tags.hpp"
+#include "boost/cgi/fwd/basic_request_fwd.hpp"
 #include "boost/cgi/cgi/request_impl.hpp"
 #include "boost/cgi/basic_request.hpp"
 

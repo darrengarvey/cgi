@@ -9,9 +9,9 @@
 #ifndef CGI_REQUEST_ACCEPTOR_SERVICE_HPP_INCLUDED
 #define CGI_REQUEST_ACCEPTOR_SERVICE_HPP_INCLUDED
 
-#include "detail/throw_error.hpp"
-#include "detail/protocol_traits.hpp"
-#include "detail/service_base.hpp"
+#include "boost/cgi/detail/throw_error.hpp"
+#include "boost/cgi/detail/service_base.hpp"
+#include "boost/cgi/detail/protocol_traits.hpp"
 
 namespace cgi {
 

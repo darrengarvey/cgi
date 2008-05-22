@@ -13,7 +13,7 @@
 #pragma once
 #endif
 
-#include "boost/cgi/common/io_service_provider_fwd.hpp"
+#include "boost/cgi/fwd/io_service_provider_fwd.hpp"
 
 namespace cgi {
  namespace common {

@@ -15,13 +15,15 @@ namespace cgi {
  namespace detail {
 
    /// Convert a char into a hexadecimal value
-   BOOST_CGI_INLINE std::string char_to_hex(char const& ch)
+   BOOST_CGI_INLINE
+   std::string char_to_hex(char const& ch)
    {
      return std::string(); // **FIXME** 
    }
 
    /// Convert two characters into a single, hex-encoded character
-   BOOST_CGI_INLINE char hex_to_char(char const& c1, char const& c2)
+   BOOST_CGI_INLINE
+   char hex_to_char(char const& c1, char const& c2)
    {
      int ret ( ( std::isalpha(c1)
                  ? ((c1 & 0xdf) - 'A') + 10
@@ -39,7 +41,8 @@ namespace cgi {
 
    /// Take two characters (a hex sequence) and return a char
    // **DEPRECATED**
-   BOOST_CGI_INLINE char url_decode( const char& c1, const char& c2 )
+   BOOST_CGI_INLINE
+   char url_decode( const char& c1, const char& c2 )
    {
      int ret = ( (c1 >= 'A' && c1 <= 'Z') || (c1 >= 'a' && c1 <= 'z')
                    ? ((c1 & 0xdf) - 'A') + 10
@@ -55,12 +58,13 @@ namespace cgi {
    }
 
    /// URL-decode a string
-   BOOST_CGI_INLINE std::string url_decode( const std::string& str )
+   BOOST_CGI_INLINE
+   std::string url_decode( const std::string& str )
    {
-     typedef std::string string_type;
-     string_type ret;
+     typedef std::string string_type; // Ahem.
+     string_type result;
 
-     for( string_type::const_iterator iter = str.begin(), end = str.end()
+     for( string_type::const_iterator iter (str.begin()), end (str.end())
         ; iter != end; ++iter )
      {
        switch( *iter )
@@ -68,28 +72,28 @@ namespace cgi {
          case ' ':
            break;
          case '+':
-           ret.append(1, ' ');
+           result.append(1, ' ');
            break;
          case '%':
-           if (std::distance(iter, end) >= 2
-            && std::isxdigit(*(iter+1))
-            && std::isxdigit(*(iter+2)))
+           if (std::distance(iter, end) <= 2
+            || !std::isxdigit(*(iter+1))
+            || !std::isxdigit(*(iter+2)))
+           {
+             result.append(1, '%');
+           }
+           else // we've got a properly encoded hex value.
            {
              char ch = *++iter; // need this because order of function arg 
                                 // evaluation is UB.
-             ret.append(1, hex_to_char(ch, *++iter));
-           }
-           else // we're not dealing with a properly encoded hex value.
-           {
-             ret.append(1, '%');
+             result.append(1, hex_to_char(ch, *++iter));
            }
            break;
          default:
-           ret.append(1, *iter);
+           result.append(1, *iter);
        }
      }
 
-     return ret;
+     return result;
    }
 
  } // namespace detail

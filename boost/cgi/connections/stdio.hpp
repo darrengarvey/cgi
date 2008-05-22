@@ -11,14 +11,14 @@
 
 #include <cstdio>
 #include <string>
+///////////////////////////////////////////////////////////
 #include <boost/system/error_code.hpp>
 #include <boost/asio.hpp>
-
-#include "boost/cgi/basic_connection_fwd.hpp"
-#include "boost/cgi/tags.hpp"
-#include "boost/cgi/connection_base.hpp"
+///////////////////////////////////////////////////////////
 #include "boost/cgi/error.hpp"
-//#include "boost/cgi/io_service.hpp"
+#include "boost/cgi/common/tags.hpp"
+#include "boost/cgi/common/connection_base.hpp"
+#include "boost/cgi/fwd/basic_connection_fwd.hpp"
 
 namespace cgi {
  namespace common {

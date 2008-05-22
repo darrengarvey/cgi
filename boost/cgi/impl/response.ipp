@@ -16,8 +16,8 @@
 
 #include <string>
 ///////////////////////////////////////////////////////////
-#include <boost/foreach.hpp>
 #include <boost/bind.hpp>
+#include <boost/foreach.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/import/write.hpp"
 #include "boost/cgi/import/buffer.hpp"
@@ -26,17 +26,16 @@
 #include "boost/cgi/common/response.hpp"
 #include "boost/cgi/http/status_code.hpp"
 #include "boost/cgi/import/streambuf.hpp"
-#include "boost/cgi/basic_request_fwd.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
+#include "boost/cgi/fwd/basic_request_fwd.hpp"
 
 
 namespace cgi {
  namespace common {
 
-  template<typename T>
-  BOOST_CGI_INLINE basic_response<T>::basic_response(
-      common::http::status_code sc)
-    : buffer_(new ::cgi::streambuf())
+  template<typename T> BOOST_CGI_INLINE
+  basic_response<T>::basic_response(http::status_code sc)
+    : buffer_(new common::streambuf())
     , ostream_(buffer_.get())
     , http_status_(sc)
     , headers_terminated_(false)
@@ -49,8 +48,8 @@ namespace cgi {
    * destruction.
    */
   template<typename T> BOOST_CGI_INLINE
-  basic_response<T>::basic_response(::cgi::streambuf* buf,
-      common::http::status_code sc)
+  basic_response<T>::basic_response(common::streambuf* buf,
+      http::status_code sc)
     : ostream_(buf)
     , http_status_(sc)
   {
@@ -122,7 +121,7 @@ namespace cgi {
   template<typename T>
   template<typename SyncWriteStream> BOOST_CGI_INLINE
   boost::system::error_code
-    basic_response<T>::flush(SyncWriteStream& sws, boost::system::error_code& ec)
+  basic_response<T>::flush(SyncWriteStream& sws, boost::system::error_code& ec)
   {
     if (!headers_terminated_)
     {
@@ -232,7 +231,7 @@ namespace cgi {
   /// Get the buffer associated with the stream
   template<typename T> BOOST_CGI_INLINE
   common::streambuf*
-    basic_response<T>::rdbuf()
+  basic_response<T>::rdbuf()
   {
     return static_cast<common::streambuf*>(ostream_.rdbuf());
   }
@@ -240,57 +239,56 @@ namespace cgi {
   /// Set the status code associated with the response.
   template<typename T> BOOST_CGI_INLINE
   basic_response<T>&
-    basic_response<T>::set_status(const http::status_code& num)
-    {
-      http_status_ = num;
-      return *this;
-    }
+  basic_response<T>::set_status(const http::status_code& num)
+  {
+    http_status_ = num;
+    return *this;
+  }
 
   /// Get the status code associated with the response.
   template<typename T> BOOST_CGI_INLINE
   http::status_code& 
-    basic_response<T>::status()
-    {
-      return http_status_;
-    }
+  basic_response<T>::status()
+  {
+    return http_status_;
+  }
 
   /// Allow more headers to be added (WARNING: avoid using this).
   template<typename T> BOOST_CGI_INLINE
   void basic_response<T>::unterminate_headers()
-    {
-      headers_terminated_ = false;
-    }
+  {
+    headers_terminated_ = false;
+  }
 
   /// Get the length of the body of the response
   template<typename T> BOOST_CGI_INLINE
-  std::size_t
-    basic_response<T>::content_length()
-    {
-      return rdbuf()->size();
-    }
+  std::size_t basic_response<T>::content_length()
+  {
+    return rdbuf()->size();
+  }
 
   /// Add a header after appending the CRLF sequence.
   template<typename T> BOOST_CGI_INLINE
   basic_response<T>&
-    basic_response<T>::set_header(
+  basic_response<T>::set_header(
         typename basic_response<T>::string_type const& value)
-    {
-      BOOST_ASSERT(!headers_terminated_);
-      headers_.push_back(value + "\r\n");
-      return *this;
-    }
+  {
+    BOOST_ASSERT(!headers_terminated_);
+    headers_.push_back(value + "\r\n");
+    return *this;
+  }
 
   /// Format and add a header given name and value, appending CRLF.
   template<typename T> BOOST_CGI_INLINE
   basic_response<T>&
-    basic_response<T>::set_header(
-        typename basic_response<T>::string_type const& name
-      , typename basic_response<T>::string_type const& value)
-    {
-      BOOST_ASSERT(!headers_terminated_);
-      headers_.push_back(name + ": " + value + "\r\n");
-      return *this;
-    }
+  basic_response<T>::set_header(
+      typename basic_response<T>::string_type const& name
+    , typename basic_response<T>::string_type const& value)
+  {
+    BOOST_ASSERT(!headers_terminated_);
+    headers_.push_back(name + ": " + value + "\r\n");
+    return *this;
+  }
 
   template<typename T> BOOST_CGI_INLINE
   void basic_response<T>::clear_headers()
