@@ -18,6 +18,8 @@ build-project acgi ;
 # Build all of the fcgi examples
 build-project fcgi ;
 
+alias all_examples : cgi acgi fcgi ;
+
 install cgi-install
  : # sources
    cgi//install

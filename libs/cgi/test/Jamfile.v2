@@ -15,3 +15,8 @@ project
 build-project compile ;
 build-project run ;
 build-project compile_fail ;
+
+if [ MATCH "^(--build-examples)" : [ modules.peek : ARGV ] ]
+{
+  build-project ../example//all_examples ;
+}

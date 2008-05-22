@@ -29,16 +29,16 @@ import modules ;
 import type ;
 type.register IPP : ipp : CPP ;
 
-path-constant incl : $(top)/boost/cgi/ ;
+path-constant impl : $(top)/boost/cgi/impl ;
 
 SOURCES =
-    $(incl)/impl/form_parser.ipp
-    $(incl)/impl/response.ipp
+    $(impl)/form_parser.ipp
+    $(impl)/response.ipp
   ;
   
 
-if [ MATCH "^(--build-cgi)" : [ modules.peek : ARGV ] ] # compile library
-{
+if [ MATCH "^(--build-cgi)" : [ modules.peek : ARGV ] ]
+{ # compile library
   ECHO "Building CGI library" ;
 
   lib boost_cgi

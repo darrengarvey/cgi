@@ -1,10 +1,10 @@
 #include <boost/static_assert.hpp>
-#include "boost/cgi/is_async.hpp"
+#include "boost/cgi/common/is_async.hpp"
 
 
 int main()
 {
-  using namespace cgi;
+  using namespace cgi::common;
 
   BOOST_STATIC_ASSERT(is_async<tags::cgi>::value == false);
   BOOST_STATIC_ASSERT(is_async<tags::async_cgi>::value == true);
