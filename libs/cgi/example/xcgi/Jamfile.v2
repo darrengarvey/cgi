@@ -7,13 +7,13 @@
 project boost/cgi/example/xcgi ;
 
 # By default, just build the examples
-build-project hello_world ;
+build-project basic ;
 build-project server1 ;
 
 # If the user explicitly passes "install" on the command line, build the
 alias install
   :
-    hello_world//install
+    basic//install
     server1//install
   ;
 
