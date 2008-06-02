@@ -113,6 +113,8 @@ These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sour
 
 [/xinclude ../cgi_dox.xml]
 
+[include:examples examples.qbk]
+
 [include:reference reference.qbk]
 
 [include:future future_development.qbk]

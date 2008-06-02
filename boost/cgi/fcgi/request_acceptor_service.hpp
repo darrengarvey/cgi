@@ -38,7 +38,8 @@ namespace cgi {
 
     typedef fcgi::acceptor_service_impl<>               service_impl_type;
     typedef service_impl_type::implementation_type      implementation_type;
-    typedef typename implementation_type::protocol_type          protocol_type;
+    typedef
+      typename implementation_type::protocol_type       protocol_type;
     typedef implementation_type::endpoint_type          endpoint_type;
     typedef typename service_impl_type::native_type     native_type;
     //typedef basic_protocol_service<protocol_type>       protocol_service_type;
@@ -162,6 +163,17 @@ namespace cgi {
       return service_impl_.assign(impl, protocol, native_acceptor, ec);
     }
 
+    service_impl_type::native_type
+    native(implementation_type& impl)
+    {
+      return service_impl_.native(impl);
+    }
+
+    bool
+    is_cgi(implementation_type& impl)
+    {
+      return service_impl_.is_cgi(impl);
+    }
   public:
     service_impl_type service_impl_;
   };

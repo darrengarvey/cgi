@@ -32,7 +32,9 @@ namespace cgi {
  } // namespace detail
 } // namespace cgi
 
-#include "boost/cgi/detail/url_decode.ipp"
+#if !defined( BOOST_CGI_BUILD_LIB )
+#    include "boost/cgi/detail/url_decode.ipp"
+#endif
 
 #include "boost/cgi/detail/pop_options.hpp"
 

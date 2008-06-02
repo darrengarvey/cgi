@@ -3,6 +3,8 @@
 #define BOOST_CGI_COMMON_SOURCE_ENUMS_HPP_INCLUDED__
 
 #include <boost/fusion/include/at.hpp>
+///////////////////////////////////////////////////////////
+#include "boost/cgi/common/map.hpp"
 
 namespace cgi {
  namespace common {

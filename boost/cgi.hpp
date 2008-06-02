@@ -14,6 +14,6 @@
 #include "boost/cgi/cgi.hpp"
 #include "boost/cgi/acgi.hpp"
 #include "boost/cgi/fcgi.hpp"
-#include "boost/cgi/scgi.hpp"
+//#include "boost/cgi/scgi.hpp"
 
 #endif // CGI_HPP_INCLUDED__

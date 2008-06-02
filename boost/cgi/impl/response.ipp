@@ -402,7 +402,7 @@ namespace cgi {
    */
   template<typename T> BOOST_CGI_INLINE
   cgi::common::basic_response<T>& 
-    operator<< (cgi::common::basic_response<T>& resp
+    operator<< (cgi::common::basic_response<T> const& resp
                , cgi::common::basic_cookie<T> ck)
   {
     BOOST_ASSERT(!resp.headers_terminated());

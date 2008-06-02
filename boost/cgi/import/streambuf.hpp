@@ -17,9 +17,6 @@ namespace cgi {
   using boost::asio::streambuf;
 
  } // namespace common
-
-   using common::streambuf;
-
 } // namespace cgi
 
 #endif // CGI_STREAMBUF_HPP_INCLUDED__

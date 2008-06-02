@@ -94,8 +94,9 @@ namespace cgi {
 
     int request_id(implementation_type& impl) { return 1; }
 
+    // **FIXME** should return error_code
     int close(implementation_type& impl, common::http::status_code& http_s
-             , int status)
+      , int status, boost::system::error_code& ec)
     {
       impl.status() = common::closed;
       impl.http_status() = http_s;
@@ -172,6 +173,15 @@ namespace cgi {
     /// Set the http status (this does nothing for aCGI)
     void set_status(implementation_type& impl, common::http::status_code&)
     {
+    }
+
+    /// Read some data from the client.
+    template<typename MutableBufferSequence>
+    std::size_t
+      read_some(implementation_type& impl, const MutableBufferSequence& buf
+               , boost::system::error_code& ec)
+    {
+      return impl.client_.read_some(buf,ec);
     }
 
   protected:

@@ -25,6 +25,7 @@
 #include <boost/asio/basic_io_object.hpp>
 ///////////////////////////////////////////////////////////
 // **FIXME** Half of these are probably useless
+#include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/common/map.hpp"
 #include "boost/cgi/common/is_async.hpp"
 #include "boost/cgi/common/role_type.hpp"
@@ -35,7 +36,6 @@
 #include "boost/cgi/fwd/basic_request_fwd.hpp"
 #include "boost/cgi/common/request_service.hpp"
 #include "boost/cgi/import/basic_io_object.hpp"
-#include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/detail/basic_sync_io_object.hpp"
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 
@@ -44,28 +44,19 @@ namespace cgi {
 
   /// The basic_request class, primary entry point to the library
   /**
-   * Note: This class is supposed to make simple use of the library easy.
-   * This comes with some restrictions, such as being noncopyable, and also
-   * providing copies of the meta-variables rather than references. This makes
-   * sure the internal data is protected.
-   * The underlying impl_type classes aren't like this (and as such aren't
-   * quite as 'safe' to use) but they may be more suited to certain needs.
+   * Note: By default, synchronous protocols (ie. cgi) auto-load AND parse
+   * STDIN,whereas async protocols don't.
    *
-   * Note: By default, synchronous protocols (ie. cgi) auto-load AND parse STDIN,
-   * whereas async protocols don't.
+   * Note: The alternative functions which take a boost::system::error_code are
+   * the non-throwing versions. Instead of a boost::system::system_error being
+   * thrown in case of an error, the passed error_code will be set to the value
+   * of the error, s.t. if (error) evaluates to true.`
    * 
    * Note: This class isn't thread safe: carrying around a mutex-per-request
    * seems prohibitively expensive. There could be functions which take a mutex
    * as an arguement and lock it. (Async calls could get messy if you need a
-   * protected request object)
-   *
-   * Note: From 10/07/07 this class is going to require a protocol_service be
-   * passed to it. This is good for FastCGI/SCGI and asynchronous CGI. A full
-   * specialisation of this class for sync CGI can be provided... The reasoning
-   * for this is that the added complexity for allowing a non-async CGI request
-   * to use the acceptor and this class doesn't seem worth it: it makes the
-   * whole library much simpler to do it this way.
-   */
+   * protected request object).
+  **/
   template<typename RequestService
           , typename ProtocolService
           , role_type Role
@@ -127,6 +118,7 @@ namespace cgi {
     }
 
     /// Make a new mutiplexed request from an existing connection.
+    // Throws.
     basic_request(implementation_type& impl)
       : basic_io_object<service_type>(impl.service_->io_service())
     {
@@ -138,6 +130,7 @@ namespace cgi {
     }
 
     /// Make a new mutiplexed request from an existing connection.
+    // Won't throw.
     basic_request(implementation_type& impl, boost::system::error_code& ec)
       : basic_io_object<service_type>(impl.service_->io_service())
     {
@@ -219,8 +212,11 @@ namespace cgi {
       //BOOST_ASSERT( request_status_ != status_type::ended );
 
       //this->service.set_status(this->implementation, http_status);
-      return this->service.close(this->implementation, http_status
-                                , program_status);
+      boost::system::error_code ec;
+      this->service.close(this->implementation, http_status,
+          program_status, ec);
+      detail::throw_error(ec);
+      return program_status;
     }
 
     int close(common::http::status_code http_status
@@ -356,6 +352,9 @@ namespace cgi {
 
     string_type server_software()
     { return env_("SERVER_SOFTWARE"); }
+
+    string_type referer()
+    { return env_("HTTP_REFERER"); }
     // -- end helper-functions]
 
     /// Get the charset from the CONTENT_TYPE header

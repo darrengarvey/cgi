@@ -17,8 +17,10 @@ build-project cgi ;
 build-project acgi ;
 # Build all of the fcgi examples
 build-project fcgi ;
+# Build all of the xcgi examples
+build-project xcgi ;
 
-alias all_examples : cgi acgi fcgi ;
+alias all_examples : cgi acgi fcgi xcgi ;
 
 install cgi-install
  : # sources
@@ -41,7 +43,12 @@ install fcgi-install
     <location>$(fcgi-bin)
   ;
 
-alias install : cgi//install acgi//install fcgi//install ;
+install xcgi-install
+  :
+    xcgi//install
+  ;
+
+alias install : cgi//install acgi//install fcgi//install xcgi//install ;
 
 explicit cgi-install  ;
 explicit acgi-install ;

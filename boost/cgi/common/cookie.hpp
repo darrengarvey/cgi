@@ -121,7 +121,7 @@ namespace cgi {
     */
 
     /// Make a string out of the cookie
-    string_type to_string()
+    string_type to_string() const
     {
       string_type str(name + "=" + value);
       if (!expires.empty()) str += ("; expires=" + expires);
@@ -138,7 +138,7 @@ namespace cgi {
 
 
 template<typename OutStream, typename T>
-inline OutStream& operator<< (OutStream& os, cgi::common::basic_cookie<T>& ck)
+inline OutStream& operator<< (OutStream& os, cgi::common::basic_cookie<T> const& ck)
 {
   os<< ck.to_string();
   return os;

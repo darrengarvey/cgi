@@ -13,10 +13,10 @@
 #include <boost/asio/ip/tcp.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/common/tags.hpp"
-#include "boost/cgi/common/connection_base.hpp"
 #include "boost/cgi/basic_connection.hpp"
 #include "boost/cgi/import/io_service.hpp"
 #include "boost/cgi/detail/push_options.hpp"
+#include "boost/cgi/common/connection_base.hpp"
 
 namespace cgi {
  namespace common {

@@ -19,8 +19,6 @@ This section of the documentation is probably best read before the [link __tutor
 
 [/include:tutorial user_guide/tutorial.qbk]
 
-[include:examples ../../example/doc.qbk]
-
 [include user_guide/tutorial/tutorial.qbk]
 
 [/endsect]

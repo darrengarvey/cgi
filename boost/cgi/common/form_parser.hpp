@@ -33,13 +33,13 @@ namespace cgi {
   class form_parser
   {
   public:
-    //typedef
-    //  boost::function<
-    //    std::size_t (
-    //        const mutable_buffers_type&
-    //      , boost::system::error_code& )
-    //  >
-    //callback_type;
+    typedef
+      boost::function<
+        std::size_t (
+            const boost::asio::mutable_buffer&
+          , boost::system::error_code& )
+      >
+    callback_type;
 
     typedef boost::asio::mutable_buffers_1 mutable_buffers_type;
     typedef std::vector<char>   buffer_type;
@@ -48,6 +48,7 @@ namespace cgi {
     typedef RequestImplType     implementation_type;
 
     form_parser(implementation_type& impl);
+    form_parser(implementation_type& impl, callback_type const& callback);
 
     mutable_buffers_type prepare(std::size_t size)
     {
@@ -97,15 +98,15 @@ namespace cgi {
     std::list<std::string> boundary_markers;
     std::vector<common::form_part> form_parts_;
 
-    //callback_type callback_;
+    const callback_type callback_;
   };
 
  } // namespace detail
 } // namespace cgi
 
-#ifndef BOOST_CGI_BUILD_LIB
-#  include "boost/cgi/impl/form_parser.ipp"
-#endif
+//#ifndef BOOST_CGI_BUILD_LIB
+#    include "boost/cgi/impl/form_parser.ipp"
+//#endif
 
 #endif // CGI_DETAIL_FORM_PARSER_HPP_INCLUDED__
 

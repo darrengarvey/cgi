@@ -104,6 +104,11 @@ namespace cgi {
       ios_provider_.reset();
     }
 
+    bool is_cgi()
+    {
+      return true;
+    }
+
     /// Return an available io_service from the IoServiceProvider
     /**
      * The order in which the underlying io_services are returned is determined

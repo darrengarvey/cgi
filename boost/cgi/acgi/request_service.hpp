@@ -19,23 +19,19 @@
 #include "boost/cgi/detail/cgi_service_impl_base.hpp"
 
 namespace cgi {
+ namespace acgi {
 
-  //template<typename ProtocolService>
-  class acgi_request_service
-  //: public boost::asio::io_service::service
-    : public cgi_service_impl_base<acgi_request_impl>
-    , public detail::service_base<acgi_request_service>
+  class request_service
+    : public cgi_service_impl_base<acgi::request_impl>
+    , public detail::service_base<request_service>
   {
   public:
-    typedef acgi_request_service        type;
+    typedef request_service             type;
     typedef common::tags::acgi          protocol_type;
-    typedef acgi_service                protocol_service_type;
+    typedef acgi::service               protocol_service_type;
 
-    /// The unique service identifier
-    //    static boost::asio::io_service::id id;
-
-    acgi_request_service(common::io_service& ios)
-      : detail::service_base<acgi_request_service>(ios)
+    request_service(common::io_service& ios)
+      : detail::service_base<request_service>(ios)
     {
     }
 
@@ -60,6 +56,7 @@ namespace cgi {
     }
   };
 
+ } // namespace acgi
 } // namespace cgi
 
 #endif // CGI_ASYNC_CGI_SERVICE_IMPL_HPP_INCLUDED__

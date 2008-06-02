@@ -278,6 +278,17 @@ namespace cgi {
     {
       return this->service.local_endpoint(this->implementation, ec);
     }
+
+    native_type
+    native()
+    {
+      return this->service.native(this->implementation);
+    }
+
+    bool is_cgi()
+    {
+      return this->service.is_cgi(this->implementation);
+    }
   };
 
  } // namespace common

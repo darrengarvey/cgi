@@ -1,6 +1,12 @@
 
-# These are some helper variables, which will need to be checked against
-# user-supplied variables (ie. using modules.peek, I think)
+import modules ;
+
+local DEFINES ;
+
+if [ MATCH "^(--build-cgi)" : [ modules.peek : ARGV ] ]
+{ # compile library
+  DEFINES = <define>BOOST_CGI_BUILD_LIB ;
+} 
 
 project boost/cgi
   : build-dir
@@ -13,6 +19,7 @@ project boost/cgi
       <library>/boost/regex/
       <define>_CRT_SECURE_NO_WARNINGS
       <define>_SCL_SECURE_NO_WARNINGS
+      $(DEFINES)
   : usage-requirements
       <include>$(top)
       <include>$(boost-root)
@@ -20,32 +27,24 @@ project boost/cgi
       <library>/boost/system/
       <library>/boost/regex/
       <linkflags>-pthread
+      $(DEFINES)
   ;
-
-
-import modules ;
-
-# make BB recognise .ipp files as .cpp files.
-import type ;
-type.register IPP : ipp : CPP ;
-
-path-constant impl : $(top)/boost/cgi/impl ;
-
-SOURCES =
-    $(impl)/form_parser.ipp
-    $(impl)/response.ipp
-  ;
-  
 
 if [ MATCH "^(--build-cgi)" : [ modules.peek : ARGV ] ]
 { # compile library
   ECHO "Building CGI library" ;
 
+  # make BB recognise .ipp files as .cpp files.
+  import type ;
+  type.register IPP : ipp : CPP ;
+
+  SOURCES = $(top)/libs/cgi/src/library_sources.cpp ;
+
   lib boost_cgi
     :
       $(SOURCES)
     :
-      <define>BOOST_CGI_BUILD_LIBRARY
+      <define>BOOST_CGI_BUILD_LIB
     ;
 }
 else

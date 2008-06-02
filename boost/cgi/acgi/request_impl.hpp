@@ -18,33 +18,29 @@
 // Make this ProtocolService-independent
 
 namespace cgi {
+ namespace acgi {
 
-  // Forward declaration
-  class acgi_service_impl;
-
-  class acgi_request_impl
+  class request_impl
     : public detail::cgi_request_impl_base<common::async_stdio_connection>
   {
   public:
-    typedef acgi_service    protocol_service_type;
-    typedef common::async_stdio_connection connection_type;
+    typedef ::cgi::acgi::service            protocol_service_type;
+    typedef common::async_stdio_connection  connection_type;
     typedef
       ::cgi::common::basic_client<
         connection_type, common::tags::acgi
       >
     client_type;
 
-    acgi_request_impl()
+    request_impl()
       : detail::cgi_request_impl_base<connection_type>()
     {
     }
 
     protocol_service_type* service_;
-  protected:
-    //acgi_request_impl(); // private default constructor
-    friend class acgi_service_impl;
   };
 
+ } // namespace acgi
 } // namespace cgi
 
 #endif // CGI_ASYNC_CGI_REQUEST_IMPL_HPP_INCLUDED__

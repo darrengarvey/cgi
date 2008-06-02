@@ -310,6 +310,26 @@ namespace cgi {
        return acceptor_service_.local_endpoint(impl.acceptor_, ec);
      }
 
+     native_type
+     native(implementation_type& impl)
+     {
+       return acceptor_service_.native(impl.acceptor_);
+     }
+
+     bool
+     is_cgi(implementation_type& impl)
+     {
+       boost::system::error_code ec;
+#if ! defined(BOOST_WINDOWS)
+       socklen_t len
+         = static_cast<socklen_t>(local_endpoint(impl,ec).capacity());
+       int ret = getpeername(native(impl), local_endpoint(impl,ec).data(), &len);
+       return ( ret != 0 && errno == ENOTCONN ) ? false : true;
+#else
+       return false;
+#endif
+     }
+ 
    public:
      template<typename CommonGatewayRequest, typename Handler>
      void check_for_waiting_request(implementation_type& impl

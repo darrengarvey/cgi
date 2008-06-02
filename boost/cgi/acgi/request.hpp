@@ -9,6 +9,7 @@
 #ifndef CGI_ACGI_REQUEST_HPP_INCLUDED__
 #define CGI_ACGI_REQUEST_HPP_INCLUDED__
 
+#include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/common/tags.hpp"
 #include "boost/cgi/acgi/service.hpp"
 #include "boost/cgi/acgi/request_impl.hpp"
@@ -16,15 +17,15 @@
 #include "boost/cgi/fwd/basic_request_fwd.hpp"
 
 namespace cgi {
-
-  class acgi_request_service;
+ namespace acgi {
 
   typedef
     common::basic_request<
-      acgi_request_service, acgi_service
+      acgi::request_service, acgi::service
     >
-  acgi_request;
+  request;
 
+ } // namespace acgi
 } // namespace cgi
 
 //namespace boost { namespace acgi {

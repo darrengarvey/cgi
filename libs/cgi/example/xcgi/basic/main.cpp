@@ -7,17 +7,19 @@
 //
 ////////////////////////////////////////////////////////////////
 //
-//[fcgi_hello_world
+//[xcgi_basic
 //
-// The simplest FastCGI program, outputs only "Hello there, universe."
+// A completely stripped-down, protocol-independent program, outputs only
+// "Hello there, universe."
+//
+// example/xcgi/basic$ `bjam install`
+// 
+// will install the example to your cgi-bin and fcgi-bin. Look
+// [link ../../doc.qbk here] for more information, including how to set these.
 //
 
-#include <iomanip>
-#include <fstream>
-#include <boost/cgi/fcgi.hpp>
 #include <boost/cgi.hpp>
-#include <boost/asio.hpp>
-#include <sys/socket.h>
+#include <boost/cgi/fcgi.hpp>
 
 using namespace std;
 using namespace boost::fcgi;
@@ -65,24 +67,10 @@ try
 {
   service s;        // This becomes useful with async operations.
   acceptor a(s);
-  ofstream file("/var/www/log/is_cgi.log", std::ios::app);
 
-  if (a.is_cgi())
-  {
-    file<< "Is CGI" << endl;
-    file.flush();
-    handle_request();
-  }
-  else
-  {
-    file<< "Is FastCGI (probably)";
-    file.flush();
-    handle_request(a);
-  }
-
-  file.flush();
-  
-  return 0;
+  return a.is_cgi() ?
+             handle_request()    // Start it as a CGI request.
+           : handle_request(a);  // Start it as a FastCGI request.
 }
 catch(boost::system::system_error& err)
 {

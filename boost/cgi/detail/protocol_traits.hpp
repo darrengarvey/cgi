@@ -26,7 +26,18 @@
 namespace cgi {
 
   namespace cgi  {}
-  namespace acgi {}
+  namespace acgi
+  {
+    //class acgi_service;
+    class request_service;
+    class request_impl;
+    typedef common::basic_protocol_service<common::tags::acgi> service;
+    typedef
+      common::basic_request<
+        acgi::request_service, acgi::service
+      >
+    request;
+  }
   namespace fcgi
   {
   class fcgi_request_impl;
@@ -110,7 +121,7 @@ namespace cgi {
     {
       typedef protocol_traits<tags::async_cgi>       type;
       typedef async_cgi_request_impl                 impl_type;
-      typedef acgi_request_service                   request_service_impl;
+      typedef acgi::request_service                  request_service_impl;
       typedef common::basic_protocol_service<
                   tags::acgi
                >                                     protocol_service_type;
@@ -131,8 +142,8 @@ namespace cgi {
     //  : protocol_traits<tags::async_cgi>
     {
       typedef protocol_traits<tags::acgi>            type;
-      typedef acgi_request_impl                      impl_type;
-      typedef acgi_request_service                   request_service_impl;
+      typedef acgi::request_impl                     impl_type;
+      typedef acgi::request_service                  request_service_impl;
       typedef common::basic_protocol_service<
                   tags::acgi
               >                                      protocol_service_type;
@@ -140,7 +151,6 @@ namespace cgi {
                   request_service_impl
                 , protocol_service_type
               >                                      request_type; 
-      typedef acgi_service_impl                      service_impl_type;
       typedef common::basic_connection<
                   tags::async_stdio
               >                                      connection_type;

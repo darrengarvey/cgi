@@ -1,4 +1,4 @@
-//                   -- cgi.hpp --
+//                -- common_headers.hpp --
 //
 //           Copyright (c) Darren Garvey 2007.
 // Distributed under the Boost Software License, Version 1.0.
@@ -6,8 +6,8 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 //
 ////////////////////////////////////////////////////////////////
-#ifndef CGI_CGI_CGI_HPP_INCLUDED__
-#define CGI_CGI_CGI_HPP_INCLUDED__
+#ifndef CGI_DETAIL_COMMON_HEADERS_HPP_INCLUDED__
+#define CGI_DETAIL_COMMON_HEADERS_HPP_INCLUDED__
 
 // #include all protocol-independent headers only. Protocol-specific
 // headers can just include this after other headers.
@@ -25,4 +25,5 @@
 #include "boost/cgi/http/status_code.hpp"
 #include "boost/cgi/import/io_service.hpp"
 
-#endif // CGI_CGI_CGI_HPP_INCLUDED__
+#endif // CGI_DETAIL_COMMON_HEADERS_HPP_INCLUDED__
+
