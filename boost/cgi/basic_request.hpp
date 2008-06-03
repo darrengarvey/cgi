@@ -399,17 +399,17 @@ namespace cgi {
     // environment.
     // eg.
     // string_type& val = req["some name"];
-    env_map& operator[](string_type const& n)
+    string_type& operator[](string_type const& n)
     {
       return env_vars(this->implementation.vars_)[n.c_str()];
     }
 
-    env_map& operator[](const char* n)
+    string_type& operator[](const char* n)
     {
       return env_vars(this->implementation.vars_)[n];
     }
 
-    env_map& operator[](common::name const& n)
+    string_type& operator[](common::name const& n)
     {
       return env_vars(this->implementation.vars_)[n];
     }
