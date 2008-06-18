@@ -11,7 +11,6 @@
 
 #include "boost/cgi/acgi/service.hpp"
 #include "boost/cgi/basic_client.hpp"
-#include "boost/cgi/common/status_type.hpp"
 #include "boost/cgi/connections/async_stdio.hpp"
 #include "boost/cgi/detail/cgi_request_impl_base.hpp"
 

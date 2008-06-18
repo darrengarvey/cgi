@@ -1,11 +1,25 @@
 
-[section Hello world]
+[section A Simple Dispatcher]
 
 [import main.cpp]
+[import Server.hpp]
 
-[acgi_hello_world]
+First, the Server class, which can dispatch both CGI and FastCGI requests.
+The handler passed to `Server::run()` must be able to deal with both
+`boost::acgi::request` and `boost::fcgi::request` types. An example handler is
+in `main.cpp` (shown below), which deals with all types.
 
-See the [@../../example/acgi/hello_world/main.cpp full source listing].
+[xcgi_server1_server]
 
-[endsect][/ hello_world]
+The `request_handler` is the important part of the example below, the part you
+should supply.
+
+[xcgi_server1]
+
+See the full source listing: [: [@../../example/xcgi/server1/Server.hpp Server.hpp]
+
+   [@../../example/xcgi/server1/main.cpp main.cpp]
+]
+
+[endsect][/ a_simple_dispatcher]
 

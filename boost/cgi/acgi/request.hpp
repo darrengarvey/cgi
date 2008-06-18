@@ -21,7 +21,7 @@ namespace cgi {
 
   typedef
     common::basic_request<
-      acgi::request_service, acgi::service
+        acgi::request_service, acgi::service
     >
   request;
 

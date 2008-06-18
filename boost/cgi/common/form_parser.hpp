@@ -29,37 +29,31 @@ namespace cgi {
  namespace detail {
 
   /// Destined for better things than an implementation detail (hopefully).
-  template<typename RequestImplType>
   class form_parser
   {
   public:
     typedef
       boost::function<
-        std::size_t (
-            const boost::asio::mutable_buffer&
-          , boost::system::error_code& )
+        std::size_t (boost::system::error_code&)
       >
     callback_type;
 
+    typedef std::string         string_type;
     typedef boost::asio::mutable_buffers_1 mutable_buffers_type;
     typedef std::vector<char>   buffer_type;
     typedef ::cgi::common::map  map_type;
 
-    typedef RequestImplType     implementation_type;
+/*
+    form_parser();
+    form_parser(callback_type const& callback);
+*/
+    form_parser(
+        buffer_type&, common::post_map&, string_type const&
+      , callback_type const&, std::size_t&, bool&); 
 
-    form_parser(implementation_type& impl);
-    form_parser(implementation_type& impl, callback_type const& callback);
-
-    mutable_buffers_type prepare(std::size_t size)
-    {
-      std::size_t bufsz(impl_.buffer_.size());
-      impl_.buffer_.resize(bufsz + size);
-      return boost::asio::buffer(&impl_.buffer_[bufsz], size);
-    }
-      
     std::string buffer_string()
     {
-      return std::string(impl_.buffer_.begin() + offset_, impl_.buffer_.end());
+      return std::string(buffer_.begin() + offset_, buffer_.end());
     }
     
     boost::system::error_code 
@@ -87,18 +81,22 @@ namespace cgi {
     boost::system::error_code
       parse_boundary_marker(boost::system::error_code& ec);
 
-  private:
-    implementation_type& impl_;
+  //private:
+  public:
+    string_type const& content_type_;
+    buffer_type& buffer_;
     std::size_t& bytes_left_;
     buffer_type::iterator pos_;
     //bool& stdin_data_read_;
-    std::size_t offset_;
+    common::post_map& data_map_;
 
     std::string boundary_marker;
     std::list<std::string> boundary_markers;
     std::vector<common::form_part> form_parts_;
 
     const callback_type callback_;
+    bool& stdin_parsed_;
+    std::size_t offset_;
   };
 
  } // namespace detail

@@ -13,10 +13,10 @@
 #include <set>
 ///////////////////////////////////////////////////////////
 #include <boost/asio.hpp>
+#include <boost/thread.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/thread.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/error.hpp"
 #include "boost/cgi/common/tags.hpp"
@@ -48,6 +48,9 @@ namespace cgi {
     typedef boost::shared_ptr<
       basic_connection<tags::shareable_tcp_socket> >  pointer;
     typedef boost::mutex                              mutex_type;
+    struct condition_type : public boost::condition_variable
+        { typedef boost::shared_ptr<boost::condition_variable> pointer; };
+    typedef boost::unique_lock<mutex_type>            scoped_lock_type;
     typedef boost::asio::ip::tcp::socket              next_layer_type;
 
     /** FastCGI specific stuff **/
@@ -57,14 +60,11 @@ namespace cgi {
     typedef 
       detail::protocol_traits<fcgi_>::request_ptr    request_ptr;
     typedef std::map<boost::uint16_t, request_type*> request_map_type;
-    typedef std::vector<request_type*>                  request_vector_type;
+    typedef std::vector<request_type*>               request_vector_type;
 
     /** End FastCGI stuff      **/
 
     // A wrapper to provide condition_type::pointer
-    struct condition_type : public boost::condition_variable
-    { typedef boost::shared_ptr<boost::condition_variable> pointer; };
-
     basic_connection(io_service& ios)
       : sock_(ios)
       , mutex_()
@@ -89,6 +89,27 @@ namespace cgi {
     void close()
     {
       sock_.close();
+    }
+
+    void lock()
+    {
+      scoped_lock_type(mutex_);
+      locked_ = true;
+    }
+
+    void unlock()
+    {
+      scoped_lock_type(mutex_);
+      locked_ = false;
+      condition_.notify_one();
+    }
+
+    void wait()
+    {
+      scoped_lock_type lock(mutex_);
+      if (locked_ = false)
+        return;
+      condition_.wait(lock);
     }
 
     static pointer create(io_service& ios)
@@ -141,7 +162,7 @@ namespace cgi {
       return sock_;
     }
 
-    mutex_type& mutex()        { return mutex_;     }
+    mutex_type& mutex()         { return mutex_;     }
     condition_type& condition() { return condition_; }
 
     boost::system::error_code
@@ -177,6 +198,7 @@ namespace cgi {
     //}
   private:
     
+    bool locked_;
     next_layer_type sock_;
     mutex_type mutex_;
     condition_type condition_;

@@ -9,7 +9,6 @@
 #ifndef CGI_BASIC_REQUEST_FWD_HPP_INCLUDED__
 #define CGI_BASIC_REQUEST_FWD_HPP_INCLUDED__
 
-#include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/fwd/request_service_fwd.hpp"
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 
@@ -18,7 +17,6 @@ namespace cgi {
 
   template<typename RequestService
           , typename ProtocolService
-          , enum role_type Role = responder
           , typename Allocator = std::allocator<char> >
   class basic_request;
 

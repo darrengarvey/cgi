@@ -7,23 +7,23 @@
 //
 ////////////////////////////////////////////////////////////////
 //
-//[xcgi_server2
+//[xcgi_server1
 //
 // A protocol-independent program, outputs only
 // 
 //   "Hello there, universe." 
 //
-// This one is similar to the xcgi/basic example and equally simple, but here
-// the protocol-dependent bits done by `Server` class (see "Server.hpp").
+// This one is similar to the xcgi/basic example and even more straigh-forward
+// simple. The difference here is that the protocol-dependent bits are done by
+// `Server` class (see "Server.hpp"). All the Server object takes is a handler
+// that is a function object with a compatible signature.
 //
-//   example/xcgi/basic$ `bjam install`
+//   example/xcgi/server1$ `bjam install`
 // 
 // will install the example to your cgi-bin and fcgi-bin. Look
 // [link ../../doc.qbk here] for more information, including how to set these.
 //
 
-#include <boost/cgi/fcgi.hpp>
-#include <boost/cgi.hpp>
 #include "Server.hpp"
 
 using namespace std;

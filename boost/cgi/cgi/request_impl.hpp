@@ -20,7 +20,6 @@
 #include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/http/status_code.hpp"
 #include "boost/cgi/connections/stdio.hpp"
-#include "boost/cgi/common/status_type.hpp"
 #include "boost/cgi/detail/cgi_request_impl_base.hpp"
 
 // Make this ProtocolService-independent
@@ -69,3 +68,4 @@ namespace cgi {
 } // namespace cgi
 
 #endif // CGI_CGI_REQUEST_IMPL_HPP_INCLUDED__
+

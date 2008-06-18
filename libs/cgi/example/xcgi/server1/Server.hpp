@@ -1,8 +1,8 @@
 #ifndef BOOST_CGI_EXAMPLES_XCGI_SERVER2_SERVER_HPP_INCLUDED_
 #define BOOST_CGI_EXAMPLES_XCGI_SERVER2_SERVER_HPP_INCLUDED_
 
-#include <boost/cgi/fcgi.hpp>
-#include <boost/cgi/acgi.hpp>
+//[xcgi_server1_server
+#include <boost/cgi.hpp>
 
 class Server
 {
@@ -35,7 +35,7 @@ public:
   template<typename Handler>
   int handle_fcgi_requests(Handler handler)
   {
-    boost::fcgi::request req(acceptor_.protocol_service());
+    boost::fcgi::request req(service_);
 
     int ret = 0;
     for (;;) // Handle requests until something goes wrong
@@ -51,6 +51,7 @@ private:
   boost::fcgi::service service_;
   boost::fcgi::acceptor acceptor_;
 };
+//]
 
 #endif // BOOST_CGI_EXAMPLES_XCGI_SERVER2_SERVER_HPP_INCLUDED_
 

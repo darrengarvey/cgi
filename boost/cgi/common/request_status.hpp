@@ -1,4 +1,4 @@
-//              -- common/status_type.hpp --
+//              -- common/request_status.hpp --
 //
 //            Copyright (c) Darren Garvey 2007.
 // Distributed under the Boost Software License, Version 1.0.
@@ -6,13 +6,13 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 //
 ////////////////////////////////////////////////////////////////
-#ifndef CGI_COMMON_STATUS_TYPE_HPP_INCLUDED__
-#define CGI_COMMON_STATUS_TYPE_HPP_INCLUDED__
+#ifndef CGI_COMMON_REQUEST_STATUS_HPP_INCLUDED__
+#define CGI_COMMON_REQUEST_STATUS_HPP_INCLUDED__
 
 namespace cgi {
  namespace common {
 
-   enum status_type
+   enum request_status
      { null
      , unloaded
      , activated
@@ -25,5 +25,5 @@ namespace cgi {
  } // namespace common
 } // namespace cgi
 
-#endif // CGI_COMMON_STATUS_TYPE_HPP_INCLUDED__
+#endif // CGI_COMMON_REQUEST_STATUS_HPP_INCLUDED__
 

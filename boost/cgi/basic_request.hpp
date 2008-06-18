@@ -31,7 +31,6 @@
 #include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/http/status_code.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
-#include "boost/cgi/common/status_type.hpp"
 #include "boost/cgi/common/source_enums.hpp"
 #include "boost/cgi/fwd/basic_request_fwd.hpp"
 #include "boost/cgi/common/request_service.hpp"
@@ -59,18 +58,20 @@ namespace cgi {
   **/
   template<typename RequestService
           , typename ProtocolService
-          , role_type Role
           , typename Allocator>
   class basic_request
-    : public boost::mpl::if_c<
-                 is_async<typename RequestService::protocol_type>::type::value
+    : public boost::mpl::if_<
+                 is_async<typename RequestService::protocol_type>
                , basic_io_object<RequestService>
                , detail::basic_sync_io_object<RequestService>
                >::type
   {
   public:
-    typedef basic_request<RequestService, ProtocolService
-                         , Role, Allocator >             type;
+    typedef
+    basic_request<
+        RequestService, ProtocolService
+      , Allocator
+    >                                                    type;
     typedef ::cgi::common::map                           map_type;
     typedef RequestService                               service_type;
     typedef typename service_type::protocol_type         protocol_type;
@@ -80,6 +81,7 @@ namespace cgi {
     typedef typename implementation_type::char_type      char_type;
     typedef typename implementation_type::string_type    string_type;
     typedef typename implementation_type::client_type    client_type;
+    typedef typename implementation_type::buffer_type    buffer_type;
 
 
     // Throws
@@ -173,14 +175,38 @@ namespace cgi {
       detail::throw_error(ec);
     }
 
-    // Error-code semantics
-    boost::system::error_code&
+    // Error-code semantics (**FIXME**)
+    boost::system::error_code
+      load(parse_options parse_opts, boost::system::error_code& ec)
+    {
+      return this->service.load(this->implementation, parse_opts, ec);
+    }
+
+    // Error-code semantics (**FIXME**)
+    boost::system::error_code
+      load(bool parse_stdin, boost::system::error_code& ec)
+    {
+      return this->service.load(this->implementation, parse_stdin, ec);
+    }
+
+    // Error-code semantics (**FIXME**)
+    boost::system::error_code
       load(boost::system::error_code& ec, bool parse_stdin = false)
     {
       return this->service.load(this->implementation, parse_stdin, ec);
     }
 
-
+    /// Get the buffer containing the POST data.
+    /**
+     * **FIXME**
+     * This actually returns the whole buffer on FastCGI at the moment, which
+     * contains the params too.
+     */
+    buffer_type& post_buffer()
+    {
+      return this->implementation.post_buffer_;
+    }
+    
     // **FIXME**
     /// Asynchronously read/parse the request meta-data
     /**
@@ -209,7 +235,7 @@ namespace cgi {
     int close(common::http::status_code http_status = http::ok
              , int program_status = 0)
     {
-      //BOOST_ASSERT( request_status_ != status_type::ended );
+      //BOOST_ASSERT( request_status_ != ended );
 
       //this->service.set_status(this->implementation, http_status);
       boost::system::error_code ec;
@@ -258,6 +284,23 @@ namespace cgi {
       return this->service.client(this->implementation);
     }
 
+    /// Read some data into the request, parsing if necessary.
+    void read_some()
+    {
+      boost::system::error_code ec;
+      this->service.read_some(this->implementation, ec);
+      detail::throw_error(ec);
+    }
+
+    /// Read some data into the request, parsing if necessary.
+    std::size_t
+    read_some(boost::system::error_code& ec)
+    {
+      return this->service.read_some(this->implementation, ec);
+    }
+
+    /// Read some data into the supplied buffer, parsing if necessary.
+    // **FIXME** (remove - use req.client().read_some() instead)
     template<typename MutableBufferSequence>
     void read_some(const MutableBufferSequence& buf)
     {
@@ -266,10 +309,12 @@ namespace cgi {
       detail::throw_error(ec);
     }
 
+    /// Read some data into the supplied buffer, parsing if necessary.
+    // **FIXME** (remove - use req.client().read_some() instead)
     template<typename MutableBufferSequence>
-    boost::system::error_code
-      read_some(const MutableBufferSequence& buf
-               , boost::system::error_code& ec)
+    std::size_t
+    read_some(const MutableBufferSequence& buf
+             , boost::system::error_code& ec)
     {
       return this->service.read_some(this->implementation, buf, ec);
     }
@@ -287,73 +332,59 @@ namespace cgi {
     }
     */
 
-    /// Search through environment variables for the matching name
-    string_type var(string_type const& name, boost::system::error_code& ec)
-    {
-      return env_vars(this->implementation)[name.c_str()];
-    }
-
-    string_type var(string_type const& name)
-    {
-      boost::system::error_code ec;
-      string_type ret (var(name, ec));
-      detail::throw_error(ec);
-      return ret;
-    }
-
     // [helper-functions for the basic CGI 1.1 meta-variables.
-    string_type auth_type()
+    string_type& auth_type()
     { return env_("AUTH_TYPE"); }
 
-    string_type content_length()
+    string_type& content_length()
     { return env_("CONTENT_LENGTH"); }
 
-    string_type content_type()
+    string_type& content_type()
     { return env_("CONTENT_TYPE"); }
 
-    string_type gateway_interface()
+    string_type& gateway_interface()
     { return env_("GATEWAY_INTERFACE"); }
 
-    string_type path_info()
+    string_type& path_info()
     { return env_("PATH_INFO"); }
 
-    string_type path_translated()
+    string_type& path_translated()
     { return env_("PATH_TRANSLATED"); }
 
-    string_type query_string()
+    string_type& query_string()
     { return env_("QUERY_STRING"); }
 
-    string_type remote_addr()
+    string_type& remote_addr()
     { return env_("REMOTE_ADDR"); }
 
-    string_type remote_host()
+    string_type& remote_host()
     { return env_("REMOTE_HOST"); }
 
-    string_type remote_ident()
+    string_type& remote_ident()
     { return env_("REMOTE_IDENT"); }
 
-    string_type remote_user()
+    string_type& remote_user()
     { return env_("REMOTE_USER"); }
 
-    string_type request_method()
+    string_type& request_method()
     { return env_("REQUEST_METHOD"); }
 
-    string_type script_name()
+    string_type& script_name()
     { return env_("SCRIPT_NAME"); }
 
-    string_type server_name()
+    string_type& server_name()
     { return env_("SERVER_NAME"); }
 
-    string_type server_port()
+    string_type& server_port()
     { return env_("SERVER_PORT"); }
 
-    string_type server_protocol()
+    string_type& server_protocol()
     { return env_("SERVER_PROTOCOL"); }
 
-    string_type server_software()
+    string_type& server_software()
     { return env_("SERVER_SOFTWARE"); }
 
-    string_type referer()
+    string_type& referer()
     { return env_("HTTP_REFERER"); }
     // -- end helper-functions]
 
@@ -399,16 +430,20 @@ namespace cgi {
     // environment.
     // eg.
     // string_type& val = req["some name"];
+
+    /// Get the value of the environment variable with name `n`.
     string_type& operator[](string_type const& n)
     {
       return env_vars(this->implementation.vars_)[n.c_str()];
     }
 
+    /// Get the value of the environment variable with name `n`.
     string_type& operator[](const char* n)
     {
       return env_vars(this->implementation.vars_)[n];
     }
 
+    /// Get the value of the environment variable with name `n`.
     string_type& operator[](common::name const& n)
     {
       return env_vars(this->implementation.vars_)[n];

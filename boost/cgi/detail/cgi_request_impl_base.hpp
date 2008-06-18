@@ -21,7 +21,7 @@
 #include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/http/status_code.hpp"
 #include "boost/cgi/connections/stdio.hpp"
-#include "boost/cgi/common/status_type.hpp"
+#include "boost/cgi/common/request_status.hpp"
 
 namespace cgi {
  namespace detail {
@@ -60,10 +60,9 @@ namespace cgi {
 
     bool stdin_parsed()                      { return stdin_parsed_;   }
     common::http::status_code& http_status() { return http_status_;    }
-    common::status_type& status()            { return request_status_; }
+    common::request_status& status()         { return request_status_; }
 
     conn_ptr& connection()                   { return connection_;     }
-
   public:
     //conn_ptr connection() { return connection_; }
 
@@ -76,7 +75,7 @@ namespace cgi {
   protected:
 
     common::http::status_code http_status_;
-    common::status_type request_status_;
+    common::request_status request_status_;
 
     conn_ptr connection_;
   };

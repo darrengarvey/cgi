@@ -18,15 +18,16 @@
 using namespace std;
 using namespace boost::fcgi;
 
-=======
-/// Handle a FastCGI request
-template<typename Acceptor>
-int handle_request(Acceptor& a)
+template<typename Request, typename Response>
+int handle_request(Request& req, Response& resp)
 {
-  int ret = 0;
-  for (;;) // Handle requests until something goes wrong
-           // (an exception will be thrown).
->>>>>>> .r46066
+  // This is a minimal response. The content_type(...) may go before or after
+  // the response text.
+  resp<< content_type("text/plain")
+      << "Hello there, universe.";
+
+  return_(resp, req, 0);
+}
 
 int main()
 {
@@ -34,6 +35,8 @@ try
 {
   service s;        // This becomes useful with async operations.
   acceptor a(s);
+
+  int ret = 0; // the return value
   
   for (;;)
   {

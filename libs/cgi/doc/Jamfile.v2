@@ -11,26 +11,39 @@ import quickbook ;
 import doxygen ;
 
 # compile the doxygen sources here
-doxygen cgi_dox
+doxygen autodoc
   :
 #   [ glob-tree ../../../boost/cgi/*.hpp : .svn ]
 #   [ glob-tree ../../../boost/libs/cgi/src/*.cpp : .svn ]
 
-    [ glob ../../../boost/cgi/*.hpp ]
-    [ glob ../../../boost/cgi/fcgi*.hpp ]
-    [ glob ../../../boost/cgi/acgi*.hpp ]
-    [ glob ../../../boost/cgi/cgi*.hpp ]
-#    [ glob ../../../boost/cgi/gateway_impl/*.hpp ]
-#    [ glob ../../../boost/cgi/gateway_service/*.hpp ]
-    [ glob ../../../boost/cgi/http/*.hpp ]
-#    [ glob ../../../boost/cgi/connections/*.hpp ]
-#    [ glob ../../../boost/cgi/request_impl/*.hpp ]
-#    [ glob ../../../boost/cgi/request_service/*.hpp ]
+    [ glob $(top)/boost/cgi/*.hpp ]
+    $(top)/boost/cgi/fcgi/client.hpp
+    $(top)/boost/cgi/fcgi/service.hpp
+    $(top)/boost/cgi/fcgi/acceptor.hpp
+    $(top)/boost/cgi/fcgi/request.hpp
+    $(top)/boost/cgi/acgi/service.hpp
+    $(top)/boost/cgi/acgi/acceptor.hpp
+    $(top)/boost/cgi/acgi/request.hpp
+    $(top)/boost/cgi/cgi/service.hpp
+    $(top)/boost/cgi/cgi/request.hpp
+    $(top)/boost/cgi/http/status_code.hpp
+    #[ glob $(top)/boost/cgi/acgi/*.hpp ]
+    #[ glob $(top)/boost/cgi/cgi/*.hpp ]
+    [ glob $(top)/boost/cgi/common/*.hpp ]
+
+    [ glob ../../../boost/cgi/connections/*.hpp ]
   :
-#    <doxygen:param>HIDE_UNDOC_MEMBERS=NO
+    #<doxygen.processor>doxproc
+    #<doxygen.doxproc.index>yes
+    #<doxygen.doxproc.title>"Developer Reference"
+    #<doxygen.doxproc.id>"developer_reference"
+
+    <doxygen:param>HIDE_UNDOC_MEMBERS=NO
     <doxygen:param>EXTRACT_PRIVATE=NO
-#    #<doxygen:param>EXTRACT_ALL=YES
+    <doxygen:param>EXTRACT_ALL=YES
     <doxygen:param>SEARCH_INCLUDES=YES
+    <doxygen:param>GENERATE_TREEVIEW=ALL
+    <doxygen:param>TYPEDEF_HIDES_STRUCT=YES
 #    <doxygen:param>INCLUDE_PATH=$(BOOST_ROOT)
   ;
 
@@ -39,31 +52,27 @@ xml cgi_xml : src/cgi.qbk ;
 boostbook standalone
   :
     cgi_xml
-    cgi_dox
+    autodoc
+    #cgi_dox
   :
-    <doxygen.processor>doxproc
-    <doxygen.doxproc.index>no
-    <doxygen.doxproc.title>"Developer Reference"
-    <doxygen.doxproc.id>"developer_reference"
-
-    <xsl:param>project.root=../../../..
-    <xsl:param>boost.libraries=/usr/local/src/boost/trunk/libs/libraries.htm
-    <xsl:param>boost.images=http://beta.boost.org/images
+    #<xsl:param>project.root=../../../..
+    #<xsl:param>boost.libraries=/usr/local/src/boost/trunk/libs/libraries.htm
+    #<xsl:param>boost.images=http://beta.boost.org/images
     # the depth (of sub-pages) the TOC shows
-    <xsl:param>toc.max.depth=1
+    #<xsl:param>toc.max.depth=1
     # Path to the stylesheet
-    <xsl:param>html.stylesheet=../../../../../../boost/trunk/doc/html/boostbook.css
+    #<xsl:param>html.stylesheet=../../../../../../boost/trunk/doc/html/boostbook.css
  
     # 
-    <xsl:param>toc.section.depth=2
+    #<xsl:param>toc.section.depth=2
 
     # How far down we go with TOC's
-    <xsl:param>generate.section.toc.level=10
+    #<xsl:param>generate.section.toc.level=10
      # how many sections are on the first page
-    <xsl:param>chunk.first.sections=1
+    #<xsl:param>chunk.first.sections=1
 
     # To chunk (together) or not to chunk (divide)
-    <xsl:param>chunk.section.depth=2 # chunk
+    #<xsl:param>chunk.section.depth=2 # chunk
  	;
 
 #install html

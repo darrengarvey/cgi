@@ -21,10 +21,11 @@
 #include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/import/io_service.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
+#include "boost/cgi/common/form_parser.hpp"
 #include "boost/cgi/common/source_enums.hpp"
 #include "boost/cgi/common/request_base.hpp"
 #include "boost/cgi/detail/service_base.hpp"
-#include "boost/cgi/common/form_parser.hpp"
+#include "boost/cgi/common/parse_options.hpp"
 
 namespace cgi {
  namespace fcgi {
@@ -66,40 +67,53 @@ namespace cgi {
 
       bool stdin_parsed_;
       ::cgi::common::http::status_code http_status_;
-      common::status_type request_status_;
+      common::request_status request_status_;
       fcgi::spec_detail::role_t request_role_;
+      std::size_t characters_left_;
 
       bool all_done_;
-
-      mutable_buffers_type prepare(std::size_t size)
-      {
-        using namespace std;
-        std::size_t bufsz( buffer_.size() );
-        //cerr<< "bufsz    = " << bufsz << endl;
-
-        // Reserve more space if it's needed.
-        // (this could be safer, referencing this against CONTENT_LENGTH)
-        //if ( (bufsz + size) >= buf_.capacity() )
-        //{
-          buffer_.resize(bufsz + size);
-        //}
-        return boost::asio::buffer(&buffer_[bufsz], size);
-      }
-
 
      /************** New stuff *****************/
       header_buffer_type header_buf_;
       boost::uint16_t id_;
-      typedef detail::form_parser<implementation_type> form_parser_type;
+      typedef detail::form_parser form_parser_type;
 
       boost::scoped_ptr<form_parser_type> fp_;
+      // Buffer to hold param records and filter data, etc.
+      buffer_type param_buffer_;
+
+      mutable_buffers_type prepare_misc(std::size_t size)
+      {
+        std::size_t bufsz(param_buffer_.size());
+        param_buffer_.resize(bufsz + size);
+        return boost::asio::buffer(&param_buffer_[bufsz], size);
+      }
      };
 
-    typedef fcgi_request_service                      type;
-    typedef ::cgi::fcgi::fcgi_request_service         full_type;
-    typedef type::implementation_type::protocol_type  protocol_type;
-    typedef type::implementation_type::request_type   request_type;
+    typedef fcgi_request_service                           self_type;
+    typedef ::cgi::fcgi::fcgi_request_service              full_type;
+    typedef self_type::implementation_type::protocol_type  protocol_type;
+    typedef self_type::implementation_type::request_type   request_type;
 
+    template<typename Service>
+    struct callback_functor
+    {
+      callback_functor(implementation_type& impl, Service* service)
+        : impl_(impl)
+        , service_(service)
+      {
+      }
+
+      std::size_t operator()(boost::system::error_code& ec)
+      {
+        return service_->read_some(impl_, ec);
+      }
+
+    private:
+      implementation_type& impl_;
+      Service* service_;
+    };
+    
     fcgi_request_service(::cgi::common::io_service& ios)
       : detail::service_base<fcgi_request_service>(ios)
     {
@@ -111,6 +125,7 @@ namespace cgi {
 
     void construct(implementation_type& impl)
     {
+      // **FIXME** move this to the client class
       impl.client_.set_connection(//new implementation_type::connection_type(this->io_service()));
         implementation_type::connection_type::create(this->io_service())
       );
@@ -142,9 +157,11 @@ namespace cgi {
     int close(implementation_type& impl, ::cgi::common::http::status_code& hsc
               , int program_status);
 
+    /// Close the request.
     int close(implementation_type& impl, ::cgi::common::http::status_code& hsc
              , int program_status, boost::system::error_code& ec);
 
+    /// Clear all request data (object is then safe to remove).
     void clear(implementation_type& impl);
 
     /// Load the request to a point where it can be usefully used.
@@ -157,13 +174,20 @@ namespace cgi {
      *    packet for this request arrives from the server.
      *
      */
-    boost::system::error_code&
-      load(implementation_type& impl, bool parse_stdin
+    boost::system::error_code
+    load(implementation_type& impl, bool parse_stdin
+          , boost::system::error_code& ec);
+
+    boost::system::error_code
+    load(implementation_type& impl, common::parse_options parse_opts
           , boost::system::error_code& ec);
 
     // **FIXME**
     template<typename Handler>
     void async_load(implementation_type& impl, bool parse_stdin, Handler handler);
+
+    /// Returns true if the request environment params have been read.
+    bool params_read(implementation_type& impl);
 
     role_type get_role(implementation_type& impl)
     {
@@ -175,6 +199,8 @@ namespace cgi {
     {
       return impl.client_;
     }
+
+    void set_status(implementation_type& impl, common::request_status status);
 
   protected:
     /// Read and parse the cgi POST meta variables (greedily)
@@ -189,8 +215,15 @@ namespace cgi {
   /***************************************************************************/
   public: // Reading stuff goes under here
 
+    /// Read some data from the client into the internal buffer.
+    std::size_t
+    read_some(implementation_type& impl, boost::system::error_code& ec)
+    {
+      return read_some(impl, impl.prepare(64), ec);
+    }
+
     // **FIXME**
-    /// Read some data from the client.
+    /// Read some data from the client into the supplied buffer.
     template<typename MutableBufferSequence>
     std::size_t
       read_some(implementation_type& impl, const MutableBufferSequence& buf
@@ -232,6 +265,10 @@ namespace cgi {
 
     /// Parse the current header
     boost::tribool parse_header(implementation_type& impl);
+
+    /// Read in the FastCGI (env) params
+    boost::system::error_code
+    read_env_vars(implementation_type& impl, boost::system::error_code& ec);
 
     // Mammoth typedef corresponding to function signature of process_*
     // functions.

@@ -19,8 +19,8 @@ namespace cgi {
    
    // typedef for typical usage (FCGI)
    typedef
-     ::cgi::common::basic_request<
-        fcgi_request_service, service
+     common::basic_request<
+          fcgi_request_service, service
      >
    request;
 

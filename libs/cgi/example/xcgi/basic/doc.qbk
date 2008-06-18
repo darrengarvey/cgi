@@ -1,11 +1,17 @@
 
-[section Hello world]
+[section Handling CGI and FastCGI]
 
 [import main.cpp]
 
-[acgi_hello_world]
+[note
+  The key bit of this example is making an fcgi::service and fcgi::acceptor and
+  then using the acceptor to check if the program is running in FastCGI or
+  CGI mode - by calling `fcgi::acceptor::is_cgi()` - then you handle it accordingly.
+]
 
-See the [@../../example/acgi/hello_world/main.cpp full source listing].
+[xcgi_basic]
+
+See the [@../../example/xcgi/basic/main.cpp full source listing].
 
 [endsect][/ hello_world]
 

@@ -13,26 +13,26 @@ namespace cgi {
    
    struct path_info
    {
-     typedef std::string              string_type;
-     typedef std::vector<string_type> vector_type;
-     typedef vector_type::iterator    iterator;
+     typedef std::string             value_type;
+     typedef std::vector<value_type> vector_type;
+     typedef vector_type::iterator   iterator;
      
-     template<typename S, typename P, enum role_type R, typename A>
-     path_info(basic_request<S,P,R,A>& request)
-       : info(boost::algorithm::trim_copy_if(request["path_info"],
+     template<typename S, typename P, typename A>
+     path_info(basic_request<S,P,A> & request)
+       : value(boost::algorithm::trim_copy_if(request["path_info"],
                   boost::algorithm::is_any_of("/")))
      {
-       boost::algorithm::split(data, info, boost::algorithm::is_any_of("/"));
+       boost::algorithm::split(parts, value, boost::algorithm::is_any_of("/"));
      }
 
-     path_info(string_type const& str)
-       : info(boost::algorithm::trim_copy_if(str, boost::algorithm::is_any_of("/")))
+     path_info(value_type const& str)
+       : value(boost::algorithm::trim_copy_if(str, boost::algorithm::is_any_of("/")))
      {
-       boost::algorithm::split(data, info, boost::algorithm::is_any_of("/"));
+       boost::algorithm::split(parts, value, boost::algorithm::is_any_of("/"));
      }
      
-     string_type info;
-     vector_type data;
+     value_type  value;
+     vector_type parts;
    };
 
  } // namespace common

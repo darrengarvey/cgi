@@ -5,7 +5,6 @@ import testing ;
 
 project boost/cgi/tests/run
   : requirements
-    <include>/usr/local/src/boost/sandbox/SOC/2006/process/tags/process-0.1
     <library>/boost/test//boost_unit_test_framework/
     <library>/boost/system/
     <library>/boost/thread/
@@ -29,6 +28,7 @@ test-suite run_test_suite
     [ run acgi_simple_request.cpp ]
     [ run name_test.cpp ]
     [ run map_test.cpp ]
+    [ run parse_options.cpp ]
   ;
 
 test-suite wget_test

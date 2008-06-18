@@ -7,9 +7,9 @@
 
 [section:ref Reference]
 
-[xinclude ../cgi_dox.xml]
+[xinclude ../autodoc.xml]
 
-[h2 Quick Reference]
+[section Quick Reference]
 
 Reference coming...
 
@@ -59,6 +59,7 @@ Responses
   * data()
   * content_length()
 
+[endsect] [/ quick_reference]
 
 [endsect] [/ ref]
 

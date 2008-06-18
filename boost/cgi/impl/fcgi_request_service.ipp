@@ -12,7 +12,6 @@
 #include <boost/fusion/support.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/fusion/include/vector.hpp>
-#include <boost/mem_fn.hpp>
 ////////////////////////////////////////////////////////////////
 #include "boost/cgi/common/map.hpp"
 #include "boost/cgi/common/tags.hpp"
@@ -22,10 +21,10 @@
 #include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/import/io_service.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
+#include "boost/cgi/common/form_parser.hpp"
 #include "boost/cgi/common/source_enums.hpp"
 #include "boost/cgi/common/request_base.hpp"
 #include "boost/cgi/detail/service_base.hpp"
-#include "boost/cgi/common/form_parser.hpp"
 #include "boost/cgi/fcgi/request_service.hpp"
 
 namespace cgi {
@@ -69,6 +68,7 @@ namespace cgi {
     {
       impl.all_done_ = true;
       impl.client_.close(program_status);
+      impl.request_status_ = common::closed;
       return program_status;
     }
 
@@ -79,19 +79,23 @@ namespace cgi {
     {
       impl.all_done_ = true;
       impl.client_.close(program_status, ec);
+      impl.request_status_ = common::closed;
       return program_status;
     }
 
     BOOST_CGI_INLINE void
     fcgi_request_service::clear(implementation_type& impl)
     {
+      /*
       BOOST_ASSERT
       (   impl.request_status_ < common::activated
        && impl.request_status_ > common::ok
        && "Are you trying to clear() a request without closing it?"
       );
+      */
                 
-      impl.buffer_.clear();
+      impl.post_buffer_.clear();
+      impl.param_buffer_.clear();
       common::get_vars(impl.vars_).clear();
       common::post_vars(impl.vars_).clear();
       common::cookie_vars(impl.vars_).clear();
@@ -117,7 +121,48 @@ namespace cgi {
      *
      */
     
-    BOOST_CGI_INLINE boost::system::error_code&
+    /// Synchronously read/parse the request meta-data
+    BOOST_CGI_INLINE boost::system::error_code
+    fcgi_request_service::load(
+        implementation_type& impl, common::parse_options parse_opts
+      , boost::system::error_code& ec)
+    {
+      if (parse_opts & common::parse_env)
+      {
+        if (read_env_vars(impl, ec)) // returns an error_code
+          return ec;
+      }
+
+      std::string const& cl = env_vars(impl.vars_)["CONTENT_LENGTH"];
+      impl.characters_left_ = cl.empty() ? 0 : boost::lexical_cast<std::size_t>(cl);
+      impl.client_.bytes_left() = impl.characters_left_;
+
+      std::string const& request_method = env_vars(impl.vars_)["REQUEST_METHOD"];
+
+      if (request_method == "GET" && parse_opts & common::parse_get)
+      {
+        parse_get_vars(impl, ec);
+      }
+      else
+      if (request_method == "POST" && parse_opts & common::parse_post)
+      {
+        parse_post_vars(impl, ec);
+      }
+
+      if (ec) return ec;
+
+      if (parse_opts & common::parse_cookie)
+      {
+        if (parse_cookie_vars(impl, ec)) // returns an error_code
+          return ec;
+      }
+
+      set_status(impl, common::loaded);
+
+      return ec;
+    }
+
+    BOOST_CGI_INLINE boost::system::error_code
     fcgi_request_service::load(
         implementation_type& impl, bool parse_stdin
       , boost::system::error_code& ec)
@@ -156,17 +201,17 @@ namespace cgi {
           handle_other_request_header(impl);
       }
 
-      common::client_status completion_condition
-        = parse_stdin ? common::stdin_read : common::params_read;
+      read_env_vars(impl, ec);
 
-      while(!ec 
-        && impl.client_.status() < completion_condition
-        && impl.request_status_ != common::loaded)
+      if (parse_stdin)
       {
-        //impl.client_.parse_packet(impl, ec);
-        parse_packet(impl, ec);
+        while(!ec 
+          && impl.client_.status() < common::stdin_read
+          && impl.request_status_ != common::loaded)
+        {
+          parse_packet(impl, ec);
+        }
       }
-
       const std::string& request_method = env_vars(impl.vars_)["REQUEST_METHOD"];
       if (request_method == "GET")
         if (parse_get_vars(impl, ec))
@@ -187,8 +232,21 @@ namespace cgi {
         implementation_type& impl, bool parse_stdin, Handler handler)
     {
       this->io_service().post(
-        detail::async_load_helper<type, Handler>(this, parse_stdin, handler)
+        detail::async_load_helper<self_type, Handler>(this, parse_stdin, handler)
       );
+    }
+
+    BOOST_CGI_INLINE
+    bool fcgi_request_service::params_read(implementation_type& impl)
+    {
+      return impl.client_.status() >= common::params_read;
+    }
+
+    BOOST_CGI_INLINE
+    void fcgi_request_service::set_status(
+        implementation_type& impl, common::request_status status)
+    {
+      impl.request_status_ = status;
     }
 
     /// Read and parse the cgi POST meta variables (greedily)
@@ -203,6 +261,7 @@ namespace cgi {
       //#     error "Not implemented"
       // **FIXME** should use form_parser, when it's ready.
       // Only works with url-encoded forms (ie. not with multipart forms)
+    /*
       std::string name;
       std::string str;
 
@@ -258,15 +317,20 @@ namespace cgi {
       if( !name.empty() )
           // **FIXME** have to have .c_str() ?
           ::cgi::common::post_vars(impl.vars_)[name.c_str()] = str;
+    */
 
-    /*
       impl.fp_.reset
       (
         new implementation_type::form_parser_type
-                ( impl, boost::mem_fn(&fcgi_request_service::read_some<boost::asio::mutable_buffer>) )
+                ( impl.post_buffer_
+                , post_vars(impl.vars_)
+                , env_vars(impl.vars_)["CONTENT_TYPE"]
+                , callback_functor<self_type>(impl, this)
+                , impl.client_.bytes_left_
+                , impl.stdin_parsed_
+                )
       );
       impl.fp_->parse(ec);
-    */
 
       return ec;
     }
@@ -303,7 +367,42 @@ namespace cgi {
       //return bytes_read;
     }
 
-    /// Read a single header, buf do nothing with it.
+    /// Read in the FastCGI (env) params
+    // **FIXME**
+    BOOST_CGI_INLINE boost::system::error_code
+    fcgi_request_service::read_env_vars(
+        implementation_type& impl, boost::system::error_code& ec)
+    {
+      while(!ec && !params_read(impl))
+      {
+        if (this->read_header(impl, ec))
+          return ec;
+          
+        boost::tribool state = this->parse_header(impl);
+
+        if (state)
+          // the header has been handled and all is ok; continue.
+          return ec;
+        else
+        if (!state)
+          // The header is confusing; something's wrong. Abort.
+          return error::bad_header_type;
+
+        // else => (state == boost::indeterminate)
+
+        implementation_type::mutable_buffers_type buf
+            = impl.prepare_misc(fcgi::spec::get_length(impl.header_buf_));
+
+        if (this->read_body(impl, buf, ec))
+          return ec;
+
+        this->parse_body(impl, buf, ec);
+
+      } // while(!ec && !params_read(impl))
+      return ec;
+    }
+
+    /// Read a single header, but do nothing with it.
     BOOST_CGI_INLINE boost::system::error_code
     fcgi_request_service::read_header(
         implementation_type& impl
@@ -528,11 +627,11 @@ namespace cgi {
     template<typename MutableBuffersType> BOOST_CGI_INLINE
     boost::system::error_code
     fcgi_request_service::read_body(
-        implementation_type& impl, const MutableBuffersType& buffer
+        implementation_type& impl, const MutableBuffersType& buf
       , boost::system::error_code& ec)
     {
       std::size_t bytes_read
-        = read(*impl.client_.connection_, buffer, boost::asio::transfer_all(), ec);
+        = read(*impl.client_.connection_, buf, boost::asio::transfer_all(), ec);
 
       BOOST_ASSERT(bytes_read == fcgi::spec::get_length(impl.header_buf_)
                    && "Couldn't read all of the record body.");
@@ -542,14 +641,14 @@ namespace cgi {
     template<typename MutableBuffersType> BOOST_CGI_INLINE
     boost::system::error_code
     fcgi_request_service::parse_body(
-        implementation_type& impl, const MutableBuffersType& buffer
+        implementation_type& impl, const MutableBuffersType& buf
       , boost::system::error_code& ec)
     {
       return
         (this->* proc_funcs[fcgi::spec::get_type(impl.header_buf_)])
             (impl, fcgi::spec::get_request_id(impl.header_buf_)
-            , boost::asio::buffer_cast<unsigned char*>(buffer)
-            , boost::asio::buffer_size(buffer), ec);
+            , boost::asio::buffer_cast<unsigned char*>(buf)
+            , boost::asio::buffer_size(buf), ec);
     }
 
 

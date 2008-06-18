@@ -275,6 +275,7 @@ namespace cgi {
        {
          request.clear();
        }
+       //request.clear(); // **FIXME** (this should be cleverer)
 
        // If we can reuse this request's connection, return.
        if (request.client().keep_connection())

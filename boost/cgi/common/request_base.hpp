@@ -33,6 +33,7 @@ namespace cgi {
   class request_base
   {
   public:
+
     /// Get the request ID of a FastCGI request, or 1.
     template<typename ImplType>
     int request_id(ImplType& impl)
@@ -40,7 +41,6 @@ namespace cgi {
       return impl.client_.request_id_;
     }
 
-  protected:
     // impl_base is the common base class for all request types'
     // implementation_type and should be inherited by it.
     struct impl_base
@@ -57,9 +57,33 @@ namespace cgi {
       >   var_map_type;
 
       var_map_type vars_;
-      buffer_type buffer_;
+      buffer_type post_buffer_;
+
+      mutable_buffers_type prepare(std::size_t size)
+      {
+        std::size_t bufsz(post_buffer_.size());
+        post_buffer_.resize(bufsz + size);
+        return boost::asio::buffer(&post_buffer_[bufsz], size);
+      }
     };
-    
+     
+    /// Read some data into the internal buffer.
+    template<typename ImplType>
+    std::size_t
+    read_some(ImplType& impl, boost::system::error_code& ec)
+    {
+      return impl.client_.read_some(impl.prepare(64), ec);
+    }
+
+    /// Read some data from the client into the supplied buffer.
+    template<typename ImplType, typename MutableBufferSequence>
+    std::size_t
+    read_some(ImplType& impl, const MutableBufferSequence& buf
+             , boost::system::error_code& ec)
+    {
+      return impl.client_.read_some(buf,ec);
+    }
+
     /// Read and parse the cgi GET meta variables
     template<typename ImplType>
     boost::system::error_code

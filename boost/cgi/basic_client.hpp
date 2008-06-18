@@ -14,7 +14,7 @@
 #include "boost/cgi/common/map.hpp"
 #include "boost/cgi/http/status_code.hpp"
 #include "boost/cgi/common/role_type.hpp"
-#include "boost/cgi/common/status_type.hpp"
+#include "boost/cgi/common/request_status.hpp"
 #include "boost/cgi/connections/tcp_socket.hpp"
 
 
