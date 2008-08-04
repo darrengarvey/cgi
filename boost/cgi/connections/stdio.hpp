@@ -17,6 +17,7 @@
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/error.hpp"
 #include "boost/cgi/common/tags.hpp"
+#include "boost/cgi/basic_connection.hpp"
 #include "boost/cgi/common/connection_base.hpp"
 #include "boost/cgi/fwd/basic_connection_fwd.hpp"
 

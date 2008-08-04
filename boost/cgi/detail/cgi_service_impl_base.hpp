@@ -124,7 +124,7 @@ namespace cgi {
       impl.http_status() = http_s;
       return status;
     }
-
+/*
     /// Synchronously read/parse the request meta-data
     boost::system::error_code&
     load(implementation_type& impl, common::parse_options parse_opts
@@ -164,7 +164,7 @@ namespace cgi {
 
       return ec;
     }
-
+*/
     /// Synchronously read/parse the request meta-data
     /**
      * @param parse_stdin if true then STDIN data is also read/parsed

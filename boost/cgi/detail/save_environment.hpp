@@ -17,7 +17,7 @@
 // The process' environment
 #if BOOST_WORKAROUND(BOOST_MSVC, BOOST_TESTED_AT(1500))
   // MSVC warns of 'inconsistent dll linkage' here...
-  _CRTIMP extern char** environ;
+  _CRTIMP extern char** _environ;
 #else
   extern char** environ;
 #endif
@@ -32,7 +32,13 @@ namespace cgi {
     *            environment.
     */
    template<typename MapT>
-   void save_environment(MapT& env_map, char** env = environ)
+   void save_environment(MapT& env_map, char** env = 
+#if BOOST_WORKAROUND(BOOST_MSVC, BOOST_TESTED_AT(1500))
+	_environ
+#else
+	 environ
+#endif
+	   )
    {
      std::string sa;
      std::string sb;

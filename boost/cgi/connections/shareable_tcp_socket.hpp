@@ -50,7 +50,7 @@ namespace cgi {
     typedef boost::mutex                              mutex_type;
     struct condition_type : public boost::condition_variable
         { typedef boost::shared_ptr<boost::condition_variable> pointer; };
-    typedef boost::unique_lock<mutex_type>            scoped_lock_type;
+	typedef boost::mutex::scoped_lock                 scoped_lock_type;
     typedef boost::asio::ip::tcp::socket              next_layer_type;
 
     /** FastCGI specific stuff **/
@@ -93,13 +93,13 @@ namespace cgi {
 
     void lock()
     {
-      scoped_lock_type(mutex_);
+      scoped_lock_type lock(mutex_);
       locked_ = true;
     }
 
     void unlock()
     {
-      scoped_lock_type(mutex_);
+      scoped_lock_type lock(mutex_);
       locked_ = false;
       condition_.notify_one();
     }

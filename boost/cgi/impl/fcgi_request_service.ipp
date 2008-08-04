@@ -120,7 +120,7 @@ namespace cgi {
      *    packet for this request arrives from the server.
      *
      */
-    
+/*    
     /// Synchronously read/parse the request meta-data
     BOOST_CGI_INLINE boost::system::error_code
     fcgi_request_service::load(
@@ -129,7 +129,7 @@ namespace cgi {
     {
       if (parse_opts & common::parse_env)
       {
-        if (read_env_vars(impl, ec)) // returns an error_code
+        if (!read_env_vars(impl, ec)) // returns an error_code
           return ec;
       }
 
@@ -153,7 +153,7 @@ namespace cgi {
 
       if (parse_opts & common::parse_cookie)
       {
-        if (parse_cookie_vars(impl, ec)) // returns an error_code
+        if (!parse_cookie_vars(impl, ec)) // returns an error_code
           return ec;
       }
 
@@ -161,7 +161,7 @@ namespace cgi {
 
       return ec;
     }
-
+*/
     BOOST_CGI_INLINE boost::system::error_code
     fcgi_request_service::load(
         implementation_type& impl, bool parse_stdin

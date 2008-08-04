@@ -152,8 +152,7 @@ int handle_request(Request& req)
   //
   resp<< "Response content-length == "
       << resp.content_length() // the content-length (returns std::size_t)
-      << content_length(resp)  // a content-length header
-      << ">";
+      << content_length(resp); // a content-length header
 
   // This funky macro finishes up:
   return_(resp, req, 0);

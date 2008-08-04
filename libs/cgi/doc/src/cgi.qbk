@@ -78,7 +78,7 @@
 ]
 
 [important
-This manual does [*not] document a library that is a part of __Boost__. The major part of it has been developed this summer as part of the Google Summer of Code, '[@http://code.google.com/soc GSoC07]'. Everything from here on in is alpha-grade, some bits more than others; [link boost.cgi.preface.comments_and_support comments and bug reports] are welcome.
+This manual does [*not] document a library that is a part of __Boost__. The major part of it has been developed this summer as part of the Google Summer of Code, '[@http://code.google.com/soc/2007 GSoC07]'. Everything from here on in is alpha-grade, some bits more than others; [link boost.cgi.preface.comments_and_support comments and bug reports] are welcome.
 
 These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sourceforge], or at [@http://svn.boost.org/svn/boost/browser/sandbox/SOC/2007/cgi svn.boost.org]. For free!
 ]

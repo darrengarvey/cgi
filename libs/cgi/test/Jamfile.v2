@@ -2,7 +2,7 @@
 
 project
   : requirements
-      <include>$(BOOST_ROOT)
+      <include>$(boost-root)
       <include>../../../
       # suppress annoying MSVC warnings
       <toolset>msvc:<define>_CRT_SECURE_NO_DEPRECATE

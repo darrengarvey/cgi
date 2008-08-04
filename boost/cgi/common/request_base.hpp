@@ -19,6 +19,7 @@
 #include <boost/system/error_code.hpp>
 ////////////////////////////////////////////////////////////////
 #include "boost/cgi/common/map.hpp"
+#include "boost/cgi/common/parse_options.hpp"
 #include "boost/cgi/detail/extract_params.hpp"
 
 namespace cgi {
@@ -82,6 +83,47 @@ namespace cgi {
              , boost::system::error_code& ec)
     {
       return impl.client_.read_some(buf,ec);
+    }
+
+    /// Synchronously read/parse the request meta-data
+    template<typename ImplType>
+    boost::system::error_code
+    load(ImplType& impl, common::parse_options parse_opts
+        , boost::system::error_code& ec)
+    {
+      if (parse_opts & common::parse_env)
+      {
+        if (!read_env_vars(impl, ec)) // returns an error_code
+          return ec;
+      }
+
+      std::string const& cl = env_vars(impl.vars_)["CONTENT_LENGTH"];
+      impl.characters_left_ = cl.empty() ? 0 : boost::lexical_cast<std::size_t>(cl);
+      impl.client_.bytes_left() = impl.characters_left_;
+
+      std::string const& request_method = env_vars(impl.vars_)["REQUEST_METHOD"];
+
+      if (request_method == "GET" && parse_opts & common::parse_get)
+      {
+        parse_get_vars(impl, ec);
+      }
+      else
+      if (request_method == "POST" && parse_opts & common::parse_post)
+      {
+        parse_post_vars(impl, ec);
+      }
+
+      if (ec) return ec;
+
+      if (parse_opts & common::parse_cookie)
+      {
+        if (!parse_cookie_vars(impl, ec)) // returns an error_code
+          return ec;
+      }
+
+      set_status(impl, common::loaded);
+
+      return ec;
     }
 
     /// Read and parse the cgi GET meta variables

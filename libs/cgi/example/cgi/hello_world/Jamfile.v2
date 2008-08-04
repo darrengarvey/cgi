@@ -6,7 +6,12 @@
 
 project boost/cgi/example/cgi/hello_world ;
 
-exe cgi_hello_world : main.cpp /boost/regex/ ;
+exe cgi_hello_world
+  :
+     main.cpp /boost/regex/ /boost/cgi/
+  :
+  ;
+
 
 # Our install rule (builds binaries and copies them to <location>)
 install install

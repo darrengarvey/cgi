@@ -93,7 +93,7 @@ int main()
     try {
 
       boost::system::error_code ec;
-      req.load(ec, true);
+      req.load(ec, parse_all); // parse everything.
 
       if (ec)
       {
@@ -130,19 +130,22 @@ int main()
                  "<input type=submit value=submit />"
                "</form><p />";
 
-      format_map(resp, req[env],     "Environment Variables");
-      format_map(resp, req[get],     "GET Variables");
-      format_map(resp, req[post],    "POST Variables");
+      format_map(resp, req[env], "Environment Variables");
+      format_map(resp, req[get], "GET Variables");
+      format_map(resp, req[post], "POST Variables");
       format_map(resp, req[cookies], "Cookie Variables");
 
-      resp<<   "<pre>";
-      BOOST_FOREACH(char& ch, req.post_buffer())
+      if (req["request_method"] = "GET")
       {
-        resp<< ch;
+        resp<<   "<pre>";
+        BOOST_FOREACH(char& ch, req.post_buffer())
+        {
+          resp<< ch;
+        }
+        resp<<   "</pre>"
+               "</body>"
+               "</html>";
       }
-      resp<<   "</pre>"
-             "</body>"
-             "</html>";
 
       return_(resp, req, 0); // All ok.
 

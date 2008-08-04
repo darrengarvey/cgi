@@ -6,9 +6,9 @@
 #project boost.cgi.docs
 #  ;
 
-#import boostbook : boostbook ;
-import quickbook ;
+import boostbook : boostbook ;
 import doxygen ;
+import quickbook ;
 
 # compile the doxygen sources here
 doxygen autodoc
@@ -33,10 +33,10 @@ doxygen autodoc
 
     [ glob ../../../boost/cgi/connections/*.hpp ]
   :
-    #<doxygen.processor>doxproc
-    #<doxygen.doxproc.index>yes
-    #<doxygen.doxproc.title>"Developer Reference"
-    #<doxygen.doxproc.id>"developer_reference"
+    <doxygen.processor>doxproc
+    <doxygen.doxproc.index>yes
+    <doxygen.doxproc.title>"Developer Reference"
+    <doxygen.doxproc.id>"developer_reference"
 
     <doxygen:param>HIDE_UNDOC_MEMBERS=NO
     <doxygen:param>EXTRACT_PRIVATE=NO
@@ -75,8 +75,8 @@ boostbook standalone
     #<xsl:param>chunk.section.depth=2 # chunk
  	;
 
-#install html
-#	:
-#	  /boost//doc/html/boostbook.css
+install html
+	:
+	  /boost//doc/html/boostbook.css
 #	  /bin/doc/$(toolset)/debug/cgi_xml.xml 
-#	;
+	;
