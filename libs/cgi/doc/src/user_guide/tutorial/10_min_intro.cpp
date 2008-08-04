@@ -23,7 +23,7 @@ The `response` class provides a streaming interface for writing replies. You ['c
 Let's assume you now want to check if the user has a cookie, "user_name", set. We get at it like this:
 */
 
-  std::string user_name( req[cookie]["user_name"] );
+  std::string user_name( req[cookies]["user_name"] );
 
 /*`
 If it's set, we'll be polite and say hello. If you are used to CGI programming, you'll notice the lack of any HTTP headers. If you don't want to bother with headers, a default header `'Content-type: text/plain'` is sent, followed by the usual HTTP end-of-line `'\r\n'` and a blank line which indicates the end of the headers and the start of content.

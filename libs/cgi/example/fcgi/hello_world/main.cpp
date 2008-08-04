@@ -34,27 +34,29 @@ int main()
 try
 {
   service s;        // This becomes useful with async operations.
-  acceptor a(s);
+  acceptor a(s);    // The acceptor is for accepting requests
 
   int ret = 0; // the return value
   
   for (;;)
   {
-    request req(s);   // Our request.
+    request req(s);   // Our request (reusing this when possible saves expensive 
+					  // construction/destruction of the request's memory).
   
     for (;;) // Handle requests until something goes wrong
              // (an exception will be thrown).
     {
       a.accept(req);
-      response resp;    // A response object to make our lives easier.
-      ret = handle_request(req, resp);
-      if (ret) break; // Use a new request if something went wrong.
+      response resp;    // Use the response class to make our lives easier.
+      ret = handle_request(req, resp); // The class defined above.
+      if (ret) break;   // Use a new request if something went wrong.
     }
     if (!a.is_open()) break; // Quit completely if the acceptor bails out.
   }
 
   return ret;
 }
+// This library throws only this type of exception (see Boost.System documentation).
 catch(boost::system::system_error& err)
 {
   std::cerr<< "System error " << err.code() << ": "

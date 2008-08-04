@@ -30,8 +30,7 @@ int main()
   
       response resp;
   
-      resp<< content_type("text/plain")
-          << "Hello, world.";
+      resp<< "Hello, world.";
   
       resp.send(req.client());
       req.close(http::ok, 0);
@@ -45,7 +44,7 @@ int main()
 }
 ``
 
-If should be reasonably obvious what's going on above. Let's go through the differences to the original CGI example.
+Hopefully you can guess what's going on above. Let's go through the differences to the original CGI example.
 
 ``
 acceptor a(s);
@@ -65,20 +64,38 @@ This is a simple example, so the program handles an arbitrary number of requests
 ``
 a.accept(req);
 
-req.load();
+req.load(); // equivalent to req.load(parse_env) - the least-expensive useful state for a request.
 ``
 
-This accepts one request. An accepted request is in a protocol-dependent state and generally isn't very useful. You must either `load()` or `async_load()` the request to put in a useful state. The arguments to these functions determine what is parsed (**FIXME** these will have to be named, so you can do `req.load(parse_params|parse_post|parse_cookies|etc...)`).
-
-Beyond this the request is basically the same as a CGI request. As mentioned previously, you must explicitly close the request when you're finished with it:
+This accepts one request. An accepted request is in a protocol-dependent state and generally isn't very useful. You must either `load()` or `async_load()` the request to put in a useful state. The arguments to these functions determine what is parsed. You can do things like:
 
 ``
-req.close(http::ok);
+req.load(parse_env|parse_post|parse_cookies); // parse everything but GET variables
+req.load(parse_all); // parse everthing
+req.load(parse_env); // parse just environment variables
+req.load(parse_get); // parse environment and GET variables
+req.load(parse_form); // parse environment and then either GET or POST variables, dependent on the REQUEST_METHOD
 ``
 
-More information on the available HTTP status codes can be found [link __http_status_codes__ here].
+Beyond the accept/load sequence the request is basically the same as a CGI request as far as a library user is concerned. As mentioned earlier, you must explicitly close the request when you're finished with it:
 
-One final thing to note is the type of error thrown by this library:
+``
+req.close(http::ok, 0);
+``
+
+The first argument should be a valid [@http://wikipedia.org/wiki/List_of_HTTP_status_codes HTTP status code], normalised to lower case and underscores except for '100 Continue', which is normalised to `http::continue_` (because `continue` is a keyword). The second argument is the program status and should be what you would have put in the `return 0;` line at the end of your `main()` function. Zero is the default if the argument is omitted, while non-zero means an error which may cause the HTTP server to kill the process. An alternative way to pass the status is like so:
+
+``
+resp<< http::moved_permanently           // Handled specially by the `response`.
+    << "This page is no longer valid."
+    << location("somewhere_else")        // The location of the new page
+    << content_type("text/plain");       // The location header has been output, so a content-type
+																				 // header is needed now.
+resp.send(req.client());
+return req.close(resp.status());         // use return_() instead!
+``
+
+One final thing to note is the type of error thrown by this library, which comes from [@http://boost.org/libs/system Boost.System]:
 
 ``
 try {

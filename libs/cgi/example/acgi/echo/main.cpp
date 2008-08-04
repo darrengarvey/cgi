@@ -135,7 +135,7 @@ int main()
       format_map(resp, req[post], "POST Variables");
       format_map(resp, req[cookies], "Cookie Variables");
 
-      if (req["request_method"] = "GET")
+      if (req["request_method"] == "GET")
       {
         resp<<   "<pre>";
         BOOST_FOREACH(char& ch, req.post_buffer())

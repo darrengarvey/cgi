@@ -69,11 +69,21 @@ The classes/functions that are shared between protocols are in the `cgi::common`
 
 [table
   [[Protocol] [`namespace`]]
+
   [[CGI]      [`namespace boost::cgi`
+
+		OR
+
                `namespace cgi::cgi`]]
   [[aCGI]     [`namespace boost::acgi`
+
+		OR
+
                `namespace cgi::acgi`]]
   [[FastCGI]  [`namespace boost::fcgi`
+
+		OR
+
                `namespace cgi::fcgi`]]
 ]
 
@@ -81,7 +91,19 @@ The classes/functions that are shared between protocols are in the `cgi::common`
 
 Macros are prefixed with `BOOST_CGI_*` .
 
-[/ **FIXME**] There aren't any tested public macros yet, when there are they will be listed here.
+The only public macros so far are:
+
+[variablelist Valid macros
+
+  [[`BOOST_CGI_DEFAULT_CONTENT_TYPE`]    [This defaults to "text/plain" and causes a default "content-type" header to be output, but ['only when you don't output any other headers].
+	]]
+
+	[[`BOOST_CGI_NO_DEFAULT_CONTENT_TYPE`] [`#define` this when you don't want a default "content-type" header to be output. CGI scripts always need one of these, so you will be responsible for sending one!
+	]]
+
+]
+
+
 
 [h5 Code snippets]
 

@@ -43,10 +43,10 @@ int main()
 
   resp<< "Request id = " << req.id() << "<p/>";
 
-  show_map_contents(resp, req[env_data], "Environment Variables");
-  show_map_contents(resp, req[get_data], "GET Variables");
-  show_map_contents(resp, req[post_data], "POST Variables");
-  show_map_contents(resp, req[cookie_data], "Cookie Variables");
+  show_map_contents(resp, req[env], "Environment Variables");
+  show_map_contents(resp, req[get], "GET Variables");
+  show_map_contents(resp, req[post], "POST Variables");
+  show_map_contents(resp, req[cookies], "Cookie Variables");
 
   // Note that this (and any other) HTTP header can go either before or after
   // the response contents.

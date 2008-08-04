@@ -29,6 +29,39 @@
 #include "boost/cgi/detail/throw_error.hpp"
 #include "boost/cgi/fwd/basic_request_fwd.hpp"
 
+/// This mess outputs a default Content-type header if the user hasn't set any.
+/** **FIXME** Not implemented; not sure if it should be...
+ * BOOST_CGI_ADD_DEFAULT_HEADER should not persiste beyond this file.
+ *
+ * It basically works like (default first):
+ *
+ * Debug mode:
+ * - Append a "Content-type: text/plain" header;
+ * - If BOOST_CGI_DEFAULT_CONTENT_TYPE is defined, set that as the
+ *   content-type;
+ * - If BOOST_CGI_NO_DEFAULT_CONTENT_TYPE is defined, do nothing.
+ *
+ * Release mode:
+ * - Same.
+ *
+ * Usage:
+ * ------
+ * // Default to a HTML content-type.
+ * #define BOOST_CGI_DEFAULT_CONTENT_TYPE "text/html"
+ */
+#if defined(BOOST_CGI_NO_DEFAULT_CONTENT_TYPE)
+//{
+#  define BOOST_CGI_ADD_DEFAULT_HEADER void
+#else
+#  if !defined(BOOST_CGI_DEFAULT_CONTENT_TYPE)
+#    define BOOST_CGI_DEFAULT_CONTENT_TYPE "text/plain"
+#  endif // !defined(BOOST_CGI_DEFAULT_CONTENT_TYPE)
+//}
+#  define BOOST_CGI_ADD_DEFAULT_HEADER   \
+      if (headers_.empty())              \
+        headers_.push_back("Content-type: "BOOST_CGI_DEFAULT_CONTENT_TYPE"\r\n")
+#endif // defined(BOOST_CGI_NO_DEFAULT_CONTENT_TYPE)
+
 
 namespace cgi {
  namespace common {
@@ -327,7 +360,7 @@ namespace cgi {
   template<typename ConstBufferSequence> BOOST_CGI_INLINE
   void basic_response<T>::prepare_headers(ConstBufferSequence& headers)
   {
-    BOOST_CGI_ADD_DEFAULT_HEADER
+    BOOST_CGI_ADD_DEFAULT_HEADER;
 
     // Terminate the headers.
     if (!headers_terminated_)
