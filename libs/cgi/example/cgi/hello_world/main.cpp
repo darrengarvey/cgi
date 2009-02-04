@@ -12,6 +12,7 @@
 // The simplest CGI program, outputs only "Hello there, universe."
 //
 
+#include <iostream>
 #include <boost/cgi/cgi.hpp>
 
 using namespace boost::cgi;
