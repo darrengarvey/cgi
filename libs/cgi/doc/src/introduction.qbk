@@ -40,7 +40,7 @@ This CGI library is a reasonably high-level library for creating CGI, FastCGI or
   The __amort_example__ example uses Google cTemplate for dealing with HTML templates. Consider having a look at it, or at the upcoming ''Karma'' part of Boost.Spirit.
 ]
 
-[h4 Concepts]:
+[h4 Concepts]
 
 The library provides abstractions which hide details of the varying specifications of CGI, FastCGI and SCGI. The main abstractions are, briefly:
 
