@@ -18,6 +18,7 @@
 #include <fstream>
 #include <cstdio>
 #include <vector>
+#include <iostream> // Uses `std::cout` in the exception handlers.
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/acgi.hpp"
 
