@@ -1,4 +1,10 @@
-# 'Do' all relevant tests.
+# Test everything works ok by running:
+#
+# $ bjam docs examples
+#
+# By default, all tests are run. The `docs` and `examples` args are optional
+# arguments for testing the documentation and examples build ok.
+#
 
 project
   : requirements
@@ -20,3 +26,17 @@ if [ MATCH "^(--build-examples)" : [ modules.peek : ARGV ] ]
 {
   build-project ../example//all_examples ;
 }
+
+alias examples
+ :
+  ../example//all_examples
+ ;
+
+alias docs
+ :
+  ../doc//standalone
+  ../doc//cgi_xml
+  ../doc//autodoc
+ :
+  <include>../doc/src
+ ;
