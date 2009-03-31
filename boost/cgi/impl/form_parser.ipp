@@ -385,7 +385,7 @@ namespace cgi {
             return ec;
           if (++runs > 40)
           {
-            std::cerr<< "Done 40 runs; bailing out" << std::endl;
+            //std::cerr<< "Done 40 runs; bailing out" << std::endl;
             break;
           }
        }
@@ -467,7 +467,7 @@ namespace cgi {
       boundary_marker = match_results[1].str();
       // New boundary markers are added to the front of the list.
       boundary_markers.push_front(match_results[1].str());
-      std::cerr<< "boundary marker := " << boundary_marker << std::endl;
+      //std::cerr<< "boundary marker := " << boundary_marker << std::endl;
 
       return ec;
     }
