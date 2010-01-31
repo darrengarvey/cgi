@@ -21,8 +21,9 @@
 #include <iostream>
 #include <iomanip>
 #include <boost/cgi/fcgi.hpp>
+#include <boost/cgi/utility.hpp>
 #include <boost/algorithm/string/regex.hpp>
-#include <google/template.h>
+#include <ctemplate/template.h>
 
 using namespace boost::fcgi;
 
@@ -34,15 +35,14 @@ std::string string_from_currency(std::string amt)
   return amt;
 }
 
-/// This function fills the dictionary and sub-dictionaries with relevant values.
+/// This function fills a dictionary.
 template<typename Request>
-void fill_amortization_dictionary(google::TemplateDictionary& dict, Request& req)
+void fill_amortization_dictionary(
+  ctemplate::TemplateDictionary& dict, Request& req)
 {
-  std::string tmp( req.POST("LoanAmt") );
-  dict.SetValue("LoanAmt", tmp.empty() ? "$250,000" : tmp);
-
-  tmp = req.POST("YearlyIntRate");
-  dict.SetValue("YearlyIntRate", tmp.empty() ? "6.000" : tmp);
+  dict.SetValue("LoanAmt", has_key(req.post, "LoanAmt")
+      ? "$250,000" : req.post["LoanAmt"]);
+  dict.SetIntValue("YearlyIntRate", req.post.as("YearlyIntRate", 6.000));
 
   boost::array<std::string, 8> year_opts
     = {{ "5", "7", "10", "20", "30", "40", "50" }};
@@ -52,16 +52,18 @@ void fill_amortization_dictionary(google::TemplateDictionary& dict, Request& req
     dict.SetValueAndShowSection("TermYrs", year, "SELECT_TERM_YEARS");
   }
 
-  if (req.POST("Amortize").empty())
+  if (req.post["Amortize"].empty())
     dict.ShowSection("NotAmortize");
   else
   {
-    double P = boost::lexical_cast<double>(string_from_currency(req.POST("LoanAmt")));
-    double i = boost::lexical_cast<double>(req.POST("YearlyIntRate")) / 1200;
-    double n = boost::lexical_cast<double>(req.POST("TermYrs")) * 12;
+    double P = boost::lexical_cast<double>(
+      string_from_currency(req.post["LoanAmt"]));
+    double i = req.post.as<double>("YearlyIntRate", 1) / 1200;
+    double n = req.post.as<double>("TermYrs", 1) * 12;
     double monthly_payments = (P*i) / (1 - std::pow((1+i), -n));
     
-    google::TemplateDictionary* sub_dict = dict.AddSectionDictionary("RegPmtSummary");
+    ctemplate::TemplateDictionary* sub_dict
+      = dict.AddSectionDictionary("RegPmtSummary");
     sub_dict->ShowSection("RegPmtSummary");
     sub_dict->SetFormattedValue("MonthlyPmt", "%.2f", monthly_payments);
 
@@ -74,7 +76,8 @@ void fill_amortization_dictionary(google::TemplateDictionary& dict, Request& req
     double principal_paid;
     double total_interest = 0;
     do{
-      google::TemplateDictionary* sub_dict2 = dict.AddSectionDictionary("PaymentEntry");
+      ctemplate::TemplateDictionary* sub_dict2
+        = dict.AddSectionDictionary("PaymentEntry");
       sub_dict2->ShowSection("PaymentEntry");
       sub_dict2->SetFormattedValue("Payment", "%.2f", monthly_payments);
       sub_dict2->SetIntValue("ROW_NUM", ++row_num);
@@ -89,51 +92,49 @@ void fill_amortization_dictionary(google::TemplateDictionary& dict, Request& req
 
     }while(balance > 0);
 
-    sub_dict->SetFormattedValue("RegPmt_TotalIntPd", "%.2f", total_interest);
-    sub_dict->SetFormattedValue("RegPmt_TotalPmts", "%.2f", total_interest + P);
+    sub_dict->SetFormattedValue(
+      "RegPmt_TotalIntPd", "%.2f", total_interest);
+    sub_dict->SetFormattedValue(
+      "RegPmt_TotalPmts", "%.2f", total_interest + P);
   }
 }
 
 template<typename Request>
 int write_amortization_template(Request& req, response& resp)
 {
-  google::TemplateDictionary dict("amortization");
+  ctemplate::TemplateDictionary dict("amortization");
 
   fill_amortization_dictionary(dict, req);
 
-  google::Template* tmpl
-    = google::Template::GetTemplate("amortization.tpl", google::STRIP_WHITESPACE);
+  ctemplate::Template* tmpl
+    = ctemplate::Template::GetTemplate("../templates/amortization.html", ctemplate::STRIP_WHITESPACE);
 
   std::string h("Content-type: text/html\r\n\r\n");
   write(req.client(), buffer(h));
 
-  std::string arg(req.GET("arg"));
-  if (arg.empty())
-    arg = "2"; // set this as default (for no particular reason).
+  int arg = req.get.as("arg", 2); // 2 is the default.
 
   // Different, but equivalent ways of writing the output.
-  if (arg == "1")
+  std::string output;
+  switch (arg)
   {
-    std::string output;
+  case 1:
     tmpl->Expand(&output, &dict);
     resp<< output;
-  }else
-  if (arg == "2")
-  {
-    std::string output;
+    break;
+  case 2:
     tmpl->Expand(&output, &dict);
     write(req.client(), buffer(output));
-  }else
-//  if (arg == "3")
-//  {
+    break;
+  case 3:
 //    // This requires a modified version of Google.cTemplate, so it won't work.
 //    std::string s;
 //    std::vector<boost::asio::const_buffer> out;
 //
 //    tmpl->Expand(&s, &out, &dict);
 //    write(req.client(), out);
-//  }else
-  {
+    break;
+  default:
     resp<< "Error!";
     return 1;
   }
@@ -154,32 +155,20 @@ int handle_request(acceptor& a)
     response resp;
     ++num;
 
-    // Accepting on a closed request is fine (and more efficient than constantly
-    // creating/destructing request objects). You must call close() first though!
+    // Accepting on a closed request is fine (and more efficient than 
+    // constantly creating/destructing request objects).
     a.accept(req);
 
-    req.load(true);
+    req.load(parse_all);
 
     resp<< content_type("text/html")
-        << "map size := " << req.POST().size() << "<p>";
+        << "map size := " << req.post.size() << "<p>";
   
     ret = write_amortization_template(req, resp);
 
-    resp.send(req.client(), ec);
-
-    ret = ret ? ret : req.close(resp.status(), 0,  ec);
+    ret = commit(req, resp, 0, ec);
   }
   return ret;
-}
-
-void accept_requests(acceptor& a)
-{
-  for(;;)
-  {
-    // Keep handling requests until something goes wrong.
-    if (handle_request(a))
-      break;
-  }
 }
 
 int main()
@@ -187,19 +176,29 @@ int main()
   try{
 
     service s;
-    acceptor a(s, true); // The true means default-initialise.
-                         // Unfortunately this only works on linux w. apache for now.
+    acceptor a(s, 8010); // Listen on port 8010.
 
-    accept_requests(a);
+    for(;;)
+    {
+      // Keep handling requests until something goes wrong.
+      // An exception will be thrown.
+      if (handle_request(a))
+        break;
+    }
     
     return 0;
 
-  }catch(boost::system::error_code& err){
-    std::cerr<< "CGI error(" << err.value() << "): " << err.message() << std::endl;
   }catch(boost::system::system_error& err){
-    std::cerr<< "System error(" << err.code() << "): " << err.what() << std::endl;
+    std::cout<< "Content-type: text/plain\r\n\r\n"
+             << "Error (" << err.code() << "): " << err.what();
+    return 0;
+  }catch(std::exception& e){
+    std::cout<< "Content-type: text/html\r\n\r\n"
+             << "Exception caught: " << e.what();
+    return 0;
   }catch(...){
-    std::cerr<< "ERROR!! BOOM!" << std::endl;
+    std::cout<< "Content-type: text/html\r\n\r\n"
+             << "Unknown error!";    
   }
 }
 //]

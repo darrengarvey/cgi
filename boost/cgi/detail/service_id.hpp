@@ -16,7 +16,7 @@
 
 #include <boost/asio/io_service.hpp>
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace detail {
 
    // Special derived service id type to keep classes header-file only.
@@ -27,7 +27,7 @@ namespace cgi {
   };
 
  } // namespace detail
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #include <boost/asio/detail/pop_options.hpp>
 

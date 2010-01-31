@@ -15,7 +15,7 @@
 #include "boost/cgi/common/map.hpp"
 
 // The process' environment
-#if BOOST_WORKAROUND(BOOST_MSVC, BOOST_TESTED_AT(1500))
+#if BOOST_WINDOWS
   // MSVC warns of 'inconsistent dll linkage' here...
   _CRTIMP extern char** _environ;
 #else
@@ -23,27 +23,35 @@
 #endif
 
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace detail {
 
    /// Save all information from `environment` to env_map
    /**
     * @param env This defaults to `::environ`, or the current process'
     *            environment.
+	*
+	* Note: empty variables are not guaranteed to be set by the server, so
+    * we are free to ignore them too. Whether we do or not depends on the
+	* macro: BOOST_CGI_KEEP_EMPTY_VARS
     */
    template<typename MapT>
-   void save_environment(MapT& env_map, char** env = 
-#if BOOST_WORKAROUND(BOOST_MSVC, BOOST_TESTED_AT(1500))
-	_environ
-#else
-	 environ
-#endif
-	   )
+   void save_environment(MapT& env_map, char** env =
+       // Windows calls the environment environ_
+#      if BOOST_WINDOWS
+         _environ
+#      else
+	     environ
+#      endif
+     )
    {
-     std::string sa;
-     std::string sb;
+    
+     BOOST_ASSERT(env && "Trying to save environment, but the passed in environment is empty / invalid.");
 
-     for(; *env; ++env)
+     typename MapT::key_type sa;
+     typename MapT::mapped_type sb;
+
+     for(; env && *env; ++env)
      {
        int i=0;
        int j=strlen(*env);
@@ -51,43 +59,25 @@ namespace cgi {
          if ((*env)[i] == '=')
            break;
 
-       // Note: empty variables are not guaranteed to be set by the server, so
-       // we are free to ignore them too.
+#if defined(BOOST_CGI_KEEP_EMPTY_VARS)
+       sa.assign(*env, i);
+       if ((*env)[i+1] != '\0')
+         sb.assign((*env+i+1), j-i-1);
+       else
+         sb.clear();
+       env_map[sa] = sb;
+#else
        if ((*env)[i+1] != '\0')
        {
          sa.assign(*env, i);
          sb.assign((*env+i+1), j-i-1);
-         env_map[sa.c_str()] = sb;
+         env_map[sa] = sb;
        }
-     }
+#endif
+	 }
    }
 
  } // namespace detail
-} // namespace cgi
-
-/* Alternative version which doesn't copy the 'value' of the variable
- ******************************************************************************
-   void save_environment(std::map<std::string,const char*>& env_map
-                        , char** env = ::environ)
-   {
-     for(; *env; ++env)
-     {
-       int i=0;
-       int j=strlen(*env);
-       for(; i < j; ++i)
-         if ((*env)[i] == '=')
-           break;
-
-       // Note: empty variables are not guaranteed to be set by the server, so
-       // we are free to ignore them too.
-       if ((*env)[i+1] != '\0')
-       {
-         std::string sa(*env, i);
-         env_map[sa] = (*env+i+1);
-       }
-     }
-   }
- ******************************************************************************
- */
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_DETAIL_SAVE_ENVIRONMENT_HPP_INCLUDED__

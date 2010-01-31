@@ -15,318 +15,246 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/asio/buffer.hpp>
 ///////////////////////////////////////////////////////////
-#include "boost/cgi/error.hpp"
+#include "boost/cgi/basic_client.hpp"
 #include "boost/cgi/common/map.hpp"
 #include "boost/cgi/common/tags.hpp"
+#include "boost/cgi/connections/shareable_tcp_socket.hpp"
+#include "boost/cgi/detail/throw_error.hpp"
+#include "boost/cgi/detail/protocol_traits.hpp"
+#include "boost/cgi/fcgi/specification.hpp"
+#include "boost/cgi/fwd/basic_request_fwd.hpp"
+#include "boost/cgi/error.hpp"
 #include "boost/cgi/import/read.hpp"
-#include "boost/cgi/basic_client.hpp"
 #include "boost/cgi/import/buffer.hpp"
 #include "boost/cgi/import/io_service.hpp"
-#include "boost/cgi/fcgi/specification.hpp"
-#include "boost/cgi/detail/throw_error.hpp"
-#include "boost/cgi/fwd/basic_request_fwd.hpp"
-#include "boost/cgi/detail/protocol_traits.hpp"
-#include "boost/cgi/connections/shareable_tcp_socket.hpp"
 
-namespace cgi {
+#undef min
+#undef max
+#include <algorithm>
+
+#ifndef NDEBUG
+#   include <iostream>
+#endif 
+
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
-  enum client_status
-  {
-    none_, // **FIXME** !
-    constructed,
-    params_read,
-    stdin_read,
-    end_request_sent,
-    closed_, // **FIXME** !
-    //aborted
-  };
-
   /// A client that uses a TCP socket that owned by it.
-  template<typename Protocol>
-  class basic_client<common::shareable_tcp_connection, Protocol>
+  /// Construct
+  template<>
+  basic_client<
+      connections::shareable_tcp
+    , ::BOOST_CGI_NAMESPACE::common::tags::fcgi
+  >::basic_client()
+    : request_id_(-1)
+    , status_(none_)
+    , total_sent_bytes_(0)
+    , total_sent_packets_(0)
+    , header_()
+    , outbuf_()
+    , keep_connection_(false)
   {
-  public:
-    typedef ::cgi::common::io_service         io_service_type;
-    typedef ::cgi::common::map                map_type;
-    typedef Protocol                          protocol_type;
-    typedef common::shareable_tcp_connection  connection_type;
-    typedef typename connection_type::pointer connection_ptr;
-    typedef boost::array<
-        unsigned char
-      , fcgi::spec::header_length::value
-    >                                         header_buffer_type;
-    typedef boost::asio::mutable_buffers_1    mutable_buffers_type;
-    typedef fcgi::spec_detail::role_t         role_type;
+  }
 
-    /// Construct
-    basic_client()
-      : request_id_(-1)
-      , status_(none_)
-      , keep_connection_(false)
+  /// Construct
+  template<>
+  basic_client<
+      connections::shareable_tcp
+    , ::BOOST_CGI_NAMESPACE::common::tags::fcgi
+  >::basic_client(io_service_type& ios)
+    : request_id_(-1)
+    , status_(none_)
+    , total_sent_bytes_(0)
+    , total_sent_packets_(0)
+    , header_()
+    , outbuf_()
+    , keep_connection_(false)
+  {
+  }
+
+  /// Override basic_client::close().
+  /**
+   * Closing a FastCGI means sending an END_REQUEST header
+   * to the HTTP server and potentially closing the connection.
+   *
+   * Note that in general the HTTP server is responsible for the
+   * lifetime of the connection, but can hand that control over
+   * to the library (eg. if the server is set up to recycle
+   * connections after N requests).
+   */
+  template<>
+  boost::system::error_code
+  basic_client<
+      connections::shareable_tcp
+    , ::BOOST_CGI_NAMESPACE::common::tags::fcgi
+  >::close(boost::uint64_t app_status, boost::system::error_code& ec)
+  {
+    // Note that the request may already be closed if the client aborts
+    // the connection.
+    if (!is_open())
+      ec = error::already_closed;
+    else
     {
-    }
-
-    /// Construct
-    basic_client(io_service_type& ios)
-      : request_id_(-1)
-      , status_(none_)
-      , keep_connection_(false)
-      //, io_service_(ios)
-      //, connection_(new connection_type::pointer(ios))
-    {
-    }
-
-    /// Destroy
-    /** Closing the connection as early as possible is good for efficiency */
-    ~basic_client()
-    {
-      close();
-    }
-
-    /// Construct the client by claiming a request id.
-    /**
-     * Before loading a request, it will usually not have a request id. This
-     * function reads headers (and corresponding bodies if necessary) until
-     * a BEGIN_REQUEST record is found. The calling request then claims and
-     * serves that request.
-     */
-    template<typename RequestImpl>
-    boost::system::error_code
-      construct(RequestImpl& req, boost::system::error_code& ec)
-    {
-      status_ = constructed;
-
-      return ec;
-    }
-
-    bool is_open() const
-    {
-      return connection_->is_open();
-    }
-
-    void close(boost::uint64_t app_status = 0)
-    {
-      boost::system::error_code ec;
-      close(app_status, ec);
-      detail::throw_error(ec);
-    }
-
-    boost::system::error_code
-      close(boost::uint64_t app_status, boost::system::error_code& ec)
-    {
-      if (status_ == closed_) return ec;
-
-      std::vector<boost::asio::const_buffer> bufs;
+      status_ = closed_;
+      outbuf_.clear();
+      header_.reset(fcgi::spec_detail::END_REQUEST, request_id_, 8);
 
       // Write an EndRequest packet to the server.
-      out_header_[0] = static_cast<unsigned char>(1); // FastCGI version
-      out_header_[1] = static_cast<unsigned char>(3); // END_REQUEST
-      out_header_[2] = static_cast<unsigned char>(request_id_ >> 8) & 0xff;
-      out_header_[3] = static_cast<unsigned char>(request_id_) & 0xff;
-      out_header_[4] = static_cast<unsigned char>(8 >> 8) & 0xff;
-      out_header_[5] = static_cast<unsigned char>(8) & 0xff;
-      out_header_[6] = static_cast<unsigned char>(0);
-      out_header_[7] = 0;
+      fcgi::spec::end_request_body body(
+        app_status, fcgi::spec_detail::REQUEST_COMPLETE);
 
-      //BOOST_ASSERT(role_ == fcgi::spec_detail::RESPONDER
-      //             && "Only supports Responder role for now (**FIXME**)");
+      outbuf_.push_back(header_.data());
+      outbuf_.push_back(body.data());
 
-      header_buffer_type end_request_body =
-      {{
-          static_cast<unsigned char>(app_status >> 24) & 0xff
-        , static_cast<unsigned char>(app_status >> 16) & 0xff
-        , static_cast<unsigned char>(app_status >>  8) & 0xff
-        , static_cast<unsigned char>(app_status >>  0) & 0xff
-        , static_cast<unsigned char>(fcgi::spec_detail::REQUEST_COMPLETE)
-        , static_cast<unsigned char>(0)
-        , static_cast<unsigned char>(0)
-        , static_cast<unsigned char>(0)
-      }};
+      write(*connection_, outbuf_, boost::asio::transfer_all(), ec);
 
-      bufs.push_back(buffer(out_header_));
-      bufs.push_back(buffer(end_request_body));
-
-      write(*connection_, bufs, boost::asio::transfer_all(), ec);
-
-      if (!keep_connection_)
-        connection_->close();
-
-      return ec;
-    }
-
-    //io_service_type& io_service() { return io_service_; }
-
-    /// Associate a connection with this client
-    /**
-     * Note: the connection must have been created using the new operator
-     */
-    bool set_connection(connection_type* conn)
-    {
-      // make sure there isn't already a connection associated with the client
-      //if (!connection_) return false;
-      connection_.reset(conn);
-      return true;
-    }
-
-    /// Associate a connection with this client
-    bool set_connection(const connection_type::pointer& conn)
-    {
-      // make sure there isn't already a connection associated with the client
-      //if (!connection_) return false;
-      connection_ = conn;
-      return true;
-    }
-
-    /// Get a shared_ptr of the connection associated with the client.
-    connection_type::pointer&
-    connection() { return connection_; }
-
-    /// Write some data to the client.
-    template<typename ConstBufferSequence>
-    std::size_t 
-    write_some(const ConstBufferSequence& buf, boost::system::error_code& ec)
-    {
-      typename ConstBufferSequence::const_iterator iter = buf.begin();
-      typename ConstBufferSequence::const_iterator end  = buf.end(); 
-
-      std::vector<boost::asio::const_buffer> bufs;
-      bufs.push_back(boost::asio::buffer(out_header_));
-
-      int total_buffer_size(0);
-      for(; iter != end; ++iter)
+      if (!ec && !keep_connection_)
       {
-        boost::asio::const_buffer buffer(*iter);
-        int new_buf_size( boost::asio::buffer_size(buffer) );
-        // only write a maximum of 65535 bytes
-        if (total_buffer_size + new_buf_size
-             > fcgi::spec::max_packet_size::value)
-          break;
-        total_buffer_size += new_buf_size;
-        bufs.push_back(*iter);
+        connection_->close();
       }
-      std::cerr<< "Size of write buffer := " << total_buffer_size << std::endl;
-      //detail::make_header(out_header_, buf
-      out_header_[0] = static_cast<unsigned char>(1);
-      out_header_[1] = static_cast<unsigned char>(6);
-      out_header_[2] = static_cast<unsigned char>(request_id_ >> 8) & 0xff;
-      out_header_[3] = static_cast<unsigned char>(request_id_) & 0xff;
-      out_header_[4] = static_cast<unsigned char>(total_buffer_size >> 8) & 0xff;
-      out_header_[5] = static_cast<unsigned char>(total_buffer_size) & 0xff;
-      out_header_[6] = static_cast<unsigned char>(0);
-      out_header_[7] = 0;
-
-      std::size_t bytes_transferred
-        = boost::asio::write(*connection_, bufs, boost::asio::transfer_all(), ec);
-
-      if (0 != (total_buffer_size + fcgi::spec::header_length::value
-          - bytes_transferred))
-        ec = error::couldnt_write_complete_packet;
-
-      return bytes_transferred;
     }
+    return ec;
+  }
 
-    /// Read data into the supplied buffer.
-    /**
-     * Reads some data that, correctly checking and stripping FastCGI headers.
-     *
-     * Returns the number of bytes read and sets `ec` such that `ec` evaluates
-     * to `true` iff an error occured during the read operation.
-     *
-     * Notable errors:
-     * - `fcgi::error::data_for_another_request`
-     * - `fcgi::error::connection_locked`
-     *
-     * These must be dealt with by user code if they choose to read through the
-     * client (reading through the request is recommended).
-     */
-    template<typename MutableBufferSequence>
-    std::size_t
-    read_some(const MutableBufferSequence& buf, boost::system::error_code& ec)
+  
+  template<>
+  template<typename ConstBufferSequence>
+  void
+  basic_client<
+      connections::shareable_tcp
+    , ::BOOST_CGI_NAMESPACE::common::tags::fcgi
+  >::prepare_buffer(const ConstBufferSequence& buf)
+  {
+    typename ConstBufferSequence::const_iterator iter = buf.begin();
+    typename ConstBufferSequence::const_iterator end  = buf.end(); 
+
+    outbuf_.clear();
+    outbuf_.push_back(boost::asio::buffer(header_.data()));
+
+    int total_buffer_size(0);
+    for(; iter != end; ++iter)
     {
-      std::size_t bytes_read(0);
-
-      return bytes_read;
+      boost::asio::const_buffer buffer(*iter);
+      std::size_t new_buf_size( boost::asio::buffer_size(*iter) );
+      if (total_buffer_size + new_buf_size 
+           > static_cast<std::size_t>(fcgi::spec::max_packet_size::value))
+      {
+        // If the send buffer is empty, extract a chunk of the
+        // new buffer to send. If there is already some data
+        // ready to send, don't add any more data to the pack.
+        if (total_buffer_size == 0)
+        {
+          total_buffer_size
+            = std::min<std::size_t>(new_buf_size,65500);
+          /*
+          std::cerr<< "Oversized buffer: " << total_buffer_size
+                   << " / " << new_buf_size << " bytes sent\n";
+          */
+          outbuf_.push_back(
+            boost::asio::buffer(*iter, total_buffer_size));
+          break;
+        }
+        else
+          break;
+      }
+      else
+      {
+        total_buffer_size += new_buf_size;
+        outbuf_.push_back(*iter);
+      }
     }
-
-    /// Asynchronously write some data to the client.
-    template<typename ConstBufferSequence, typename Handler>
-    void async_write_some(const ConstBufferSequence& buf, Handler handler)
-    {
-      connection_->async_write_some(buf, handler);
-    }
-
-    /// Asynchronously read some data from the client.
-    template<typename MutableBufferSequence, typename Handler>
-    void async_read_some(const MutableBufferSequence& buf, Handler handler)
-    {
-      connection_->async_read_some(buf, handler);
-    }
-
-
-    const client_status& status() const
-    {
-      return status_;
-    }
-
-    bool keep_connection() const
-    {
-      return keep_connection_;
-    }
-
-    //int id() { return request_id_; }
-
-    std::size_t& bytes_left()
-    {
-      return bytes_left_;
-    }
-
-  public:
-    friend class fcgi_request_service;
-    boost::uint16_t request_id_;
-    client_status status_;
-    std::size_t bytes_left_;
-    //request_impl_type* current_request_;
+    header_.reset(fcgi::spec_detail::STDOUT, request_id_, total_buffer_size);
+  }
+  
+  template<>
+  void
+  basic_client<
+      connections::shareable_tcp
+    , ::BOOST_CGI_NAMESPACE::common::tags::fcgi
+  >::handle_write(std::size_t bytes_transferred, boost::system::error_code& ec)
+  {
+    total_sent_bytes_ += bytes_transferred;
+    total_sent_packets_ += 1;
     
-    /// A marker to say if the final STDIN (and/or DATA) packets have been
-    // read. Note: having data on the connection doesn't imply it's for
-    // this request; we can save time by knowing when to not even try.
-    //bool closed_;
+    std::size_t total_buffer_size = static_cast<std::size_t>(header_.content_length());
+    
+#ifndef NDEBUG
+    if (ec)
+      std::cerr<< "Error " << ec << ": " << ec.message() << '\n';
+    else    
+      std::cerr
+        << "Transferred " << total_buffer_size
+        << " (+" << (bytes_transferred - total_buffer_size)
+        << " protocol) bytes (running total: "
+        << total_sent_bytes_ << " bytes; "
+        << total_sent_packets_ << " packets).\n";
+#endif // NDEBUG
 
-    connection_ptr   connection_;
-
-    //fcgi::spec_detail::Header hdr_;
-    /// Buffer used to check the header of each packet.
-    header_buffer_type out_header_;
-
-    bool keep_connection_;
-    role_type role_;
-
-  public:
-
-    //template<typename Request>
-    //Request& lookup_request(boost::uint16_t id)
-    //{
+    // Now remove the protocol overhead for the caller, who
+    // doesn't want to know about them.
+    bytes_transferred -= fcgi::spec::header_length::value;
+    // Check everything was written ok.
+    if (!ec && bytes_transferred != total_buffer_size)
+      ec = ::BOOST_CGI_NAMESPACE::fcgi::error::couldnt_write_complete_packet;
+  }
 
 
-            //*/
-  };
+  /// Write some data to the client.
+  template<>
+  template<typename ConstBufferSequence>
+  std::size_t 
+  basic_client<
+      connections::shareable_tcp
+    , ::BOOST_CGI_NAMESPACE::common::tags::fcgi
+  >::write_some(
+      const ConstBufferSequence& buf
+    , boost::system::error_code& ec
+  )
+  {
+    prepare_buffer(buf);
+    
+    std::size_t bytes_transferred
+      = boost::asio::write(*connection_, outbuf_
+                          , boost::asio::transfer_all(), ec);
 
-//#include "boost/cgi/fcgi/client_fwd.hpp"
+    handle_write(bytes_transferred, ec);
+    
+    return bytes_transferred;
+  }
+
+
+  /// Write some data to the client.
+  template<>
+  template<typename ConstBufferSequence, typename Handler>
+  void
+  basic_client<
+      connections::shareable_tcp
+    , ::BOOST_CGI_NAMESPACE::common::tags::fcgi
+  >::async_write_some(
+      const ConstBufferSequence& buf
+    , Handler handler
+  )
+  {
+    prepare_buffer(buf);
+    
+    std::size_t bytes_transferred
+      = boost::asio::write(*connection_, outbuf_
+                          , boost::asio::transfer_all(), ec);
+
+    handle_write(bytes_transferred, ec);
+  }
 
  } // namespace common
 
 namespace fcgi {
     typedef
       common::basic_client<
-        common::shareable_tcp_connection, ::cgi::common::fcgi_
+        connections::shareable_tcp, ::BOOST_CGI_NAMESPACE::common::tags::fcgi
       >
     client;
 } // namespace fcgi
 
-
-
-}// namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_FCGI_CLIENT_HPP_INCLUDED__
 

@@ -20,17 +20,17 @@
 #include "../detail/service_base.hpp"
 #include "../detail/extract_params.hpp"
 
-namespace cgi {
+namespace BOOST_CGI_NAMESPACE {
 
   class scgi_request_service_impl
     : public detail::service_base<scgi_service_impl>
   {
   public:
-    typedef tags::scgi          protocol_type;
-    typedef scgi_request_impl   implementation_type;
-    typedef cgi::map            map_type;
+    typedef tags::scgi                  protocol_type;
+    typedef scgi_request_impl           implementation_type;
+    typedef BOOST_CGI_NAMESPACE::map    map_type;
 
-    scgi_request_service_impl(cgi::io_service& ios)
+    scgi_request_service_impl(BOOST_CGI_NAMESPACE::io_service& ios)
       : detail::service_base<scgi_request_service_impl>(ios)
       , io_service_(ios)
     {
@@ -234,9 +234,9 @@ namespace cgi {
     }
 
   private:
-    cgi::io_service& io_service_;
+    BOOST_CGI_NAMESPACE::io_service& io_service_;
   };
 
-} // namespace cgi
+} // namespace BOOST_CGI_NAMESPACE
 
 #endif // CGI_SCGI_SERVICE_IMPL_HPP_INCLUDED__

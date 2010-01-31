@@ -7,7 +7,7 @@
 
 BOOST_AUTO_TEST_CASE( map_test )
 {
-  cgi::common::map m;
+  boost::cgi::common::map m;
 
   /// First check that upper case compares with lower case.
   m["foo"] = "bar";
@@ -18,4 +18,7 @@ BOOST_AUTO_TEST_CASE( map_test )
   m["FATFOO"] = "minibar";
   BOOST_CHECK_EQUAL( m["FATFOO"], "minibar" );
   BOOST_CHECK_EQUAL( m["fatfoo"], "minibar" );
+
+  // Sanity check.
+  BOOST_CHECK_NOT_EQUAL( m["nonfoo"], "dfpij" );
 }

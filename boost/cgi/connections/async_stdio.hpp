@@ -18,10 +18,16 @@
 #include "boost/cgi/connections/stdio.hpp"
 #include "boost/cgi/import/io_service.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
-  // Asynchronous access to stdio
+  // Asynchronous access to stdio.
+  /**
+   * This class doesn't do real async I/O, but fakes it by posting
+   * a read / write to an io_service, which may be run in a background
+   * thread. On most systems this won't actually mean true async I/O,
+   * but this emulates it as an interim solution.
+   */
   template<>
   class basic_connection<tags::async_stdio>
     : public basic_connection<tags::stdio>
@@ -47,7 +53,7 @@ namespace cgi {
       is_open_ = false;
     }
 
-    static pointer create(::cgi::common::io_service& ios)
+    static pointer create(::BOOST_CGI_NAMESPACE::common::io_service& ios)
     {
       return pointer(new basic_connection<tags::async_stdio>(ios));
     }
@@ -119,19 +125,15 @@ namespace cgi {
     }
 
   private:
-    ::cgi::common::io_service& io_service_;
+    ::BOOST_CGI_NAMESPACE::common::io_service& io_service_;
   };
 
-  typedef basic_connection<tags::async_stdio> async_stdio_connection;
-
-
-  //  template<typename ProtocolService = detail::async_cgi_service>
-  //struct async_stdio_connection
-  //{
-  //  typedef basic_connection<tags::async_cgi, ProtocolService>    type;
-  //};
-
  } // namespace common
-} // namespace cgi
+
+  namespace connections {
+    typedef common::basic_connection<common::tags::async_stdio> async_stdio;
+  } // namespace connections
+
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_ASYNC_STDIO_HPP_INCLUDED__

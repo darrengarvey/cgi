@@ -21,12 +21,12 @@
  *
  * THIS FILE IS OBSOLETE.
  *
- * SEE request_service.hpp:cgi::scgi::scgi_request_service::implementation_type
+ * SEE request_service.hpp:BOOST_CGI_NAMESPACE::scgi::scgi_request_service::implementation_type
  * INSTEAD.
  *
 **************/
 
-namespace cgi {
+namespace BOOST_CGI_NAMESPACE {
  namespace scgi {
 
   
@@ -34,10 +34,12 @@ namespace cgi {
   class scgi_request_impl
   {
   public:
-    typedef cgi::map                             map_type;
-    typedef tcp_connection                       connection_type;
-    typedef connection_type::pointer             connection_ptr;
-    typedef ::cgi::basic_client<connection_type> client_type;
+    typedef BOOST_CGI_NAMESPACE::map                map_type;
+    typedef tcp_connection                          connection_type;
+    typedef connection_type::pointer                connection_ptr;
+    typedef ::BOOST_CGI_NAMESPACE::basic_client<
+        connection_type
+      >                                             client_type;
 
     scgi_request_impl()
       : stdin_parsed_(false)
@@ -75,6 +77,6 @@ namespace cgi {
   };
 
  } // namespace scgi
-} // namespace cgi
+} // namespace BOOST_CGI_NAMESPACE
 
 #endif // CGI_SCGI_REQUEST_IMPL_HPP_INCLUDED__

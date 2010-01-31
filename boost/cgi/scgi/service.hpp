@@ -12,16 +12,16 @@
 #include "boost/cgi/tags.hpp"
 #include "boost/cgi/basic_protocol_service.hpp"
 
-namespace cgi {
+namespace BOOST_CGI_NAMESPACE {
 
   //typedef basic_protocol_service<tags::scgi> scgi_service;
 
  namespace scgi {
 
    // typedef for standard scgi::service (a model of ProtocolService)
-   typedef basic_protocol_service< ::cgi::scgi_> service;
+   typedef basic_protocol_service< ::BOOST_CGI_NAMESPACE::scgi_> service;
 
  }
-} // namespace cgi
+} // namespace BOOST_CGI_NAMESPACE
 
 #endif // CGI_SCGI_SERVICE_HPP_INCLUDED__

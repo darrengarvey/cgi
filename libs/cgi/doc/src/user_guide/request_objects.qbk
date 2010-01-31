@@ -1,5 +1,5 @@
 [/
- / Copyright (c) 2007 Darren Garvey
+ / Copyright (c) 2007-2009 Darren Garvey
  /
  / Distributed under the Boost Software License, Version 1.0. (See accompanying
  / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,10 +13,9 @@ There are `typedef`s for typical usage, following usual __naming_styles__:
 
 [table Request typedefs
  [[Protocol] [`typedef`     ]]
- [[CGI     ] [`cgi_request` ]]
- [[aCGI    ] [`acgi_request`]]
- [[FastCGI ] [`fcgi_request`]]
- [[SCGI    ] [`scgi_request`]]
+ [[CGI     ] [`boost::cgi::request` ]]
+ [[FastCGI ] [`boost::fcgi::request`]]
+ [[SCGI    ] [`boost::scgi::request`]]
 ]
 
 

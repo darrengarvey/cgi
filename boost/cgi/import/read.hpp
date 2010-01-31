@@ -11,14 +11,14 @@
 
 #include <boost/asio/read.hpp>
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
   using boost::asio::read;
   using boost::asio::async_read;
 
  } // namespace common
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_READ_HPP_INCLUDED
 

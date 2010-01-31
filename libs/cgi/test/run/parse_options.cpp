@@ -5,7 +5,7 @@
 
 BOOST_AUTO_TEST_CASE( test_parse_options )
 {
-  using namespace cgi::common;
+  using namespace boost::cgi::common;
 
   {
     parse_options opt = parse_env;

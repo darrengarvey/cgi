@@ -28,7 +28,7 @@
 //#include "service_selector.hpp"
 #include "boost/cgi/scgi/request.hpp"
 
-namespace cgi {
+namespace BOOST_CGI_NAMESPACE {
  namespace scgi {
   
    /// The service_impl class for SCGI basic_request_acceptor<>s
@@ -45,7 +45,7 @@ namespace cgi {
     * which takes a ProtocolService (**LINK**). If the protocol isn't async then
     * the class can be used without a ProtocolService.
     */
-   template<typename Protocol_ = ::cgi::scgi_>
+   template<typename Protocol_ = ::BOOST_CGI_NAMESPACE::scgi_>
    class acceptor_service_impl
      : public detail::service_base<acceptor_service_impl<Protocol_> >
    {
@@ -93,7 +93,7 @@ namespace cgi {
        acceptor_service_type::native_type                native_type;
  
 
-     explicit acceptor_service_impl(::cgi::io_service& ios)
+     explicit acceptor_service_impl(::BOOST_CGI_NAMESPACE::io_service& ios)
        : detail::service_base<acceptor_service_impl<Protocol_> >(ios)
        , acceptor_service_(boost::asio::use_service<acceptor_service_type>(ios))
        //, endpoint(boost::asio::ip::tcp::v4())
@@ -182,7 +182,7 @@ namespace cgi {
             assignment. There are a couple of ways around this; the one that
             seems sensible is to keep the basic_request<>s noncopyable, but
             allow the actual data be copied. At the moment the actual data is
-            held in a vector<string> headers container and a cgi::streambuf.
+            held in a vector<string> headers container and a BOOST_CGI_NAMESPACE::streambuf.
             These two bits should really be factored out into a message type.
             IOW, the message type will be copyable (but should probably have
             unique-ownership semantics).
@@ -212,7 +212,7 @@ namespace cgi {
             assignment. There are a couple of ways around this; the one that
             seems sensible is to keep the basic_request<>s noncopyable, but
             allow the actual data be copied. At the moment the actual data is
-            held in a vector<string> headers container and a cgi::streambuf.
+            held in a vector<string> headers container and a BOOST_CGI_NAMESPACE::streambuf.
             These two bits should really be factored out into a message type.
             IOW, the message type will be copyable (but should probably have
             unique-ownership semantics).
@@ -281,7 +281,7 @@ namespace cgi {
    };
  
  } // namespace scgi
-} // namespace cgi
+} // namespace BOOST_CGI_NAMESPACE
  
 #include "boost/cgi/detail/pop_options.hpp"
 

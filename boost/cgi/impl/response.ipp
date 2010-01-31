@@ -19,19 +19,22 @@
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 ///////////////////////////////////////////////////////////
-#include "boost/cgi/import/write.hpp"
-#include "boost/cgi/import/buffer.hpp"
+#include "boost/cgi/config.hpp"
+
 #include "boost/cgi/common/cookie.hpp"
 #include "boost/cgi/common/header.hpp"
+#include "boost/cgi/common/name.hpp"
 #include "boost/cgi/common/response.hpp"
-#include "boost/cgi/http/status_code.hpp"
-#include "boost/cgi/import/streambuf.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
 #include "boost/cgi/fwd/basic_request_fwd.hpp"
+#include "boost/cgi/http/status_code.hpp"
+#include "boost/cgi/import/buffer.hpp"
+#include "boost/cgi/import/streambuf.hpp"
+#include "boost/cgi/import/write.hpp"
 
-/// This mess outputs a default Content-type header if the user hasn't set any.
-/** **FIXME** Not implemented; not sure if it should be...
- * BOOST_CGI_ADD_DEFAULT_HEADER should not persiste beyond this file.
+/// A macro to output an implicit Content-type.
+/**
+ * `BOOST_CGI_ADD_DEFAULT_HEADER` should not persiste beyond this file.
  *
  * It basically works like (default first):
  *
@@ -47,7 +50,6 @@
  * Usage:
  * ------
  * // Default to a HTML content-type.
- * #define BOOST_CGI_DEFAULT_CONTENT_TYPE "text/html"
  */
 #if defined(BOOST_CGI_NO_DEFAULT_CONTENT_TYPE)
 //{
@@ -63,16 +65,23 @@
 #endif // defined(BOOST_CGI_NO_DEFAULT_CONTENT_TYPE)
 
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
+
  namespace common {
 
   template<typename T> BOOST_CGI_INLINE
   basic_response<T>::basic_response(http::status_code sc)
     : buffer_(new common::streambuf())
+#if defined (BOOST_WINDOWS)
+    , ostream_(buffer_.get()) //, std::ios::out | std::ios::binary)
+#else
     , ostream_(buffer_.get())
+#endif // defined (BOOST_WINDOWS)
     , http_status_(sc)
     , headers_terminated_(false)
+    , charset_("ISO-8859-1")
   {
+    //ostream_.openmode = 
   }
 
   /// Construct with a particular buffer
@@ -83,9 +92,16 @@ namespace cgi {
   template<typename T> BOOST_CGI_INLINE
   basic_response<T>::basic_response(common::streambuf* buf,
       http::status_code sc)
+#if BOOST_WINDOWS
+    : ostream_(buf, std::ios::out | std::ios::binary) 
+#else
     : ostream_(buf)
+#endif // defined (BOOST_WINDOWS)
     , http_status_(sc)
+    , headers_terminated_(false)
+    , charset_("ISO-8859-1")
   {
+    //ostream_.openmode = std::ios::out | std::ios::binary;
   }
 
   template<typename T> BOOST_CGI_INLINE
@@ -95,18 +111,28 @@ namespace cgi {
 
     /// Clear the response buffer.
   template<typename T> BOOST_CGI_INLINE
-  void basic_response<T>::clear()
+  void basic_response<T>::clear(bool clear_headers)
   {
     ostream_.clear();
-    headers_.clear();
-    headers_terminated_ = false;
+    buffer_.reset(new common::streambuf);
+    ostream_.rdbuf(buffer_.get());
+    if (clear_headers) {
+      headers_.clear();
+      headers_terminated_ = false;
+    }
   }
 
-    /// Return the response to the 'just constructed' state.
+  /// Return the response to the 'just constructed' state.
+  /**
+   * Clears the response headers and body. Resets the response so it can
+   * be safely used again.
+   */
   template<typename T> BOOST_CGI_INLINE
   void basic_response<T>::reset()
   {
     clear();
+    ostream_.flush(); 
+    buffer_->consume(buffer_->size());
     headers_terminated_ = false;
   }
 
@@ -214,7 +240,9 @@ namespace cgi {
       common::write(sws, headers, boost::asio::transfer_all(), ec);
     }
 
-    common::write(sws, buffer_->data(), boost::asio::transfer_all(), ec);
+    // Only write the body if it is non-empty.
+    if (content_length())
+      common::write(sws, buffer_->data(), boost::asio::transfer_all(), ec);
 
     return ec;
   }
@@ -272,7 +300,7 @@ namespace cgi {
   /// Set the status code associated with the response.
   template<typename T> BOOST_CGI_INLINE
   basic_response<T>&
-  basic_response<T>::set_status(const http::status_code& num)
+  basic_response<T>::status(const http::status_code& num)
   {
     http_status_ = num;
     return *this;
@@ -280,8 +308,8 @@ namespace cgi {
 
   /// Get the status code associated with the response.
   template<typename T> BOOST_CGI_INLINE
-  http::status_code& 
-  basic_response<T>::status()
+  http::status_code 
+  basic_response<T>::status() const
   {
     return http_status_;
   }
@@ -299,6 +327,32 @@ namespace cgi {
   {
     return rdbuf()->size();
   }
+
+  /// Get the response as a string.
+  template<typename T> BOOST_CGI_INLINE  
+  typename basic_response<T>::string_type
+    basic_response<T>::str(bool include_header) const
+  {
+    string_type body;
+    if (include_header)
+    {
+      typedef typename std::vector<string_type>::const_iterator iter_t;
+      for (
+        iter_t iter(headers_.begin()), end(headers_.end());
+        iter != end;
+        ++iter
+      ) {
+        body += *iter;
+      }
+    }
+    
+    body += string_type(
+      boost::asio::buffer_cast<const char_type *>(buffer_->data()),
+      boost::asio::buffer_size(buffer_->data()));
+      
+    return body;
+  }
+
 
   /// Add a header after appending the CRLF sequence.
   template<typename T> BOOST_CGI_INLINE
@@ -324,6 +378,23 @@ namespace cgi {
   }
 
   template<typename T> BOOST_CGI_INLINE
+  typename basic_response<T>::string_type
+  basic_response<T>::header_value(string_type const& name)
+  {
+    for(std::vector<std::string>::iterator iter = headers_.begin(), end = headers_.end();
+        iter != end; ++iter)
+    {
+        if (iter->substr(0,name.length()) == name)
+        {
+            // Extract the value (assumes there's at most one space after the separator.
+            int start(name.length() + (iter->at(name.length()+1) == ' ' ? 2 : 1));
+            return iter->substr(start, iter->length()-start-2); // strip the trailing \r\n
+        }
+    }
+    return headers_.back();
+  }
+
+  template<typename T> BOOST_CGI_INLINE
   void basic_response<T>::clear_headers()
     {
       BOOST_ASSERT(!headers_terminated_);
@@ -343,17 +414,22 @@ namespace cgi {
       return headers_terminated_;
     }
 
-    // Is this really necessary?
+  // Is this really necessary?
   template<typename T> BOOST_CGI_INLINE
   void basic_response<T>::end_headers()
   {
     headers_terminated_ = true;
   }
 
-    /// Get the ostream containing the response body.
+  /// Get the ostream containing the response body.
   template<typename T> BOOST_CGI_INLINE
   typename basic_response<T>::ostream_type&
     basic_response<T>::ostream() { return ostream_; }
+    
+  /// Get the ostream containing the response body.
+  template<typename T> BOOST_CGI_INLINE
+  std::vector<typename basic_response<T>::string_type>&
+    basic_response<T>::headers() { return headers_; }
     
   // Send the response headers and mark that they've been sent.
   template<typename T>
@@ -361,37 +437,46 @@ namespace cgi {
   void basic_response<T>::prepare_headers(ConstBufferSequence& headers)
   {
     BOOST_CGI_ADD_DEFAULT_HEADER;
-
+    
     // Terminate the headers.
     if (!headers_terminated_)
       headers_.push_back("\r\n");
 
-    //{ Construct a ConstBufferSequence out of the headers we have.
-    //std::vector<boost::asio::const_buffer> headers;
-    typedef typename std::vector<string_type>::iterator iter;
-    for (iter i(headers_.begin()), e(headers_.end()); i != e; ++i)
+    typedef typename std::vector<string_type>::iterator iter_t;
+    for (
+      iter_t iter(headers_.begin()), end(headers_.end());
+      iter != end;
+      ++iter
+    )
     {
-      headers.push_back(common::buffer(*i));
+      boost::cgi::common::name type(iter->substr(0, 12).c_str());
+      if (type == "Content-type")
+        iter->insert(iter->length()-2, "; charset: " + charset_);    
+
+      //{ Construct a ConstBufferSequence out of the headers we have.
+      headers.push_back(common::buffer(*iter));
     }
     //}
 
     headers_terminated_ = true;
-    //return ec;
   }
 
- } // namespace common
-} // namespace cgi
-
-  /// Generic ostream template
-  template<typename T, typename U> BOOST_CGI_INLINE
-  cgi::common::basic_response<T>&
-    operator<< (cgi::common::basic_response<T>& resp, const U& u)
+  template<typename T> BOOST_CGI_INLINE
+  BOOST_CGI_NAMESPACE::common::basic_response<T>& 
+    operator<< (BOOST_CGI_NAMESPACE::common::basic_response<T>& resp
+               , BOOST_CGI_NAMESPACE::common::basic_cookie<T> const& ck)
   {
-    resp.ostream()<< u;
+    BOOST_ASSERT(!resp.headers_terminated());
+    resp.set_header("Set-cookie", ck.to_string());
     return resp;
   }
 
-  /// You can stream a cgi::header into a response.
+ } // namespace common
+
+BOOST_CGI_NAMESPACE_END
+
+  /// Generic ostream template
+  /// You can stream a BOOST_CGI_NAMESPACE::header into a response.
   /**
    * This is just a more convenient way of doing:
    *
@@ -406,61 +491,17 @@ namespace cgi {
    * effects; for instance, it won't write any data to the client.
    * ]
    */
-  template<typename T> BOOST_CGI_INLINE
-  cgi::common::basic_response<T>&
-    operator<< (cgi::common::basic_response<T>& resp
-               , cgi::common::basic_header<T> const& hdr)
-  {
-    if (hdr.content.empty()) {
-      resp.end_headers();
-      return resp;
-    }else{
-      // We shouldn't allow headers to be sent after they're explicitly ended.
-      BOOST_ASSERT(!resp.headers_terminated());
-      resp.set_header(hdr.content);
-      return resp;
-    }
-  }
-
-  /// You can stream a cgi::cookie into a response.
+  /// You can stream a BOOST_CGI_NAMESPACE::cookie into a response.
   /**
    * This is just a shorthand way of setting a header that will set a
    * client-side cookie.
    *
    * You cannot stream a cookie to a response after the headers have been
    * terminated. In this case, an alternative could be to use the HTML tag:
-   * <meta http-equiv="Set-cookie" ...> (see http://tinyurl.com/3bxftv or
-   * http://tinyurl.com/33znkj), but this is outside the scope of this
-   * library.
+   * <meta http-equiv="Set-cookie" ...> (see \url http://tinyurl.com/3bxftv
+   * or \url http://tinyurl.com/33znkj), but this is outside the scope of
+   * this library.
    */
-  template<typename T> BOOST_CGI_INLINE
-  cgi::common::basic_response<T>& 
-    operator<< (cgi::common::basic_response<T> const& resp
-               , cgi::common::basic_cookie<T> ck)
-  {
-    BOOST_ASSERT(!resp.headers_terminated());
-    resp.set_header("Set-cookie", ck.to_string());
-    return resp;
-  }
-
-  template<typename T> BOOST_CGI_INLINE
-  cgi::common::basic_response<T>& 
-    operator<< (cgi::common::basic_response<T>& resp
-               , cgi::common::basic_cookie<T> const& ck)
-  {
-    BOOST_ASSERT(!resp.headers_terminated());
-    resp.set_header("Set-cookie", ck.to_string());
-    return resp;
-  }
-
-  template<typename T> BOOST_CGI_INLINE
-  cgi::common::basic_response<T>&
-    operator<< (cgi::common::basic_response<T>& resp
-               , cgi::common::http::status_code status)
-  {
-    BOOST_ASSERT(!resp.headers_terminated());
-    return resp.set_status(status);
-  }
 
 #undef BOOST_CGI_ADD_DEFAULT_HEADER
 

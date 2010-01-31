@@ -14,11 +14,12 @@
 #define BOOST_CGI_COMMON_NAME_HPP_INCLUDED__
 
 #include <string>
-#include <ostream>
+//#include <ostream>
 #include <cstdlib>
 #include <ctype.h>
+#include "boost/cgi/config.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
    template <typename CharT>
@@ -61,7 +62,7 @@ namespace cgi {
 
    };
 
-   // typedef for typical usage.
+   // typedefs for typical usage.
    typedef std::basic_string<char, ichar_traits<char> >       name;
    typedef std::basic_string<wchar_t, ichar_traits<wchar_t> > wname;
 
@@ -72,10 +73,10 @@ namespace cgi {
                , std::basic_string<CharT, ichar_traits<CharT> > const& str)
   {
     return os<< str.c_str();
-  } 
+  }
 
  } // namespace common
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // BOOST_CGI_COMMON_NAME_HPP_INCLUDED__
 

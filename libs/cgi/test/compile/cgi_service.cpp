@@ -2,7 +2,7 @@
 
 int main()
 {
-  cgi::acgi::service s;
+  boost::acgi::service s;
 
   return 0;
 }

@@ -11,13 +11,13 @@
 
 #include <boost/asio/write.hpp>
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
   using boost::asio::write;
   using boost::asio::async_write;
 
  } // namespace common
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_WRITE_HPP_INCLUDED

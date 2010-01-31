@@ -12,14 +12,28 @@
 #include <boost/shared_ptr.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/common/map.hpp"
-#include "boost/cgi/http/status_code.hpp"
 #include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/common/request_status.hpp"
 #include "boost/cgi/connections/tcp_socket.hpp"
+#include "boost/cgi/detail/throw_error.hpp"
+#include "boost/cgi/detail/protocol_traits.hpp"
+#include "boost/cgi/error.hpp"
+#include "boost/cgi/http/status_code.hpp"
 
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
+ 
+  enum client_status
+  {
+    none_, // **FIXME** !
+    constructed,
+    params_read,
+    stdin_read,
+    end_request_sent,
+    closed_, // **FIXME** !
+    //aborted
+  };
 
   /// A client
   /**
@@ -43,10 +57,19 @@ namespace cgi {
   class basic_client
   {
   public:
-    //typedef cgi::map                          map_type;
+    //typedef BOOST_CGI_NAMESPACE::map                          map_type;
+    typedef ::BOOST_CGI_NAMESPACE::common::io_service   io_service_type;
+    typedef ::BOOST_CGI_NAMESPACE::common::map          map_type;
     typedef Connection                        connection_type;
     typedef Protocol                          protocol_type;
     typedef typename connection_type::pointer connection_ptr;
+    typedef boost::array<unsigned char, 8>    header_buffer_type;
+    typedef boost::asio::mutable_buffers_1    mutable_buffers_type;
+    typedef typename 
+      detail::protocol_traits<
+          Protocol
+      >::role_type                              role_type;
+
 
     basic_client()
     {
@@ -56,28 +79,53 @@ namespace cgi {
       //: io_service_(ios)
     {
     }
-
-    bool is_open()
+    
+    /// Construct the client by claiming a request id.
+    /**
+     * Before loading a request, it will usually not have a request id. This
+     * function reads headers (and corresponding bodies if necessary) until
+     * a BEGIN_REQUEST record is found. The calling request then claims and
+     * serves that request.
+     */
+    template<typename RequestImpl>
+    boost::system::error_code
+      construct(RequestImpl& req, boost::system::error_code& ec)
     {
-      return connection_->is_open();
+      status_ = constructed;
+      return ec;
+    }
+    
+    boost::system::error_code
+      close(boost::uint64_t app_status, boost::system::error_code& ec)
+    {
+      if (!is_open())
+        ec = error::already_closed;
+      else
+      {
+        status_ = closed_;
+        connection_->close();
+      }
+      return ec;
     }
 
-    void close()
+    void close(boost::uint64_t app_status = 0)
     {
-      connection_->close();
+      boost::system::error_code ec;
+      close(app_status, ec);
+      detail::throw_error(ec);
     }
 
     /// Associate a connection with this client
     /**
      * Note: the connection must have been created using the new operator
-     *
+     */
     bool set_connection(connection_type* conn)
     {
       // make sure there isn't already a connection associated with the client
-      if (!connection_) return false;
+      //if (!connection_) return false;
       connection_.reset(conn);
       return true;
-    }*/
+    }
 
     //io_service& io_service() { return io_service_; }
 
@@ -94,10 +142,6 @@ namespace cgi {
       return true;
     }
 
-    /// Get a shared_ptr of the connection associated with the client.
-    connection_ptr& connection() { return connection_; }
-    std::size_t& bytes_left()    { return bytes_left_; }
-
     /// Write some data to the client.
     template<typename ConstBufferSequence>
     std::size_t write_some(const ConstBufferSequence& buf
@@ -106,7 +150,20 @@ namespace cgi {
       return connection_->write_some(buf, ec);
     }
 
-    /// Read some data from the client.
+    /// Read data into the supplied buffer.
+    /**
+     * Reads some data that, correctly checking and stripping FastCGI headers.
+     *
+     * Returns the number of bytes read and sets `ec` such that `ec` evaluates
+     * to `true` iff an error occured during the read operation.
+     *
+     * Notable errors:
+     * - `fcgi::error::data_for_another_request`
+     * - `fcgi::error::connection_locked`
+     *
+     * These must be dealt with by user code if they choose to read through the
+     * client (reading through the request is recommended).
+     */
     template<typename MutableBufferSequence>
     std::size_t read_some(const MutableBufferSequence& buf
                          , boost::system::error_code& ec)
@@ -140,16 +197,76 @@ namespace cgi {
     {
       connection_->async_read_some(buf, handler);
     }
+    
+    
+    ////// Querying the client.
+
+    /// Get a shared_ptr of the connection associated with the client.
+    connection_ptr& connection() { return connection_; }
+    std::size_t& bytes_left()    { return bytes_left_; }
+    
+    bool is_open()
+    {
+      return connection_->is_open();
+    }
+
+    /// Get the status of the client.
+    const client_status& status() const
+    {
+      return status_;
+    }
+
+    /// Set the status of the client.
+    void status(client_status status)
+    {
+      status_ = status;
+    }
+
+    bool keep_connection() const
+    {
+      return keep_connection_;
+    }
+    
+    boost::uint16_t const& request_id() const
+    {
+      return request_id_;
+    }
+
   private:
+  
+    template<typename ConstBufferSequence>
+    void prepare_buffer(const ConstBufferSequence& buf)
+    { /* NOOP */ }
+        
+    void handle_write(
+      std::size_t bytes_transferred, boost::system::error_code& ec)
+    { /* NOOP */ }
+  
     //io_service&                           io_service_;
     connection_ptr                        connection_;
 
   public: // **FIXME**
     // we should never read more than content-length bytes.
     std::size_t                           bytes_left_;
+    
+    boost::uint16_t request_id_;
+    client_status status_;
+    
+    boost::uint64_t total_sent_bytes_;
+    boost::uint64_t total_sent_packets_;
+
+    /// Buffer used to check the header of each packet.
+    //header_buffer_type out_header_;
+    fcgi::spec::header header_;
+
+    /// Output buffer.
+    std::vector<boost::asio::const_buffer> outbuf_;
+
+    bool keep_connection_;
+    role_type role_;
   };
 
  } // namespace common
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_BASIC_CLIENT_HPP_INCLUDED__

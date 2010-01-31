@@ -14,7 +14,7 @@
 //#include "boost/cgi/request_service_fwd.hpp"
 #include "boost/cgi/scgi/request_service.hpp"
 #include "boost/cgi/scgi/service.hpp"
-namespace cgi {
+namespace BOOST_CGI_NAMESPACE {
 
   //class scgi::scgi_request_service;
 
@@ -25,7 +25,7 @@ namespace cgi {
    // typedef for typical usage (SCGI)
    typedef basic_request<scgi_request_service, service> request;
  } // namespace scgi
-} // namespace cgi
+} // namespace BOOST_CGI_NAMESPACE
 
 //#include "boost/cgi/request_service.hpp"
 #include "boost/cgi/basic_request.hpp"

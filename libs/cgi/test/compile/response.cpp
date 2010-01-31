@@ -2,7 +2,7 @@
 
 int main(int, char**)
 {
-  cgi::common::response resp;
+  boost::cgi::common::response resp;
 
   resp<< "blah";
 

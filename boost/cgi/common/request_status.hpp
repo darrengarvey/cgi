@@ -8,22 +8,29 @@
 ////////////////////////////////////////////////////////////////
 #ifndef CGI_COMMON_REQUEST_STATUS_HPP_INCLUDED__
 #define CGI_COMMON_REQUEST_STATUS_HPP_INCLUDED__
+#include "boost/cgi/config.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
    enum request_status
-     { null
-     , unloaded
-     , activated
-     , loaded
-     , ok = loaded
+     { null           = 0
+     , unloaded       = null
+     , activated      = 1
+     , accepted       = activated
+     , begin_request_found = 2
+     , env_read       = 4
+     , get_read       = 8
+     , post_read      = 16
+     , cookies_read   = 32
+     , loaded         = 64
+     , ok             = loaded
      , aborted
      , closed
      };
 
  } // namespace common
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_COMMON_REQUEST_STATUS_HPP_INCLUDED__
 

@@ -5,10 +5,29 @@
 
 project boost.cgi.docs
   ;
+  
+#exe doc_quickstart_cgi
+#  :
+#    src/quickstart/quickstart_cgi.cpp /boost/cgi/
+#  :
+#    <threading>multi
+#    <library>/boost//thread
+#  ;
+
+# Our install rule (builds binaries and copies them to <location>)
+#install install_quickstart_cgi
+# : doc_quickstart_cgi
+# : <location>$(cgi-bin)
+# ;
+
+# Only install example if you use `bjam install' or equivalent
+#explicit install_quickstart_cgi ;
+
 
 import boostbook : boostbook ;
 import doxygen ;
 import quickbook ;
+#import auto-index ;
 
 # compile the doxygen sources here
 doxygen autodoc
@@ -17,34 +36,66 @@ doxygen autodoc
 #   [ glob-tree ../../../boost/libs/cgi/src/*.cpp : .svn ]
 
     [ glob $(top)/boost/cgi/*.hpp ]
+    [ glob $(top)/boost/cgi/common/*.hpp ]
+    [ glob $(top)/boost/cgi/util/*.hpp ]
+    [ glob $(top)/boost/cgi/connections/*.hpp ]
+    [ glob $(top)/boost/cgi/cgi/*.hpp ]
+    [ glob $(top)/boost/cgi/fcgi/*.hpp ]
     $(top)/boost/cgi/fcgi/client.hpp
     $(top)/boost/cgi/fcgi/service.hpp
     $(top)/boost/cgi/fcgi/acceptor.hpp
     $(top)/boost/cgi/fcgi/request.hpp
-    $(top)/boost/cgi/acgi/service.hpp
-    $(top)/boost/cgi/acgi/acceptor.hpp
-    $(top)/boost/cgi/acgi/request.hpp
     $(top)/boost/cgi/cgi/service.hpp
     $(top)/boost/cgi/cgi/request.hpp
     $(top)/boost/cgi/http/status_code.hpp
-    #[ glob $(top)/boost/cgi/acgi/*.hpp ]
-    #[ glob $(top)/boost/cgi/cgi/*.hpp ]
-    [ glob $(top)/boost/cgi/common/*.hpp ]
-
-    [ glob ../../../boost/cgi/connections/*.hpp ]
   :
-    <doxygen.processor>doxproc
-    <doxygen.doxproc.index>yes
-    <doxygen.doxproc.title>"Developer Reference"
-    <doxygen.doxproc.id>"developer_reference"
-
+    <doxygen:param>TAB_SIZE=2
+    # <doxygen:param>EXTRACT_ALL=YES
     <doxygen:param>HIDE_UNDOC_MEMBERS=NO
-    <doxygen:param>EXTRACT_PRIVATE=NO
-    <doxygen:param>EXTRACT_ALL=YES
+    # Show all inherited members of a class in the documentation of that class
+    # as if those members were ordinary class members.
+    <doxygen:param>INLINE_INHERITED_MEMB=YES
+    <doxygen:param>SORT_MEMBER_DOCS=YES
+    #<doxygen:param>EXTRACT_PRIVATE=YES
+    <doxygen:param>EXTRACT_STATIC=YES
+    # If the EXTRACT_PRIVATE tag is set to YES all private members of a class
+    # will be included in the documentation
+    <doxygen:param>EXTRACT_PRIVATE=NO 
+    <doxygen:param>EXTRACT_LOCAL_CLASSES=YES
+    <doxygen:param>EXTRACT_LOCAL_METHODS=YES
+    # If the EXTRACT_LOCAL_CLASSES tag is set to YES classes (and structs) defined
+    # locally in source files will be included in the documentation.
+    <doxygen:param>EXTRACT_LOCAL_CLASSES=YES 
+    <doxygen:param>ENABLE_PREPROCESSING=YES
+    <doxygen:param>MACRO_EXPANSION=YES
+    <doxygen:param>EXPAND_ONLY_PREDEF=YES
     <doxygen:param>SEARCH_INCLUDES=YES
-    <doxygen:param>GENERATE_TREEVIEW=ALL
-    <doxygen:param>TYPEDEF_HIDES_STRUCT=YES
-#    <doxygen:param>INCLUDE_PATH=$(BOOST_ROOT)
+    # If the INLINE_INFO tag is set to YES (the default) then a tag [inline] is
+    # inserted in the documentation for inline members.
+    <doxygen:param>INLINE_INFO=YES
+    # If the SORT_BRIEF_DOCS tag is set to YES then doxygen will sort the brief
+    # descriptions of file, namespace and class members alphabetically by member
+    # name.
+    <doxygen:param>SORT_BRIEF_DOCS=YES
+    # If the SORT_MEMBER_DOCS tag is set to YES (the default) then doxygen will
+    # sort the (detailed) documentation of file and class members alphabetically
+    # by member name.
+    <doxygen:param>SORT_MEMBER_DOCS=YES
+    # List of the files that are included by a file in the documentation of that
+    # file.
+    <doxygen:param>SHOW_INCLUDE_FILES=NO
+    # Prepend the brief description of a member or function before the detailed
+    # description
+    <doxygen:param>REPEAT_BRIEF=YES
+    # Include brief member descriptions after the members that are listed in the
+    # file and class
+    <doxygen:param>BRIEF_MEMBER_DESC=YES
+    # Treat a multi-line C++ special comment block (i.e. a block of //! or
+    # /// comments) as a brief description.
+    <doxygen:param>MULTILINE_CPP_IS_BRIEF=YES
+    # May be best to always use \brief and \details to avoid ambiguity?
+    <doxygen:param>INCLUDE_PATH=$(boost-root)
+    <doxygen:param>WARN_LOGFILE=$(top)/libs/cgi/doc/doxywarnings.log
   ;
 
 xml cgi_xml : src/cgi.qbk ;
@@ -52,31 +103,81 @@ xml cgi_xml : src/cgi.qbk ;
 boostbook standalone
   :
     cgi_xml
-    autodoc
+    #autodoc
     #cgi_dox
   :
-    #<xsl:param>project.root=../../../..
-    #<xsl:param>boost.libraries=/usr/local/src/boost/trunk/libs/libraries.htm
-    #<xsl:param>boost.images=http://beta.boost.org/images
-    # the depth (of sub-pages) the TOC shows
-    #<xsl:param>toc.max.depth=1
-    # Path to the stylesheet
-    #<xsl:param>html.stylesheet=../../../../../../boost/trunk/doc/html/boostbook.css
- 
-    # 
-    #<xsl:param>toc.section.depth=2
+    # This one turns on indexing:
+    #<auto-index>on
+    # Choose indexing method for pdf's:
+    #<format>pdf:<auto-index-internal>off
+    # Choose indexing method for html:
+    #<format>html:<auto-index-internal>on
+    # Set the name of the script file to use:
+    #<auto-index-script>index.idx
 
+    # Some general style settings:
+    <xsl:param>table.footnote.number.format=1
+    <xsl:param>footnote.number.format=1
+
+    # HTML options first:
+    # Use graphics not text for navigation:
+    <xsl:param>navig.graphics=1
+    # How far down we chunk nested sections, basically all of them:
+    <xsl:param>chunk.section.depth=10
+    # Don't put the first section on the same page as the TOC:
+    <xsl:param>chunk.first.sections=1
+    # How far down sections get TOC's
+    <xsl:param>toc.section.depth=10
+    # Max depth in each TOC:
+    <xsl:param>toc.max.depth=4
     # How far down we go with TOC's
-    #<xsl:param>generate.section.toc.level=10
-     # how many sections are on the first page
-    #<xsl:param>chunk.first.sections=1
+    <xsl:param>generate.section.toc.level=1
+    #<xsl:param>generate.toc="chapter nop section nop"
 
-    # To chunk (together) or not to chunk (divide)
-    #<xsl:param>chunk.section.depth=2 # chunk
+    #<xsl:param>root.filename="svg_plot"
+    #<xsl:param>root.filename=cgi
+    <xsl:param>boost.image.src="../../../../boost/boostified/release/doc/html/images"
+
+    # <xsl:param>project.root=http://beta.boost.org/development
+    # <xsl:param>annotation.support=1
+    # <xsl:param>quickbook.source.style.show="'true'"
+
+    # PDF Options:
+    # TOC Generation
+    <xsl:param>fop1.extensions=0
+    <format>pdf:<xsl:param>xep.extensions=1
+    <format>pdf:<xsl:param>fop.extensions=0
+
+    # No indent on body text:
+    <format>pdf:<xsl:param>body.start.indent=0pt
+    # Margin size:
+    <format>pdf:<xsl:param>page.margin.inner=0.5in
+    # Margin size:
+    <format>pdf:<xsl:param>page.margin.outer=0.5in
+    # Paper type = A4
+    <format>pdf:<xsl:param>paper.type=A4
+    # Yes, we want graphics for admonishments:
+    <xsl:param>admon.graphics=1
+    # Set this one for PDF generation *only*:
+    # default pnd graphics are awful in PDF form,
+    # better use SVG's instead:
+    <format>pdf:<xsl:param>admon.graphics.extension=".svg"
+    <format>pdf:<xsl:param>use.role.for.mediaobject=1
+    <format>pdf:<xsl:param>preferred.mediaobject.role=print
+    <format>pdf:<xsl:param>img.src.path=$(images_location)/
+    <format>pdf:<xsl:param>admon.graphics.path=$(images_location)/images/
+    <format>pdf:<xsl:param>draft.mode="no"
+
+    <dependency>autodoc
  	;
 
 install html
 	:
 	  /boost//doc/html/boostbook.css
-#	  /bin/doc/$(toolset)/debug/cgi_xml.xml 
+	  /bin/doc/$(toolset)/debug/cgi_xml.xml 
 	;
+
+install pdf-install : standalone : <location>. <install-type>PDF ;
+
+explicit install ;
+explicit pdf-install ;

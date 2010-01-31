@@ -1,0 +1,75 @@
+
+
+<html>
+<head>
+<title>CGI Echo Example (using Google cTemplate)</title>
+<link rel="stylesheet" type="text/css" href="/css/debug_view.css" />
+</head>
+<body>
+
+{{#RUNNING_TIME}}
+<div class="debuginfo">
+    Run time ({{RUNNING_TIME_RESOLUTION}}):
+	<ul class="nvpair">
+		<li class="name">Real</li><li class="value">{{REAL_TIME}}</li>
+		<li class="name">CPU</li><li class="value">{{CPU_TIME}}</li>
+		<li class="name">User</li><li class="value">{{USER_TIME}}</li>
+		<li class="name">System</li><li class="value">{{SYSTEM_TIME}}</li>
+	</ul>
+</div>
+{{/RUNNING_TIME}}
+
+<p class="bold">
+	<h1>Problem found.</h1>
+    <p>The original response follows, after some details about the error that occurred and the request that caused it</p>
+    <p>First, the error that we tried to detect:</p>
+</p>
+<div class="info">
+	{{ERROR}}
+	{{#SYSTEM_ERROR}}
+        <ul class=nvpair><p>{{ERROR_MSG}}</p>
+            <li class=name>Code:</li>");
+    err_msg += string("<li class=value>") + boost::lexical_cast<std::string>(err->code()) + "</li>" 
+            + "<li class=name>What:</li>"
+            + "<li class=value>" + err->what() + "</li>"
+            + "<li class=name>Type:</li>"
+            + "<li class=value>" + typeid(*err).name() + "</li><br class=clear /></ul>";	    
+	{{/SYSTEM_ERROR}}
+</div>
+
+Some details about the request:
+
+<div class="info">
+{{#REQUEST_DATA_MAP}}
+<div class="var_map">
+	<div class="var_map_title">
+		{{REQUEST_DATA_MAP_TITLE}}
+    </div>
+    <ul>
+    {{#REQUEST_DATA_MAP_EMPTY}}
+		<li class="var_pair">EMPTY</li>
+	{{/REQUEST_DATA_MAP_EMPTY}}
+	{{#REQUEST_DATA_PAIR}}
+		<li class="var_pair">
+           <div class="var_name">{{REQUEST_DATA_NAME:h}}</div>
+           <div class="var_value">{{REQUEST_DATA_VALUE:h}}</div>
+        </li>
+    {{/REQUEST_DATA_PAIR}}
+	</ul>
+</div>
+{{/REQUEST_DATA_MAP}}
+</div>
+
+The headers sent in the original (broken) response were:
+<div class="info">
+	<pre style="white-space:pre; padding-left: 3em; margin-left: 1em">
+		<ul>{{#RESPONSE_HEADER}}<li>{{HEADER:h}}</li>{{/RESPONSE_HEADER}}</ul>
+	</pre>
+</div>
+
+Below is the original response (take into account that it may not look as it should):
+<div class="clear"></div>
+
+</body>
+
+</html>

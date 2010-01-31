@@ -11,80 +11,47 @@
 
 #include "boost/cgi/error.hpp"
 #include "boost/cgi/basic_client.hpp"
+#include "boost/cgi/common/form_part.hpp"
 #include "boost/cgi/detail/url_decode.hpp"
-#include "boost/cgi/common/form_parser.hpp"
 #include "boost/cgi/common/source_enums.hpp"
+#include "boost/cgi/config.hpp"
 
-namespace cgi {
- namespace detail {
+#include <fstream>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/random/mersenne_twister.hpp>
 
-/*
-    BOOST_CGI_INLINE
-    form_parser::form_parser (
-    )
-      : content_type_(env_vars(impl.vars_)["CONTENT_TYPE"])
-      , buffer_(impl.buffer_)
-      , bytes_left_(impl.client_.bytes_left_)
-      //, stdin_data_read_(impl.stdin_data_read_)
-      , offset_(0)
-      , data_map_(post_vars(impl.vars_))
-      , callback_()
-    {
-    }
+/// Characters that should be removed from any file uploads.
+/**
+ * The filename of any file uploads is a stripped version of
+ * the provided file's name. As such, we need to clean the uploaded
+ * file's name.
+ */
+#ifndef BOOST_CGI_UNSAFE_FILENAME_CHARS
+#   define BOOST_CGI_UNSAFE_FILENAME_CHARS ":~.|"
+#endif // BOOST_CGI_UNSAFE_FILENAME_CHARS
 
-    BOOST_CGI_INLINE
-    form_parser::form_parser (
-      , callback_type const& callback
-    )
-      : content_type_(env_vars(impl.vars_)["CONTENT_TYPE"])
-      , buffer_(impl.buffer_)
-      , bytes_left_(impl.client_.bytes_left_)
-      //, stdin_data_read_(impl.stdin_data_read_)
-      , offset_(0)
-      , data_map_(post_vars(impl.vars_))
-      , callback_(callback)
-    {
-    }
-*/
+BOOST_CGI_NAMESPACE_BEGIN
 
-    BOOST_CGI_INLINE
-    form_parser::form_parser (
-        buffer_type& buf
-      , common::post_map& data_map
-      , form_parser::string_type const& ct
-      , callback_type const& callback
-      , std::size_t& bytes_left
-      , bool& stdin_parsed
-    )
-      : content_type_(ct)//env_vars(impl.vars_)["CONTENT_TYPE"])
-      , buffer_(buf)
-      , bytes_left_(bytes_left)
-      , data_map_(data_map)
-      , callback_(callback)
-      , stdin_parsed_(stdin_parsed)
-      , offset_(0)
-    {
-    }
+ namespace common {
 
     BOOST_CGI_INLINE
     boost::system::error_code
-      form_parser::parse(boost::system::error_code& ec)
+      form_parser::parse(context ctx, boost::system::error_code& ec)
     {
-      BOOST_ASSERT(!content_type_.empty());
+      context_ = &ctx;
+      
+      BOOST_ASSERT(!ctx.content_type.empty());
 
-      if (boost::algorithm::ifind_first(content_type_,
-            "application/x-www-form-urlencoded"))
-      {
+      if (ctx.content_type.find(
+         "application/x-www-form-urlencoded") != string_type::npos)
         parse_url_encoded_form(ec);
-      }
       else
-      if (boost::algorithm::ifind_first(content_type_,
-            "multipart/form-data"))
-      {
+      if (ctx.content_type.find(
+         "multipart/form-data") != string_type::npos)
         parse_multipart_form(ec);
-      }
       else
-        return ec = error::invalid_form_type;
+        return ec = common::error::invalid_form_type;
 
       return ec;
     }
@@ -93,63 +60,57 @@ namespace cgi {
     boost::system::error_code
       form_parser::parse_url_encoded_form(boost::system::error_code& ec)
     {
-      std::string name;
-      std::string str;
+     buffer_type& str(context_->buffer);
+     string_type result;
+     string_type name;
 
-      char ch;
-      char ch1;
-      while( bytes_left_ )
-      {
-        ch = getchar();
-        --bytes_left_;
+     if (str.size() == 0)
+    	 return ec;
 
-        switch(ch)
-        {
-        case '%': // unencode a hex character sequence
-          if (bytes_left_ >= 2)
-          {
-            ch = getchar();
-            ch1 = getchar();
-            if (std::isxdigit(ch) && std::isxdigit(ch1))
-            {
-              str.append(1, detail::hex_to_char(ch, ch1));
-            }
-            else // we don't have a hex sequence
-            {
-              str.append(1, '%').append(1, ch).append(1, ch1);
-            }
-            bytes_left_ -= 2;
-          }
-          else // There aren't enough characters to make a hex sequence
-          {
-            str.append(1, '%');
-            --bytes_left_;
-          }
-          break;
-        case '+':
-            str.append(1, ' ');
-            break;
-        case ' ': // skip spaces
-            break;
-        case '=': // the name is complete, now get the corresponding value
-            name.swap(str);
-            break;
-        case '&': // we now have the name/value pair, so save it
-            // **FIXME** have to have .c_str() ?
-            data_map_[name.c_str()] = str;
-            str.clear();
-            name.clear();
+     for( buffer_type::const_iterator iter (str.begin()), end (str.end())
+        ; iter != end; ++iter )
+     {
+       switch( *iter )
+       {
+         case ' ':
            break;
-        default:
-            str.append(1, ch);
-        }
-      }
+         case '+':
+           result.append(1, ' ');
+           break;
+         case '%':
+           if (std::distance(iter, end) <= 2
+            || !std::isxdigit(*(iter+1))
+            || !std::isxdigit(*(iter+2)))
+           {
+             result.append(1, '%');
+           }
+           else // we've got a properly encoded hex value.
+           {
+             char ch = *++iter; // need this because order of function arg
+                                // evaluation is UB.
+             result.append(1, detail::hex_to_char(ch, *++iter));
+           }
+           break;
+         case '=': // the name is complete, now get the corresponding value
+            name.swap(result);
+            break;
+         case '&': // we now have the name/value pair, so save it
+            // **FIXME** have to have .c_str() ?
+            context_->data_map[name.c_str()] = result;
+            result.clear();
+            name.clear();
+            break;
+         default:
+           result.append(1, *iter);
+       }
+     }
+#if defined(BOOST_CGI_KEEP_EMPTY_VARS)
       // save the last param (it won't have a trailing &)
-      if( !name.empty() )
-          // **FIXME** have to have .c_str() ?
-          data_map_[name.c_str()] = str;
-
-      return ec;
+      if( !name.empty() ) {
+          context_->data_map[name.c_str()] = result;
+      }
+#endif // BOOST_CGI_KEEP_EMPTY_VARS
+     return ec;
     }
 
     /// Parse a multipart form.
@@ -158,17 +119,10 @@ namespace cgi {
       form_parser::parse_multipart_form(boost::system::error_code& ec)
     {
       parse_boundary_marker(ec);
-
       move_to_start_of_first_part(ec);
 
-      if (ec && ec != boost::asio::error::eof)
-        return ec;
-
-      do {
+      while(!ec && !context_->stdin_parsed)
         parse_form_part(ec);
-      }while( //!impl_.stdin_parsed_
-            bytes_left_ // != 0
-           );//&& ec != boost::asio::error::eof );
 
       return ec;
     }
@@ -178,218 +132,96 @@ namespace cgi {
     boost::system::error_code
       form_parser::parse_form_part(boost::system::error_code& ec)
     {
-      if (!parse_form_part_meta_data(ec)
-      &&  !parse_form_part_data(ec))
-        return ec;
+      namespace algo = boost::algorithm;
 
-      return ec;
-    }
+      string_type marker(
+        string_type("--") + context_->boundary_markers.front());
+      string_type& buffer(context_->buffer);
+      std::size_t& offset (context_->offset);
 
-    BOOST_CGI_INLINE
-    boost::system::error_code
-      form_parser::parse_form_part_data(boost::system::error_code& ec)
-    {
-      std::string regex("^(.*?)" // the data
-                        "\\x0D\\x0A" // CR LF
-                        "--" "(");
-      if (boundary_markers.size() > 1)
+      std::size_t end = buffer.find("\r\n\r\n", offset);
+      if (end == string_type::npos)
+        return ec = common::error::multipart_meta_data_not_terminated;
+      
+      string_type meta (buffer.substr(offset,end-offset));
+      
+      // sic - short-cut check for Content-Disposition.
+      std::size_t pos1 = meta.find("isposition:"); // sic
+      std::size_t pos2 = meta.find(";", pos1);
+      std::size_t pos3 = meta.find("name=");
+      std::size_t pos4 = meta.find(";", pos3);
+      std::size_t pos5 = meta.find("\r\n");
+      std::size_t pos6 = meta.find("filename=", pos2);
+      
+      if (pos3 == string_type::npos)
+        pos3 = meta.find("\r\n");
+      string_type field_name (meta.substr(pos3+5, pos4-pos3-5));
+      algo::trim_if(field_name, algo::is_any_of("\" "));
+      
+      common::form_part part;
+      part.name = field_name;
+      part.content_disposition = meta.substr(pos1+11, pos2-pos1-11);
+
+      std::size_t next_pos = buffer.find(string_type("\r\n") + marker, end);
+      
+      if (pos6 == string_type::npos)
       {
-        std::list<std::string>::iterator i(boundary_markers.begin());
-        regex = regex + "(?:" + *i + ")";
-        ++i;
-        for(; i != boundary_markers.end(); ++i)
-        {
-          regex = regex + "|(?:" + *i + ")";
-        }
+        string_type content (
+           buffer.substr(meta.length()+4, next_pos-meta.length()-4));
+        
+        // Load the data to the request's post map.
+        part.value = content;
       }
       else
       {
-        regex += *boundary_markers.begin();
+        string_type filename (meta.substr(pos6+9, pos5-pos6-9));
+        algo::trim_if(filename, algo::is_any_of("\" "));
+        // Load the filename as the value on the request's post map.
+        //part.value = "<FileUpload: '" + filename + "'>";
+        part.value = filename;
+        // Empty parameters could probably be left out, but setting even
+        // an empty variable is consistent with the rest of the library.
+        // **FIXME** Might be useful to respect BOOST_CGI_KEEP_EMPTY_VARS
+        // here. Leaving that out as it would not be expected, AFAIK.
+        if (!filename.empty())
+        {
+          part.filename = filename;
+          // Load the data to a local file.
+          string_type content (
+              buffer.substr(meta.length()+4, next_pos-meta.length()-4));
+          //boost::mt19937 rng(time(NULL));
+          string_type randomatter (
+            boost::lexical_cast<string_type>(time(NULL)));
+          string_type user_ip (context_->random_string);
+          // Clean dangerous characters.
+          algo::trim_if(filename, algo::is_any_of(BOOST_CGI_UNSAFE_FILENAME_CHARS));
+          string_type internal_filename(
+            BOOST_CGI_UPLOAD_DIRECTORY+filename+"."+user_ip+"."+randomatter);
+          part.path = internal_filename;
+          std::ofstream file (
+              internal_filename.c_str()
+            , std::ios::out | std::ios::binary);
+          file<< content;
+          //file.flush();
+          context_->uploads_map[part.name.c_str()] = part;
+        }
       }
-
-      regex += ")(--)?[ ]*\\x0D\\x0A";
-      boost::regex re(regex);
-
-      typedef buffer_type::iterator buffer_iter;
-
-      boost::match_results<buffer_iter> matches;
-
-      std::size_t offset = offset_;
-
-      //int runs = 0;
-      buffer_iter begin(buffer_.begin() + offset);
-      buffer_iter end(buffer_.end());
-
-      for(;;)
+      // Load the data to the request's post map.
+      context_->data_map[part.name.c_str()] = part.value;
+      
+      buffer.erase(0, next_pos+marker.length()+2);
+      if (buffer.length() >= 2
+        && buffer.substr(0,2) == "--")
       {
-        if (!boost::regex_search(begin, end, matches, re
-                                , boost::match_default
-                                | boost::match_partial))
-        {
-          return boost::system::error_code(345, boost::system::system_category);
-        }
-        else
-        {
-          if (matches[1].matched)
-          {
-            form_parts_.back().buffer_
-             // = boost::range_iterator<;
-             = std::make_pair(matches[1].first, matches[1].second);
-            // **FIXME**
-            data_map_[form_parts_.back().name.c_str()] = matches[1];
-            //std::ofstream of("c:/cc/log/post_vars.log");
-            //of<< "var == " << matches[1] << std::endl;
-            offset_ = offset + matches[0].length();
-            pos_ = matches[0].second;
-
-            if (matches[3].matched)
-            {
-              bytes_left_ = 0; // stop reading completely.
-              //impl_.stdin_parsed_ = true;
-            }
-            return ec;
-          }
-          else
-          {
-            std::size_t bytes_read
-                = callback_(ec);
-                            //impl_.client_.read_some(prepare(64), ec);
-
-            if (bytes_read == 0 && bytes_left_ == 0) // **FIXME**
-            {
-              //stdin_data_read_ = true;
-              return ec;
-            }
-
-            begin = buffer_.begin() + offset;
-            end = buffer_.end();
-
-            if (ec)
-              return ec;
-          }
-        }
+         //ec = common::error::eof;
+         context_->stdin_parsed = true;
+         context_->bytes_left = 0;
       }
-
-      return ec;
-    }
-
-    BOOST_CGI_INLINE
-    boost::system::error_code
-      form_parser::parse_form_part_meta_data(boost::system::error_code& ec)
-    {
-      // Oh dear this is ugly. The move to Boost.Spirit will have to be sooner than planned.
-      // (it's a nested, recursive pattern, which regexes don't suit, apparently)
-      boost::regex re(  "(?:"         // [IGNORE] the line may be empty, as meta-data is optional
-                          "^"
-                          "([-\\w]+)" // name
-                          ":[ ^]*"       // separator
-                          "([-/\\w]+)" // optional(?) value
-                          ""
-                          "(?:"
-                            ";"
-                            "[ ]*"    // additional name/value pairs (don't capture)
-                            "([-\\w]+)" // name
-                            "[ \\x0D\\x0A]*=[ \\x0D\\x0A]*"       // separator
-                            "(?:\"?([-.\\w]*)\"?)" // value may be empty
-                          ")?"
-                          "(?:"
-                            ";"
-                            "[ ]*"    // additional name/value pairs (don't capture)
-                            "([-\\w]+)" // name
-                            "[ \\x0D\\x0A]*=[ \\x0D\\x0A]*"       // separator
-                            "(?:\"?([-.\\w]*)\"?)" // value may be empty
-                          ")?"        // mark the extra n/v pairs optional
-                          "\\x0D\\x0A"
-                        ")"
-                        "(?:"
-                          "([-\\w]+)" // name
-                          ":[ ^]*"       // separator
-                          "([-/\\w]+)" // optional(?) value
-                          ""
-                          "(?:"
-                            ";"
-                            "[ ]*"    // additional name/value pairs (don't capture)
-                            "([-\\w]+)" // name
-                            "[ \\x0D\\x0A]*=[ \\x0D\\x0A]*"       // separator
-                            "(?:\"?([-.\\w]*)\"?)" // value may be empty
-                          ")?"
-                          "(?:"
-                            ";"
-                            "[ ]*"    // additional name/value pairs (don't capture)
-                            "([-\\w]+)" // name
-                            "[ \\x0D\\x0A]*=[ \\x0D\\x0A]*"       // separator
-                            "(?:\"?([-.\\w]*)\"?)" // value may be empty
-                          ")?"        // mark the extra n/v pairs optional
-                          "\\x0D\\x0A"    // followed by the end of the line
-                        ")?"
-                      "(\\x0D\\x0A)");     // followed by the 'header termination' line
-
-      typedef buffer_type::iterator buffer_iter;
-
-      boost::match_results<buffer_iter> matches;
-
-      std::size_t offset = offset_;
-      pos_ = buffer_.begin();
-      int runs = 0;
-
-      std::size_t bytes_read = 0;
-      for(;;)
-      {
-        buffer_iter begin(buffer_.begin() + offset);
-        buffer_iter end(buffer_.end());
-
-        if (!boost::regex_search(begin, end, matches, re
-                                , boost::match_default | boost::match_partial))
-        {
-          stdin_parsed_ = true;
-          return ec;
-        }
-        if (matches[0].matched)
-        {
-          common::form_part part;
-          for ( unsigned int i = 1
-              ; i < matches.size()
-               && matches[i].matched
-               && !matches[i].str().empty()
-              ; i+=2)
-          {
-            if (matches[i].str() == "name")
-            {
-              part.name = matches[i+1];
-            }
-            else
-            {
-              part.meta_data_[matches[i]]
-                = std::make_pair(matches[i+1].first, matches[i+1].second);
-            }
-            form_parts_.push_back(part);
-         }
-
-         if (matches[13].str() == "\r\n")
-         {
-           offset_ = offset + matches[0].length();
-           offset += matches[0].length();
-           pos_ = matches[0].second;
-
-           return ec;
-         }
-         else
-         {
-           throw std::runtime_error("Invalid POST data (header wasn't terminated as expected)");
-         }
-
-        }else{
-          bytes_read
-            = callback_(ec);
-          if (ec)
-            return ec;
-          if (++runs > 40)
-          {
-            //std::cerr<< "Done 40 runs; bailing out" << std::endl;
-            break;
-          }
-       }
-      }
+      else
+      if (buffer.length() == 0)
+        context_->bytes_left = 0;
+        
+      buffer.erase(0,2);
 
       return ec;
     }
@@ -398,58 +230,19 @@ namespace cgi {
     boost::system::error_code
       form_parser::move_to_start_of_first_part(boost::system::error_code& ec)
     {
-      boost::regex re("((?:.*)?"   // optional leading characters
-                      //"(?:\\x0D\\x0A)|^" // start of line
-                      "[\\x0D\\x0A^]*?"
-                      "("
-                        "--" + boundary_markers.front() + // two dashes and our marker
-                      ")"
-                      "(--)?" // optional two dashes (not sure if this is allowed)
-                      " *\\x0D\\x0A)");
-                                        // on the first marker.
+      string_type marker(
+        string_type("--") + context_->boundary_markers.front() + "\r\n");
+      string_type& buffer(context_->buffer);
 
-      typedef buffer_type::iterator buffer_iter;
-      //std::cerr<< "Regex := " << re << std::endl;
+      std::size_t pos = buffer.find(marker);
 
-      boost::match_results<buffer_iter> matches;
+      if (pos == string_type::npos)
+        ec = common::error::multipart_form_boundary_not_found;
+      else
+        buffer.erase(0, pos+marker.length());
+      
+      ec = boost::system::error_code();
 
-      // get data into our buffer until we reach the first boundary marker.
-      int runs = 0;
-      std::size_t offset = 0;
-      std::size_t bytes_read = 0;
-      for(;;)
-      {
-        bytes_read
-          = callback_(ec);
-
-        if (ec || (bytes_read == 0))
-          return ec;
-        buffer_iter begin(buffer_.begin());// + offset);
-        buffer_iter end(buffer_.end());
-        if (!boost::regex_search(begin, end //impl.buffer_.begin(), impl.buffer_.end()
-                                , matches, re, boost::match_default | boost::match_partial))
-        {
-          offset = buffer_.size();
-          continue;
-        }
-        else
-        {
-          if (matches[2].matched)
-          {
-            buffer_.erase(buffer_.begin(), matches[0].second);
-            offset_ = 0;
-            pos_ = buffer_.begin();
-            return ec;
-          }
-          else
-          {
-            if (++runs > 10)
-              return ec;
-            continue;
-          }
-        }
-      }
-      // skip that line and then erase the buffer
       return ec;
     }
 
@@ -457,24 +250,22 @@ namespace cgi {
     boost::system::error_code
       form_parser::parse_boundary_marker(boost::system::error_code& ec)
     {
-      //BOOST_ASSERT(!content_type.empty());
-
-      boost::regex re("; ?boundary=\"?([^\"\n\r]+)\"?");
-      boost::smatch match_results;
-      if (!boost::regex_search(content_type_, match_results, re))
-        return boost::system::error_code(666, boost::system::system_category);
-
-      boundary_marker = match_results[1].str();
-      // New boundary markers are added to the front of the list.
-      boundary_markers.push_front(match_results[1].str());
-      //std::cerr<< "boundary marker := " << boundary_marker << std::endl;
+      string_type& ctype(context_->content_type);
+      string_type& marker(context_->boundary_marker);
+      
+      marker.assign(ctype.substr(ctype.find("boundary=")+9));
+      boost::algorithm::trim(marker);
+      if (marker.empty())
+        ec = common::error::no_boundary_marker;
+      else
+        context_->boundary_markers.push_front(marker);
 
       return ec;
     }
 
-
- } // namespace detail
-} // namespace cgi
+ } // namespace common
+ 
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_DETAIL_FORM_PARSER_IPP_INCLUDED__
 

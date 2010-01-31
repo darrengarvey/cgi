@@ -12,16 +12,21 @@
 #include "boost/cgi/common/tags.hpp"
 #include "boost/cgi/common/basic_protocol_service.hpp"
 
-namespace cgi {
-
-  //typedef basic_protocol_service<tags::scgi> scgi_service;
-
+BOOST_CGI_NAMESPACE_BEGIN
  namespace fcgi {
+ 
+   // typedef for standard fcgi::service (a model of ProtocolService)
+   typedef
+   common::basic_protocol_service<
+       common::tags::fcgi
+     >
+   service;
+   
+ } // namespace fcgi
+BOOST_CGI_NAMESPACE_END
 
-   // typedef for standard scgi::service (a model of ProtocolService)
-   typedef ::cgi::common::basic_protocol_service< ::cgi::common::fcgi_> service;
-
- }
-} // namespace cgi
+namespace boost { namespace fcgi {
+  using ::BOOST_CGI_NAMESPACE::fcgi::service;
+} }
 
 #endif // CGI_FCGI_SERVICE_HPP_INCLUDED__

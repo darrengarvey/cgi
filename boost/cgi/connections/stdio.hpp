@@ -11,6 +11,11 @@
 
 #include <cstdio>
 #include <string>
+#if BOOST_WINDOWS
+#   include <stdio.h> // for _setmode
+#   include <io.h>    // for _setmode
+#   include <fcntl.h> // for _setmode
+#endif // BOOST_WINDOWS
 ///////////////////////////////////////////////////////////
 #include <boost/system/error_code.hpp>
 #include <boost/asio.hpp>
@@ -21,7 +26,7 @@
 #include "boost/cgi/common/connection_base.hpp"
 #include "boost/cgi/fwd/basic_connection_fwd.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
   template<>
@@ -34,12 +39,26 @@ namespace cgi {
     basic_connection()
       : is_open_(true)
     {
+#if BOOST_WINDOWS
+      // We have to open stdin in binary mode on windows,
+      // or "\r\n" sequences are truncated to "\n".
+      _setmode(_fileno(stdin),_O_BINARY);
+      _setmode(_fileno(stdout),_O_BINARY);
+      _setmode(_fileno(stderr),_O_BINARY);
+#endif
     }
 
     template<typename T>
     basic_connection(T&)
       : is_open_(true)
     {
+#if BOOST_WINDOWS
+      // We have to open stdin in binary mode on windows,
+      // or "\r\n" sequences are truncated to "\n".
+      _setmode(_fileno(stdin),_O_BINARY);
+      _setmode(_fileno(stdout),_O_BINARY);
+      _setmode(_fileno(stderr),_O_BINARY);
+#endif
     }
 
     bool is_open() const
@@ -60,7 +79,7 @@ namespace cgi {
     template<typename MutableBufferSequence>
     std::size_t read_some(MutableBufferSequence buf
                          , boost::system::error_code& ec)
-    {  
+    {
       if (std::fread(boost::asio::buffer_cast<void *>(buf)
                     , boost::asio::buffer_size(buf)
                     , 1, stdin))
@@ -69,12 +88,12 @@ namespace cgi {
       }
 
       if (std::feof(stdin))
-        ec = boost::asio::error::eof;
+        ec = ::BOOST_CGI_NAMESPACE::error::eof;
       else
       if (std::ferror(stdin))
-        ec = ::cgi::error::bad_read;
+        ec = ::BOOST_CGI_NAMESPACE::error::bad_read;
       else
-        ec = ::cgi::error::broken_pipe;
+        ec = ::BOOST_CGI_NAMESPACE::error::broken_pipe;
 
       return 0;
     }
@@ -83,22 +102,34 @@ namespace cgi {
     std::size_t write_some(ConstBufferSequence& buf
                           , boost::system::error_code& ec)
     {
+      ec = boost::system::error_code();
+      
       std::size_t bytes_transferred(0);
-      for(typename ConstBufferSequence::const_iterator i = buf.begin()
-         ; i != buf.end(); ++i)
+      for(typename ConstBufferSequence::const_iterator i = buf.begin(),
+          end (buf.end())
+         ; !ec && i != end; ++i)
       {
         std::size_t buf_len = boost::asio::buffer_size(*i);
         bytes_transferred += buf_len;
-        int ret( fputs(boost::asio::buffer_cast<const char*>(*i), stdout) );
-        if (ret == EOF)
-        {
-          return ::cgi::error::broken_pipe;
-        }
-        //else
-        //if (ret < 0)
+        //int ret(fputs(boost::asio::buffer_cast<const char*>(*i), stdout));
+        //if (ret == EOF)
         //{
-        //  return ::cgi::error::
-        //std::cout.write(boost::asio::buffer_cast<const char*>(*i), buf_len);
+        //  return ::BOOST_CGI_NAMESPACE::error::broken_pipe;
+        //}
+        //std::cerr<< "[buf] " 
+        // << std::string(boost::asio::buffer_cast<const char*>(*i), buf_len)
+        // << std::endl;
+        if (!std::fwrite(boost::asio::buffer_cast<const void *>(*i)
+                       , buf_len, 1, stdout))
+        {
+          if (std::feof(stdout))
+            ec = ::BOOST_CGI_NAMESPACE::error::eof;
+          else
+          if (std::ferror(stdout))
+            ec = ::BOOST_CGI_NAMESPACE::error::bad_write;
+          else
+            ec = ::BOOST_CGI_NAMESPACE::error::broken_pipe;
+        }
       }
       return bytes_transferred;
     }
@@ -107,22 +138,12 @@ namespace cgi {
     bool is_open_;
   };
 
-  namespace connection {
-
-    typedef basic_connection<tags::stdio> stdio;
-
-  } // namespace connection
-
-  // Deprecated
-  typedef basic_connection<tags::stdio> stdio_connection;
-
-  //  template<typename ProtocolService = detail::cgi_service>
-  //struct stdio_connection
-  //{
-  //  typedef basic_connection<tags::stdio, ProtocolService>    type;
-  //};
-
  } // namespace common
-} // namespace cgi
+
+  namespace connections {
+    typedef common::basic_connection<common::tags::stdio> stdio;
+  } // namespace connections
+
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_STDIO_CONNECTION_IMPL_HPP_INCLUDED__

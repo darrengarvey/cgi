@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>CGI Stencils (using Google cTemplate)</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+</head>
+<body>
+
+<fieldset>
+    <legend>Test 1 - Filename</legend>
+    {{filename}}<br />
+    {{path}}<br />
+    {{filename_check}}<br />
+    {{content_type}}<br />
+    {{content_disposition}}<br />
+    
+    <form method="post" enctype="multipart/form-data">
+      <input type="file" name="file" value="" />
+      <input type="hidden" name="upload" value="1" />
+      <input type="submit" name="submit" value="Upload" />
+    </form>
+</fieldset>
+
+</body>
+</html>

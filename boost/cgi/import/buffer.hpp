@@ -11,7 +11,7 @@
 
 #include <boost/asio/buffer.hpp>
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
   /// Import the Boost.Asio overloads.
@@ -21,6 +21,6 @@ namespace cgi {
 
   using common::buffer;
 
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_HPP_INCLUDED__

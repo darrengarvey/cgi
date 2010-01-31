@@ -9,9 +9,9 @@
 
 This section of the documentation is probably best read before the [link __tutorial__ tutorial]. In a nutshell, this is a quick and dirty run-through of how to get and install the library [-and configure your server].
 
-[include:building user_guide/building.qbk]
+[/include:building user_guide/building.qbk]
 
-[include:server_config user_guide/server_configuration.qbk]
+[/include:server_config user_guide/server_configuration.qbk]
 
 [endsect]
 

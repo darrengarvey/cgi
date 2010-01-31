@@ -11,14 +11,14 @@
 
 #include "boost/cgi/detail/url_decode.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace detail {
 
    /// Convert a char into a hexadecimal value
    BOOST_CGI_INLINE
    std::string char_to_hex(char const& ch)
    {
-     return std::string(); // **FIXME** 
+     return std::string(); // **FIXME**
    }
 
    /// Convert two characters into a single, hex-encoded character
@@ -40,7 +40,7 @@ namespace cgi {
    }
 
    /// Take two characters (a hex sequence) and return a char
-   // **DEPRECATED**
+   // **DEPRECATED** (use the above function)
    BOOST_CGI_INLINE
    char url_decode( const char& c1, const char& c2 )
    {
@@ -64,6 +64,9 @@ namespace cgi {
      typedef std::string string_type; // Ahem.
      string_type result;
 
+     if (str.length() == 0)
+    	 return str;
+
      for( string_type::const_iterator iter (str.begin()), end (str.end())
         ; iter != end; ++iter )
      {
@@ -83,7 +86,7 @@ namespace cgi {
            }
            else // we've got a properly encoded hex value.
            {
-             char ch = *++iter; // need this because order of function arg 
+             char ch = *++iter; // need this because order of function arg
                                 // evaluation is UB.
              result.append(1, hex_to_char(ch, *++iter));
            }
@@ -97,7 +100,7 @@ namespace cgi {
    }
 
  } // namespace detail
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #include "boost/cgi/detail/pop_options.hpp"
 

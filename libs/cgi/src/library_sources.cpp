@@ -8,8 +8,8 @@
  * eg.
  *    libs/cgi/build$ bjam --build-cgi               (builds the library)
  *
- *    libs/cgi/example$ bjam --build-cgi install     
- *        
+ *    libs/cgi/example$ bjam --build-cgi install
+ *
  *        (builds and installs all the examples using the compiled binary
  *         - which will be installed if necessary - see the docs for more)
  *
@@ -33,4 +33,3 @@
 //#include <boost/cgi/impl/response.ipp>
 #include <boost/cgi/impl/fcgi_request_service.ipp>
 #include <boost/cgi/detail/url_decode.ipp>
-

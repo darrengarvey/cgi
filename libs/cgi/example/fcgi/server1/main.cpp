@@ -20,6 +20,7 @@
 // This is very similar to the fcgi_echo example.
 //
 
+#include <iostream>
 #include "boost/cgi/fcgi.hpp"
 #include "./server.hpp"
 
@@ -53,25 +54,16 @@ int handle_request(request& req, boost::system::error_code& ec)
       << "Hello there, universe!<p />";
 
   // Use the function defined above to show some of the request data.
-  format_map(resp, req[env_data],    "Environment Variables");
-  format_map(resp, req[get_data],    "GET Variables");
-  format_map(resp, req[cookie_data], "Cookie Variables");
+  format_map(resp, req.env,    "Environment Variables");
+  format_map(resp, req.get,    "GET Variables");
+  format_map(resp, req.cookies, "Cookie Variables");
    // Response headers can be added at any time before send/flushing it:
   resp<< "<h3>Response Length</h3>" << resp.content_length()
       // response::content_length() returns the length of the *body*
       // of the response (ie. not including the headers).
       << content_length(resp);
 
-  // This funky macro finishes up:
-  return_(resp, req, 0);
-  // It is equivalent to the below, where the third argument is represented by
-  // `program_status`:
-  //
-  // resp.send(req.client());
-  // req.close(resp.status(), program_status);
-  // return program_status;
-  //
-  // Note: in this case `program_status == 0`.
+  return commit(req, resp);
 }
 
 ///////////////////////////////////////////////////////////

@@ -1,0 +1,70 @@
+#             Copyright (c) 2007 Darren Garvey
+#
+# Distributed under the Boost Software License, Version 1.0.
+#     (See accompanying file LICENSE_1_0.txt or copy 
+#        at http://www.boost.org/LICENSE_1_0.txt)
+
+import os ;
+
+if [ os.name ] = NT
+{
+  # Change this path to where the Google cTemplate library files are.
+  # You'll have to install these yourself.
+  lib ctemplate : : <file>c:/path/to/ctemplate/lib ;
+}
+else
+{
+  lib ctemplate ;
+}
+
+project boost/cgi/example/cgi/debug_server2 ;
+
+exe cgi_ctemplate_debug_server
+  :
+    ctemplate.cpp
+    TracebackServer.cpp
+    TracebackServer.hpp
+  :
+    <library>/boost/cgi/
+    <library>/boost/chrono/
+    <library>ctemplate
+  ;
+
+
+# Our install rule (builds binaries and copies them to <location>)
+install install-css
+ : debug_view.css
+ : <location>$(htdocs)/css/
+ ;
+
+install install-js
+ : debug_view.js
+ : <location>$(htdocs)/js/
+ ;
+
+install install-template
+ : debug_view.html
+   default_view.html
+ : <location>$(htdocs)/../templates/
+ ;
+
+install install-exe
+ : cgi_ctemplate_debug_server
+ : <location>$(cgi-bin)
+ ;
+
+explicit install-css ;
+explicit install-js ;
+explicit install-template ;
+explicit install-exe ;
+
+install install
+ :
+  install-css
+  install-js
+  install-template
+  install-exe
+ ;
+
+# Only install example if you use `bjam install' or equivalent
+explicit install ;

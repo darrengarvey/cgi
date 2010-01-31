@@ -15,7 +15,7 @@
 
 #include "boost/cgi/fwd/io_service_provider_fwd.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
   template<
@@ -25,7 +25,7 @@ namespace cgi {
   class basic_protocol_service;
 
  } // namespace common
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_BASIC_PROTOCOL_SERVICE_FWD_HPP_INCLUDED__
 

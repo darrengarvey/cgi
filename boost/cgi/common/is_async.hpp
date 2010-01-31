@@ -12,8 +12,9 @@
 #include <boost/mpl/bool.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/common/tags.hpp"
+#include "boost/cgi/config.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
    template<typename Protocol>
@@ -31,7 +32,7 @@ namespace cgi {
    };
 
  } // namespace common
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_COMMON_IS_ASYNC_HPP_INCLUDED__
 

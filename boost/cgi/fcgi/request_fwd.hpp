@@ -11,7 +11,7 @@
 
 #include "boost/cgi/basic_request_fwd.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
   namespace fcgi {
 
     typedef service service_t;
@@ -20,7 +20,7 @@ namespace cgi {
     typedef basic_request<fcgi_request_service, service_t> request;
 
   } // namespace fcgi
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_FCGI_REQUEST_FWD_HPP_INCLUDED__
 

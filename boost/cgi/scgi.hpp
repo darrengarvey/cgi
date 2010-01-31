@@ -29,11 +29,11 @@ namespace cgi {
 */
 
 /// Dump acgi stuff into the boost namespace
-namespace boost {
- namespace scgi {
+BOOST_CGI_NAMESPACE_BEGIN
+ namespace acgi {
    using namespace ::cgi::scgi;
    using namespace ::cgi::common;
  } // namespace acgi
-} // namespace boost
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_SCGI_HPP_INCLUDED__

@@ -13,13 +13,15 @@
 
 #include <boost/ref.hpp>
 #include <boost/bind.hpp>
-#include <boost/asio.hpp> // **FIXME**
+#include <boost/asio.hpp>
 #include <boost/thread.hpp>
+#include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/system/error_code.hpp>
 ///////////////////////////////////////////////////////////
+#include "boost/cgi/fcgi/error.hpp"
 #include "boost/cgi/fcgi/request.hpp"
 #include "boost/cgi/import/io_service.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
@@ -27,8 +29,8 @@
 #include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 
-namespace cgi {
-   
+BOOST_CGI_NAMESPACE_BEGIN
+
    namespace detail {
 
      /// Helper functions for async_accept operation.
@@ -54,7 +56,7 @@ namespace cgi {
        typename T::implementation_type::request_type& request;
        Handler handler;
      };
-  
+
    } // namespace detail
 
   namespace fcgi {
@@ -62,77 +64,74 @@ namespace cgi {
   /// The service_impl class for FCGI basic_request_acceptor<>s
    /**
     * Note: this is near enough to being generic. It will hopefully translate
-    *       directly to the fcgi_acceptor_service_impl. In other words you would
-    *       then have one acceptor_service_impl<>, so you'd use
+    *       directly to the fcgi_acceptor_service_impl. In other words you
+    *       would then have one acceptor_service_impl<>, so you'd use
     *       acceptor_service_impl<scgi> acceptor_service_impl_; // and
     *       acceptor_service_impl<fcgi> acceptor_service_impl_; // etc...
     *
-    * Note: If the protocol is an asynchronous protocol, which means it requires
-    * access to a boost::asio::io_service instance, then this class becomes a
-    * model of the Service concept (**LINK**) and must only use the constructor
-    * which takes a ProtocolService (**LINK**). If the protocol isn't async then
-    * the class can be used without a ProtocolService.
+    * Note: If the protocol is an asynchronous protocol, which means it
+    * requires access to a boost::asio::io_service instance, then this
+    * class becomes a model of the Service concept (**LINK**) and must
+    * only use the constructor which takes a ProtocolService (**LINK**).
+    * If the protocol isn't async then the class can be used without a
+    * ProtocolService.
     */
-   template<typename Protocol_ = ::cgi::common::fcgi_>
+   template<typename Protocol = common::tags::fcgi>
    class acceptor_service_impl
-     : public detail::service_base< ::cgi::fcgi::acceptor_service_impl<Protocol_> >
+     : public detail::service_base<
+         ::BOOST_CGI_NAMESPACE::fcgi::acceptor_service_impl<Protocol>
+       >
    {
    public:
+   
+     typedef acceptor_service_impl<Protocol>        self_type;
+     typedef Protocol                               protocol_type;
+     typedef detail::protocol_traits<Protocol>      traits;
+     typedef typename traits::protocol_service_type protocol_service_type;
+     typedef typename traits::native_protocol_type  native_protocol_type;
+     typedef typename traits::native_type           native_type;
+     typedef typename traits::request_type          request_type;
+     typedef typename traits::pointer               request_ptr;
+     typedef typename traits::acceptor_service_type acceptor_service_type;
+     typedef typename traits::acceptor_impl_type    acceptor_impl_type;
+     typedef typename traits::port_number_type      port_number_type;
+     typedef typename traits::endpoint_type         endpoint_type;
+     typedef std::pair<
+       typename std::set<request_ptr>::iterator, bool> request_iter;
+     typedef boost::function<int (request_type&)>   accept_handler_type;
 
-     /// The unique service identifier
-     //static boost::asio::io_service::id id;
- 
      struct implementation_type
      {
-       typedef Protocol_                             protocol_type;
-       typedef common::basic_protocol_service<
-                 protocol_type
-               >                                     protocol_service_type;
-       typedef boost::asio::ip::tcp                  native_protocol_type;
-       typedef fcgi::request                         request_type;
+       typedef Protocol                               protocol_type;
+       typedef detail::protocol_traits<Protocol>      traits;
+       typedef typename traits::protocol_service_type protocol_service_type;
+       typedef typename traits::native_protocol_type  native_protocol_type;
+       typedef typename traits::request_type          request_type;
        typedef boost::asio::socket_acceptor_service<
                  native_protocol_type
                >                                     acceptor_service_type;
-       typedef unsigned short                        port_number_type;
-       typedef boost::asio::ip::tcp::endpoint        endpoint_type;
-       //typedef typename
-       //  acceptor_service_type::native_type          native_type;
- 
-       acceptor_service_type::implementation_type    acceptor_;
+       typedef typename
+         acceptor_service_type::implementation_type  acceptor_impl_type;
+       typedef typename traits::port_number_type     port_number_type;
+       typedef typename traits::endpoint_type        endpoint_type;
+
+       acceptor_impl_type                            acceptor_;
        boost::mutex                                  mutex_;
        std::queue<boost::shared_ptr<request_type> >  waiting_requests_;
+       std::set<request_ptr>                         running_requests_;
        protocol_service_type*                        service_;
        port_number_type                              port_num_;
        endpoint_type                                 endpoint_;
-     }; 
+       
+     };
 
-     typedef acceptor_service_impl<Protocol_>            type;
-     typedef typename
-       type::implementation_type::protocol_type
-                                                         protocol_type;
-     typedef typename
-       type::implementation_type::protocol_service_type
-                                                         protocol_service_type;
-     typedef typename
-       type::implementation_type::acceptor_service_type
-                                                         acceptor_service_type;
-     typedef typename
-       type::implementation_type::native_protocol_type
-                                                         native_protocol_type;
-     typedef typename
-       acceptor_service_type::native_type                native_type;
-
-     typedef typename 
-       type::implementation_type::endpoint_type          endpoint_type;
- 
-
-     explicit acceptor_service_impl(::cgi::common::io_service& ios)
-       : detail::service_base< ::cgi::fcgi::acceptor_service_impl<Protocol_> >(ios)
+     explicit acceptor_service_impl(::BOOST_CGI_NAMESPACE::common::io_service& ios)
+       : detail::service_base< ::BOOST_CGI_NAMESPACE::fcgi::acceptor_service_impl<Protocol> >(ios)
        , acceptor_service_(boost::asio::use_service<acceptor_service_type>(ios))
-       //, endpoint(boost::asio::ip::tcp::v4())
+       , strand_(ios)
      {
      }
- 
+
      protocol_service_type&
        service(implementation_type const& impl) const
      {
@@ -143,25 +142,10 @@ namespace cgi {
      boost::system::error_code
        default_init(implementation_type& impl, boost::system::error_code& ec)
      {
+       // I've never got the default initialisation working on Windows...
 #if ! defined(BOOST_WINDOWS)
-       //assign(impl.acceptor_, , 0, ec);
        return acceptor_service_.assign(impl.acceptor_, boost::asio::ip::tcp::v4()
                                       , 0, ec);
- #else
-//#      error "Windows isn't supported at the moment"
-       HANDLE hListen = INVALID_HANDLE_VALUE;
-       boost::asio::detail::socket_type sock;
-       struct sockaddr sa;
-       int sa_len = sizeof(sa);
-#if NO_WSAACCEPT
-       sock = accept((boost::asio::detail::socket_type)hListen, &sa, &sa_len);
-       if (sock == INVALID_SOCKET)
-         return cgi::error::invalid_socket;
-#else
-       sock = WSAAccept((unsigned int)hListen, &sa, &sa_len, NULL, (DWORD)NULL);
-       if (sock == INVALID_SOCKET)
-         return ::cgi::error::invalid_socket;
-#endif
 #endif
        return ec;
      }
@@ -172,7 +156,7 @@ namespace cgi {
        impl.protocol_service_ = &ps;
      }
 
-     protocol_service_type& 
+     protocol_service_type&
        get_protocol_service(implementation_type& impl)
      {
        BOOST_ASSERT(impl.service_ != NULL);
@@ -182,27 +166,25 @@ namespace cgi {
      void construct(implementation_type& impl)
      {
        acceptor_service_.construct(impl.acceptor_);
-       //impl.acceptor_ptr().reset(impl::acceptor_type(this->io_service()));
      }
- 
+
      void destroy(implementation_type& impl)
      {
        // close/reject all the waiting requests
-       /***/
        acceptor_service_.destroy(impl.acceptor_);
      }
- 
+
      void shutdown_service()
      {
        acceptor_service_.shutdown_service();
      }
- 
+
      /// Check if the given implementation is open.
      bool is_open(implementation_type& impl)
      {
        return acceptor_service_.is_open(impl.acceptor_);
      }
- 
+
      /// Open a new *socket* acceptor implementation.
      boost::system::error_code
        open(implementation_type& impl, const native_protocol_type& protocol
@@ -210,7 +192,7 @@ namespace cgi {
      {
        return acceptor_service_.open(impl.acceptor_, protocol, ec);
      }
- 
+
      template<typename Endpoint>
      boost::system::error_code
        bind(implementation_type& impl, const Endpoint& endpoint
@@ -220,7 +202,7 @@ namespace cgi {
            boost::asio::socket_base::reuse_address(true), ec);
        return acceptor_service_.bind(impl.acceptor_, endpoint, ec);
      }
- 
+
      /// Assign an existing native acceptor to a *socket* acceptor.
      boost::system::error_code
        assign(implementation_type& impl, const native_protocol_type& protocol
@@ -229,41 +211,140 @@ namespace cgi {
      {
        return acceptor_service_.assign(impl.acceptor_, protocol
                                       , native_acceptor, ec);
-     }    
- 
+     }
+
      boost::system::error_code
        listen(implementation_type& impl, int backlog, boost::system::error_code& ec)
      {
        return acceptor_service_.listen(impl.acceptor_, backlog, ec);
      }
- 
+     
+     void do_accept(implementation_type& impl
+             , accept_handler_type handler)
+     {
+       request_ptr new_request;
+       
+       if (impl.waiting_requests_.empty())
+       {
+         // Accepting on new request.
+         new_request = request_type::create(*impl.service_);
+       }
+       else
+       {
+         // Accepting on existing request.
+         new_request = impl.waiting_requests_.front();
+         impl.waiting_requests_.pop();
+       }
+       
+       impl.running_requests_.insert(new_request);
+       
+       // The waiting request may be open if it is a multiplexed request.
+       // If we can reuse this request's connection, return.
+       if (!new_request->is_open() && !new_request->client().keep_connection())
+       {
+         // ...otherwise accept a new connection.
+         //std::cerr<< "Accepting a new connection." << std::endl;
+         acceptor_service_.async_accept(impl.acceptor_,
+             new_request->client().connection()->next_layer(), 0,
+             strand_.wrap(
+               boost::bind(&self_type::handle_accept
+                , this, boost::ref(impl), new_request, handler, _1
+               )
+             )
+           );
+       }
+       else
+       {
+         //std::cerr<< "Reusing existing connection." << std::endl;
+         impl.service_->post(
+           strand_.wrap(
+             boost::bind(&self_type::handle_accept
+                 , this, boost::ref(impl), new_request, handler, boost::system::error_code()
+               )
+             )
+           );
+       }
+     }
+
+     void handle_accept(
+         implementation_type& impl, request_ptr new_request,
+         accept_handler_type handler, const boost::system::error_code& ec
+      )
+     {
+       new_request->status(common::accepted);
+       int status = handler(*new_request);
+       impl.running_requests_.erase(impl.running_requests_.find(new_request));
+       if (new_request->is_open()) {
+         new_request->close(http::ok, status);
+       }
+       new_request->clear();
+       impl.waiting_requests_.push(new_request);
+     }
+
+     /// Accepts a request and runs the passed handler.
+     void async_accept(implementation_type& impl
+             , accept_handler_type handler)
+     {
+       //impl.service_->post(
+           strand_.post(
+             boost::bind(&self_type::do_accept,
+                 this, boost::ref(impl), handler)
+             );
+         //);
+     }
+     
+     int accept(implementation_type& impl, accept_handler_type handler
+             , endpoint_type* endpoint, boost::system::error_code& ec)
+     {
+       typedef std::pair<std::set<request_type::pointer>::iterator, bool> pair_t;
+       
+       request_ptr new_request;
+       pair_t insert_result;
+       
+       if (impl.waiting_requests_.empty())
+       {
+         // Accepting on new request.
+         new_request = request_type::create(*impl.service_);
+       }
+       else
+       {
+         // Accepting on existing request.
+         new_request = impl.waiting_requests_.front();
+         impl.waiting_requests_.pop();
+       }
+       
+       insert_result = impl.running_requests_.insert(new_request);
+       
+       // The waiting request may be open if it is a multiplexed request.
+       if (!new_request->is_open())
+       {
+         // If we can reuse this request's connection, return.
+         if (!new_request->client().keep_connection())
+         {
+           // ...otherwise accept a new connection.
+           ec = acceptor_service_.accept(impl.acceptor_,
+                    new_request->client().connection()->next_layer(), endpoint, ec);
+         }
+       }
+       new_request->status(common::accepted);
+       int status = handler(*new_request);
+       
+       impl.running_requests_.erase(insert_result.first);
+       if (new_request->is_open()) {
+         new_request->close(http::ok, status);
+       }
+       new_request->clear();
+       impl.waiting_requests_.push(new_request);
+       
+       return status;
+     }
+
      /// Accepts one request.
      template<typename CommonGatewayRequest>
      boost::system::error_code
        accept(implementation_type& impl, CommonGatewayRequest& request
              , endpoint_type* endpoint, boost::system::error_code& ec)
      {
-       /* THIS BIT IS BROKEN:
-        *-- The noncopyable semantics of a basic_request<> don't allow the
-            assignment. There are a couple of ways around this; the one that
-            seems sensible is to keep the basic_request<>s noncopyable, but
-            allow the actual data be copied. At the moment the actual data is
-            held in a vector<string> headers container and a cgi::streambuf.
-            These two bits should really be factored out into a message type.
-            IOW, the message type will be copyable (but should probably have
-            unique-ownership semantics).
-        --*
-       {
-         boost::mutex::scoped_lock lk(impl.mutex_);
-         if (!impl.waiting_requests_.empty())
-         {
-           request = *(impl.waiting_requests_.front());
-           impl.waiting_requests_.pop();
-           return ec;
-         }
-       }
-       */
-
        BOOST_ASSERT
        ( ! request.is_open()
         && "Error: Calling accept on open request (close it first?)."
@@ -275,26 +356,27 @@ namespace cgi {
        {
          request.clear();
        }
-       //request.clear(); // **FIXME** (this should be cleverer)
 
        // If we can reuse this request's connection, return.
        if (request.client().keep_connection())
          return ec;
 
        // ...otherwise accept a new connection.
-       return acceptor_service_.accept(impl.acceptor_,
+       ec = acceptor_service_.accept(impl.acceptor_,
                 request.client().connection()->next_layer(), endpoint, ec);
+       if (!ec)
+         request.status(common::accepted);
+       return ec;
      }
- 
+
      /// Asynchronously accepts one request.
-     //template<typename CommonGatewayRequest, typename Handler>
-     //void async_accept(implementation_type& impl, CommonGatewayRequest& request
      template<typename Handler>
-     void async_accept(implementation_type& impl, typename implementation_type::request_type& request
+     void async_accept(implementation_type& impl
+					  , typename implementation_type::request_type& request
                       , Handler handler)
      {
        this->io_service().post(
-         detail::accept_handler<type, Handler>(*this, impl, request, handler)
+         detail::accept_handler<self_type, Handler>(*this, impl, request, handler)
        );
      }
 
@@ -321,19 +403,24 @@ namespace cgi {
      is_cgi(implementation_type& impl)
      {
        boost::system::error_code ec;
-#if ! defined(BOOST_WINDOWS)
-       socklen_t len
-         = static_cast<socklen_t>(local_endpoint(impl,ec).capacity());
-       int ret = getpeername(native(impl), local_endpoint(impl,ec).data(), &len);
-       return ( ret != 0 && errno == ENOTCONN ) ? false : true;
+       socklen_t len (
+         static_cast<socklen_t>(local_endpoint(impl,ec).capacity()) );
+       int check (
+         getpeername(native(impl), local_endpoint(impl,ec).data(), &len) );
+         
+       /// The FastCGI check works differently on Windows and UNIX.
+#if defined(BOOST_WINDOWS)
+       return ( check == SOCKET_ERROR &&
+                WSAGetLastError() == WSAENOTCONN ) ? false : true;
 #else
-       return false;
+       return ( check == -1 && 
+                errno == ENOTCONN ) ? false : true;
 #endif
      }
- 
+
    public:
      template<typename CommonGatewayRequest, typename Handler>
-     void check_for_waiting_request(implementation_type& impl
+     int check_for_waiting_request(implementation_type& impl
                                    , CommonGatewayRequest& request
                                    , Handler handler)
      {
@@ -353,19 +440,20 @@ namespace cgi {
          return handler(boost::system::error_code());
 
        // ...otherwise accept a new connection (asynchronously).
-       return acceptor_service_.async_accept(impl.acceptor_,
+       acceptor_service_.async_accept(impl.acceptor_,
          request.client().connection()->next_layer(), 0, handler);
+       return 0;
      }
- 
+
    public:
      /// The underlying socket acceptor service.
-     acceptor_service_type& acceptor_service_;
+     acceptor_service_type&          acceptor_service_;
+     boost::asio::io_service::strand strand_;
    };
- 
+
  } // namespace fcgi
-} // namespace cgi
- 
+BOOST_CGI_NAMESPACE_END
+
 #include "boost/cgi/detail/pop_options.hpp"
 
 #endif // CGI_FCGI_ACCEPTOR_SERVICE_IMPL_HPP_INCLUDED__
-

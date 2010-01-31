@@ -6,14 +6,13 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 //
 ////////////////////////////////////////////////////////////////
-#ifndef CGI_HPP_INCLUDED__
-#define CGI_HPP_INCLUDED__
+#ifndef BOOST_CGI_HPP_INCLUDED__
+#define BOOST_CGI_HPP_INCLUDED__
 
 // #include all headers
 
 #include "boost/cgi/cgi.hpp"
-#include "boost/cgi/acgi.hpp"
 #include "boost/cgi/fcgi.hpp"
 //#include "boost/cgi/scgi.hpp"
 
-#endif // CGI_HPP_INCLUDED__
+#endif // BOOST_CGI_HPP_INCLUDED__

@@ -11,13 +11,13 @@
 
 #include <boost/asio/basic_io_object.hpp>
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
    using boost::asio::basic_io_object;
 
  } // namespace common
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_IMPORT_BASIC_IO_OBJECT_HPP_INCLUDED__
 

@@ -1,0 +1,11 @@
+
+[section Stencil]
+
+[import main.cpp]
+
+[cgi_stencil]
+
+See the [@../../example/cgi/stencil/main.cpp full source listing].
+
+[endsect][/ stencil]
+

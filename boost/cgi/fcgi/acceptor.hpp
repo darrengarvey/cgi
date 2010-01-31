@@ -12,17 +12,21 @@
 #include "boost/cgi/basic_request_acceptor.hpp"
 #include "boost/cgi/fcgi/request_acceptor_service.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace fcgi {
 
    /// Typedef for common usage (FCGI)
    typedef
-     ::cgi::common::basic_request_acceptor<
-       fcgi_request_acceptor_service<>
-     >
+     ::BOOST_CGI_NAMESPACE::common::basic_request_acceptor<
+	       fcgi_request_acceptor_service<>
+       >
    acceptor;
 
  } // namespace fcgi
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
+
+namespace boost { namespace fcgi {
+  using ::BOOST_CGI_NAMESPACE::fcgi::acceptor;
+} }
 
 #endif // CGI_FCGI_ACCEPTOR_HPP_INCLUDED__

@@ -13,14 +13,11 @@
 #pragma once
 #endif
 
-namespace cgi {
+#include "boost/cgi/config.hpp"
+
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
-   /// SCGI (note, this must be removed)
-   struct scgi_{};
-   /// FastCGI
-   struct fcgi_{};
- 
   namespace tags {
 
     // the null tag type
@@ -28,8 +25,6 @@ namespace cgi {
 
     // protocol types
     struct cgi {};
-    struct async_cgi {}; // call it acgi?
-    struct acgi {};
     struct fcgi {};
     struct scgi {};
 
@@ -40,6 +35,7 @@ namespace cgi {
 
     // Connection types
     struct stdio {};
+    //struct stderr {};
     struct async_stdio {};
     struct tcp_socket {};
     // A shareable tcp_socket (ie. one that can be locked)
@@ -47,6 +43,6 @@ namespace cgi {
 
   } // namespace tags
  } // namespace common
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_TAGS_HPP_INCLUDED__

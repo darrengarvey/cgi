@@ -5,7 +5,7 @@
 #define BOOST_TEST_MODULE name_test_suite
 #include <boost/test/unit_test.hpp>
 
-using cgi::common::name;
+using boost::cgi::common::name;
 
 BOOST_AUTO_TEST_CASE( case_insensitive_cmp )
 {

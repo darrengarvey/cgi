@@ -23,19 +23,20 @@
 #include "boost/cgi/import/streambuf.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
 #include "boost/cgi/fwd/basic_request_fwd.hpp"
+#include "boost/cgi/config.hpp"
 
-
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
   /// The response class: a helper for responding to requests.
-  template<typename T>
+  template<typename CharT>
   class basic_response
   {
   public:
-    typedef T                              char_type;
-    typedef typename std::basic_string<T>  string_type;
-    typedef typename std::basic_ostream<T> ostream_type;
+    typedef basic_response<CharT>              self_type;
+    typedef CharT                              char_type;
+    typedef typename std::basic_string<CharT>  string_type;
+    typedef typename std::basic_ostream<CharT> ostream_type;
 
     basic_response(common::http::status_code sc = common::http::ok);
 
@@ -44,13 +45,13 @@ namespace cgi {
      * Takes the buffer and uses it internally, does nothing with it on
      * destruction.
      */
-    basic_response(::cgi::common::streambuf* buf,
+    basic_response(::BOOST_CGI_NAMESPACE::common::streambuf* buf,
         common::http::status_code sc = common::http::ok);
 
     ~basic_response();
 
     /// Clear the response buffer.
-    void clear();
+    void clear(bool clear_headers = true);
 
     /// Return the response to the 'just constructed' state.
     void reset();
@@ -122,28 +123,59 @@ namespace cgi {
 
     /// Set the status code associated with the response.
     basic_response<char_type>&
-      set_status(const http::status_code& num);
+      status(const http::status_code& num);
 
     /// Get the status code associated with the response.
-    http::status_code& status();
+    http::status_code status() const;
 
     /// Allow more headers to be added (WARNING: avoid using this).
     void unterminate_headers();
 
-    /// Get the length of the body of the response
+    /// Get the length of the body of the response (ie. not including the headers).
     std::size_t content_length();
 
     /// Add a header after appending the CRLF sequence.
     basic_response<char_type>&
-      set_header(const string_type& value);
+      set(basic_header<char_type> const& hdr)
+    {
+      if (hdr.content.empty())
+        end_headers();
+      else
+        set_header(hdr.content);
+      return *this;
+    }
 
+    basic_response<char_type>&
+      set(const basic_cookie<char_type>& ck)
+    {
+      set_header("Set-Cookie", ck.to_string());
+      return *this;
+    }
+
+    basic_response<char_type>&
+      set_header(const string_type& value);
+      
     /// Format and add a header given name and value, appending CRLF.
     basic_response<char_type>&
       set_header(string_type const& name, string_type const& value);
-    
+
+    /// Get the contents of the response as a string.
+    /**
+     * This copies the contents of the response into a string.
+     * Headers aren't included in the dump unless `include_header` is true.
+     */
+    string_type str(bool include_header = false) const;
+
+    string_type header_value(string_type const& name);
+
     void clear_headers();
 
     void reset_headers();
+    
+    /// Get the charset.
+    string_type& charset() const { return charset_; }
+    /// Set the charset.
+    void charset(string_type const& cs) { charset_ = cs; }
 
     bool headers_terminated() const;
 
@@ -152,10 +184,61 @@ namespace cgi {
 
     /// Get the ostream containing the response body.
     ostream_type& ostream();
-  protected:
-    // Vector of all the headers, each followed by a CRLF
-    std::vector<string_type> headers_;
 
+    /// Get the headers
+    std::vector<string_type>& headers();
+
+    template<typename T>
+    self_type& operator<<(T t)
+    {
+      ostream_<< t;
+      return *this;
+    }
+
+    self_type& operator<< (charset_header<char_type> const& hdr)
+    {
+      charset(hdr.content);
+      return *this;
+    }
+ 
+     self_type& operator<< (basic_header<char_type> const& hdr)
+    {
+      return set(hdr);
+    }
+ 
+    self_type& operator<< (basic_cookie<char_type> const& ck)
+    {
+      return set(ck);
+    }
+ 
+    self_type& operator<< (http::status_code stat)
+    {
+      status(stat);
+      return *this;
+    }
+
+    self_type& operator<< (self_type& other)
+    {
+      if (!headers_terminated())
+      {
+        typedef std::vector<std::string>::const_iterator iter_t;
+        for(iter_t iter (other.headers().begin()), end (other.headers().end());
+            iter != end;
+            ++iter
+          )
+        {
+          if (iter->substr(0,13) != "Content-type:") // Don't overwrite the content-type.
+            headers_.push_back(*iter);
+        }
+      }
+      ostream_<< other.ostream().rdbuf();
+      return *this;
+    }
+ 
+  protected:
+   // Vector of all the headers, each followed by a CRLF
+    std::vector<string_type> headers_;
+    
     // The buffer is a shared_ptr, so you can keep it cached elsewhere.
     boost::shared_ptr<common::streambuf> buffer_;
 
@@ -163,10 +246,12 @@ namespace cgi {
 
     http::status_code http_status_;
 
-    // True if no more headers can be appended. 
+    // True if no more headers can be appended.
     bool headers_terminated_;
 
-  private:
+    string_type charset_;
+
+ private:
     // Send the response headers and mark that they've been sent.
     template<typename ConstBufferSequence>
     void prepare_headers(ConstBufferSequence& headers);
@@ -174,22 +259,20 @@ namespace cgi {
 
    /// Typedefs for typical usage.
    typedef basic_response<char>    response;
-   typedef basic_response<wchar_t> wresponse; // **FIXME** (untested)
+   typedef basic_response<wchar_t> wresponse; // **TODO** (untested)
 
  } // namespace common
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
+
+
 
   /// Generic ostream template
+  /*
   template<typename CharT, typename T>
-  cgi::common::basic_response<CharT>&
-    operator<< (cgi::common::basic_response<CharT>& resp, const T& t);
-
-  template<typename CharT>
-  cgi::common::basic_response<CharT>&
-    operator<< (cgi::common::basic_response<CharT>& resp
-               , cgi::common::basic_header<CharT> const& hdr);
-
-  /// You can stream a cgi::cookie into a response.
+  BOOST_CGI_NAMESPACE::common::basic_response<CharT>&
+    operator<< (BOOST_CGI_NAMESPACE::common::basic_response<CharT>& resp, T t);
+  */
+  /// You can stream a BOOST_CGI_NAMESPACE::cookie into a response.
   /**
    * This is just a shorthand way of setting a header that will set a
    * client-side cookie.
@@ -200,20 +283,17 @@ namespace cgi {
    * http://tinyurl.com/33znkj), but this is outside the scope of this
    * library.
    */
-  template<typename charT, typename T>
-  cgi::common::basic_response<charT>& 
-    operator<< (cgi::common::basic_response<charT>&
-               , cgi::common::basic_cookie<T>&);
-
-  template<typename charT, typename T>
-  cgi::common::basic_response<charT>&
-    operator<< (cgi::common::basic_response<charT>&
-               , cgi::common::http::status_code);
-
+              
+  /*
+   template<typename charT>
+  BOOST_CGI_NAMESPACE::common::basic_response<charT>&
+    operator<< (BOOST_CGI_NAMESPACE::common::basic_response<charT>&
+               , BOOST_CGI_NAMESPACE::common::basic_cookie<charT>);
+  */             
 #include "boost/cgi/detail/pop_options.hpp"
 
-//#if !defined(BOOST_CGI_BUILD_LIB)
+#if !defined(BOOST_CGI_BUILD_LIB)
 #  include "boost/cgi/impl/response.ipp"
-//#endif
+#endif
 
 #endif // CGI_RESPONSE_HPP_INCLUDED__

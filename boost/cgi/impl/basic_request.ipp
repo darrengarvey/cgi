@@ -38,8 +38,10 @@
 #include "boost/cgi/import/basic_io_object.hpp"
 #include "boost/cgi/detail/basic_sync_io_object.hpp"
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
+#include "boost/cgi/config.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
+
  namespace common {
 
   /// The basic_request class, primary entry point to the library
@@ -58,61 +60,10 @@ namespace cgi {
    * protected request object).
   **/
 
-    // Throws
-  template<typename RS, typename PS, typename A>
-  basic_request<RS,PS,A>::basic_request
-  (
-      bool load_now = true, bool parse_post = true
-  )
-      : detail::basic_sync_io_object<service_type>()
-  {
-    if (load_now) load(parse_post);
-  }
-
-		// Won't throw
-  template<typename RS, typename PS, typename A>
-  basic_request<RS,PS,A>::basic_request
-  (
-      boost::system::error_code& ec
-    , const bool load_now = true
-    , const bool parse_post = true
-  )
-      : detail::basic_sync_io_object<service_type>()
-  {
-    if (load_now) load(ec, parse_post);
-  }
-
-		// Throws
-  template<typename RS, typename PS, typename A>
-  basic_request<RS,PS,A>::basic_request
-  (
-      protocol_service_type& s, const bool load_now = false
-    , const bool parse_post = false
-  )
-      : basic_io_object<service_type>(s.io_service())
-  {
-    set_protocol_service(s);
-    if (load_now) load(parse_post);
-  }
-
-		// Won't throw
-  template<typename RS, typename PS, typename A>
-  basic_request<RS,PS,A>::basic_request
-  (
-      protocol_service_type& s
-    , boost::system::error_code& ec
-    , const bool load_now = false, const bool parse_post = false
-  )
-      : basic_io_object<service_type>(s.io_service())
-  {
-    set_protocol_service(s);
-    if(load_now) load(ec, parse_post);//this->service.load(this->implementation, false, ec);
-  }
-
     /// Make a new mutiplexed request from an existing connection.
     // Throws.
-  template<typename RS, typename PS, typename A>
-  basic_request<RS,PS,A>::    basic_request(implementation_type& impl)
+  template<typename RequestService, typename ProtocolService, typename Acceptor>
+  basic_request<RequestService,ProtocolService,Acceptor>::    basic_request(implementation_type& impl)
       : basic_io_object<service_type>(impl.service_->io_service())
     {
       set_protocol_service(*impl.service_);
@@ -124,8 +75,8 @@ namespace cgi {
 
     /// Make a new mutiplexed request from an existing connection.
     // Won't throw.
-  template<typename RS, typename PS, typename A>
-  basic_request<RS,PS,A>::    basic_request(implementation_type& impl, boost::system::error_code& ec)
+  template<typename RequestService, typename ProtocolService, typename Acceptor>
+  basic_request<RequestService,ProtocolService,Acceptor>::    basic_request(implementation_type& impl, boost::system::error_code& ec)
       : basic_io_object<service_type>(impl.service_->io_service())
     {
       set_protocol_service(*impl.service_);
@@ -139,21 +90,21 @@ namespace cgi {
       //  close(http::internal_server_error, 0);
     }
 
-  template<typename RS, typename PS, typename A>
-  basic_request<RS,PS,A>::    static pointer create(protocol_service_type& ps)
+  template<typename RequestService, typename ProtocolService, typename Acceptor>
+  basic_request<RequestService,ProtocolService,Acceptor>::    static pointer create(protocol_service_type& ps)
     {
       return pointer(new type(ps));
     }
 
-  template<typename RS, typename PS, typename A>
-  basic_request<RS,PS,A>::    void set_protocol_service(protocol_service_type& ps)
+  template<typename RequestService, typename ProtocolService, typename Acceptor>
+  basic_request<RequestService,ProtocolService,Acceptor>::    void set_protocol_service(protocol_service_type& ps)
     {
       this->service.set_service(this->implementation, ps);
     }
 
     /// Return `true` if the request is still open (ie. not aborted or closed)
-  template<typename RS, typename PS, typename A>
-  basic_request<RS,PS,A>::    bool is_open()
+  template<typename RequestService, typename ProtocolService, typename Acceptor>
+  basic_request<RequestService,ProtocolService,Acceptor>::    bool is_open()
     {
       return this->service.is_open(this->implementation);
     }
@@ -308,7 +259,7 @@ namespace cgi {
      * Set the output sink as `stdout_`, `stderr_`, or `stdout_ | stderr_`
      */
     /*
-    void set_output(cgi::sink dest, boost::system::error_code& ec)
+    void set_output(BOOST_CGI_NAMESPACE::sink dest, boost::system::error_code& ec)
     {
       this->service(this->implementation, dest, ec);
     }
@@ -489,7 +440,8 @@ namespace cgi {
   };
 
  } // namespace common
-} // namespace cgi
+ 
+BOOST_CGI_NAMESPACE_END
 
 #include "boost/cgi/detail/pop_options.hpp"
 

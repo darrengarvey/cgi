@@ -3,7 +3,15 @@
 
 [include echo/doc.qbk]
 
+[include async_echo/doc.qbk]
+
 [include amortization/doc.qbk]
+
+[include stencil/doc.qbk]
+
+[include file_browser/doc.qbk]
+
+[include upload/doc.qbk]
 
 [section Servers]
 

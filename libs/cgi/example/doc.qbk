@@ -23,8 +23,6 @@ The example(s) will be installed into the relevant directory.
 
 [include cgi/doc.qbk]
 
-[include acgi/doc.qbk]
-
 [include fcgi/doc.qbk]
 
 [include xcgi/doc.qbk]

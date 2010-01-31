@@ -15,21 +15,22 @@
 #include "boost/cgi/import/io_service.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
 #include "boost/cgi/detail/service_base.hpp"
+#include "boost/cgi/common/tags.hpp"
 #include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/fcgi/acceptor_service_impl.hpp"
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
 
   /// The service class for FCGI basic_request_acceptor<>s
   /**
-   * Note: If the protocol is an asynchronous protocol, which means it requires
-   * access to a boost::asio::io_service instance, then this class becomes a
-   * model of the Service concept (**LINK**) and must only use the constructor
-   * which takes a ProtocolService (**LINK**). If the protocol isn't async then
-   * the class can be used without a ProtocolService.
+   * Note: If the protocol is an asynchronous protocol, which means it 
+   * requires access to a boost::asio::io_service instance, then this class
+   * becomes a model of the Service concept (**LINK**) and must only use the
+   * constructor which takes a ProtocolService (**LINK**). If the protocol
+   * isn't async then the class can be used without a ProtocolService.
    */
-  template<typename Protocol_ = common::fcgi_>
+  template<typename Protocol_ = common::tags::fcgi>
   class fcgi_request_acceptor_service
     : public detail::service_base<fcgi_request_acceptor_service<Protocol_> >
   {
@@ -38,11 +39,12 @@ namespace cgi {
 
     typedef fcgi::acceptor_service_impl<>               service_impl_type;
     typedef service_impl_type::implementation_type      implementation_type;
-    typedef
-      typename implementation_type::protocol_type       protocol_type;
+    typedef service_impl_type::native_type              native_type;
+    typedef service_impl_type::protocol_service_type    protocol_service_type;
+    typedef service_impl_type::accept_handler_type      accept_handler_type;
+    typedef implementation_type::protocol_type          protocol_type;
     typedef implementation_type::endpoint_type          endpoint_type;
-    typedef typename service_impl_type::native_type     native_type;
-    //typedef basic_protocol_service<protocol_type>       protocol_service_type;
+    typedef implementation_type::acceptor_service_type  acceptor_service_type;
 
     /// The unique service identifier
     //static boost::asio::io_service::id id;
@@ -120,13 +122,17 @@ namespace cgi {
       return service_impl_.listen(impl, backlog, ec);
     }
 
-//    template<typename CommonGatewayRequest>
-//    boost::system::error_code
-//      accept(implementation_type& impl, CommonGatewayRequest& request
-//            , boost::system::error_code& ec)
-//    {
-//      return service_impl_.accept(impl, request, NULL, ec);
-//    }
+    int accept(implementation_type& impl, accept_handler_type handler
+            , endpoint_type * ep, boost::system::error_code& ec)
+    {
+      return service_impl_.accept(impl, handler, ep, ec);
+    }
+
+    void async_accept(implementation_type& impl
+            , accept_handler_type handler)
+    {
+      return service_impl_.async_accept(impl, handler);
+    }
 
     template<typename CommonGatewayRequest>
     boost::system::error_code
@@ -178,7 +184,7 @@ namespace cgi {
     service_impl_type service_impl_;
   };
 
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #include "boost/cgi/detail/pop_options.hpp"
 

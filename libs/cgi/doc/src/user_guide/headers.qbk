@@ -1,5 +1,5 @@
 [/
- / Copyright (c) 2007 Darren Garvey
+ / Copyright (c) 2007,2009 Darren Garvey
  /
  / Distributed under the Boost Software License, Version 1.0. (See accompanying
  / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,13 +13,9 @@ Depending on what protocol you plan on using, you should include one of the foll
 ``
 #include <boost/cgi.hpp>      // include header files for any protocol
 
-#include <boost/cgi/cgi.hpp>  // include all headers required for (sync) CGI usage
-
-#include <boost/cgi/acgi.hpp> // include all headers required for aCGI usage
+#include <boost/cgi/cgi.hpp>  // include all headers required for CGI usage
 
 #include <boost/cgi/fcgi.hpp> // include all headers required for FastCGI usage
-
-#include <boost/cgi/scgi.hpp> // include all headers required for SCGI usage
 ``
 
 [endsect] [/ headers]

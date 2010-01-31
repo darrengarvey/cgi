@@ -52,7 +52,7 @@ public:
 
 BOOST_AUTO_TEST_CASE( response_test )
 {
-  using namespace cgi::common;
+  using namespace boost::cgi::common;
 
   dummy_request req;
   string s ("Hello, world.");

@@ -2,8 +2,8 @@
 
 int main()
 {
-  cgi::common::io_service ios;
-  cgi::common::async_stdio_connection conn(ios);
+  boost::cgi::common::io_service ios;
+  boost::cgi::connections::async_stdio conn(ios);
 
   return 0;
 }

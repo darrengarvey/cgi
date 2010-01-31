@@ -13,7 +13,7 @@
 
 #include <string>
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace detail {
 
    /// Convert a char into a hexadecimal value
@@ -30,7 +30,7 @@ namespace cgi {
    BOOST_CGI_INLINE std::string url_decode( const std::string& str );
 
  } // namespace detail
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #if !defined( BOOST_CGI_BUILD_LIB )
 #    include "boost/cgi/detail/url_decode.ipp"

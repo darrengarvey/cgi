@@ -1,7 +1,9 @@
 
 [section Tutorial]
 
-[include hello_world.qbk]
+**FIXME** - If this doesn't get fixed, please remind me!
+
+[/include hello_world.qbk]
 
 [section:what_next The next step]
 

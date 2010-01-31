@@ -3,8 +3,8 @@
 
 int main()
 {
-  cgi::scgi::service s;
-  cgi::scgi::acceptor a(s);
+  boost::scgi::service s;
+  boost::scgi::acceptor a(s);
 
   return 0;
 }

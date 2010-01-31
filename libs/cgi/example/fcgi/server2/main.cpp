@@ -65,22 +65,13 @@ int handle_request(fcgi::request& req, boost::system::error_code& ec)
       << "Hello there, universe!<p />";
 
   // Use the function defined above to show some of the request data.
-  format_map(resp, req[env_data], "Environment Variables");
-  format_map(resp, req[get_data], "GET Variables");
-  format_map(resp, req[cookie_data], "Cookie Variables");
+  format_map(resp, req.env, "Environment Variables");
+  format_map(resp, req.get, "GET Variables");
+  format_map(resp, req.cookies, "Cookie Variables");
 
   //log_<< "Handled request, handling another." << std::endl;
 
-  // This funky macro finishes up:
-  return_(resp, req, 0);
-  // It is equivalent to the below, where the third argument is represented by
-  // `program_status`:
-  //
-  // resp.send(req.client());
-  // req.close(resp.status(), program_status);
-  // return program_status;
-  //
-  // Note: in this case `program_status == 0`.
+  return commit(req, resp);
 }
 
 
@@ -134,16 +125,16 @@ public:
                           );
   }
 
-  void handle_accept(request_type::pointer req  
+  int handle_accept(request_type::pointer req  
                     , boost::system::error_code ec)
   {
     if (ec)
     {
       //std::cerr<< "Error accepting request: " << ec.message() << std::endl;
-      return;
+      return -1;
     }
 
-    req->load(ec, true);
+    req->load(parse_all, ec);
 
     //req->async_load(boost::bind(&server::handle_request, this
     //                           , req, boost::asio::placeholders::error)
@@ -157,13 +148,14 @@ public:
     requests_.insert(new_request);
 
     start_accept(new_request);
+    return 0;
   }
 
   void handle_request(request_type::pointer req
                      , boost::system::error_code ec)
   {
-    handler_(*req, ec);
-    if (ec)
+    
+    if (handler_(*req, ec) || ec)
     {
       //std::cerr<< "Request handled, but ended in error: " << ec.message()
       //         << std::endl;

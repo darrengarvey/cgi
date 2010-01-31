@@ -21,7 +21,7 @@
 //#include "service_selector.hpp"
 #include "boost/cgi/scgi/acceptor_service_impl.hpp"
 
-namespace cgi {
+namespace BOOST_CGI_NAMESPACE {
 
   /// The service class for SCGI basic_request_acceptor<>s
   /**
@@ -48,7 +48,7 @@ namespace cgi {
     /// The unique service identifier
     //static boost::asio::io_service::id id;
 
-    scgi_request_acceptor_service(::cgi::io_service& ios)
+    scgi_request_acceptor_service(::BOOST_CGI_NAMESPACE::io_service& ios)
       : detail::service_base<scgi_request_acceptor_service<protocol_type> >(ios)
       , service_impl_(ios)
     {
@@ -155,7 +155,7 @@ namespace cgi {
     service_impl_type service_impl_;
   };
 
-} // namespace cgi
+} // namespace BOOST_CGI_NAMESPACE
 
 #include "boost/cgi/detail/pop_options.hpp"
 

@@ -15,10 +15,10 @@
 
 [* THIS LIBRARY IS NOT A PART OF BOOST.]
 
-Boost.CGI is an open-source library for writing CGI programs in Standard C++. The library supports vanilla CGI, SCGI and FastCGI (SCGI doesn't really work yet) so it can be used to write anything from simple 'CGI scripts' to full-fledged, scalable applications. This library rests on top of and should appear familiar to users of Boost.Asio, a cross-platform asynchronous (and ['fast]) networking library. One of the main aims of the library is to allow programs to be written for any of the supported protocols without any real modification.
+Boost.CGI is an open-source library for writing CGI programs in Standard C++. The library supports vanilla CGI and FastCGI [footnote SCGI support was orignally planned, but isn't currently included. If you want it, let me know.] so it can be used to write anything from simple 'CGI scripts' to full-fledged, scalable applications. This library rests on top of and should appear familiar to users of Boost.Asio, a cross-platform asynchronous (and ['fast]) networking library. One of the main aims of the library is to allow programs to be written for any of the supported protocols without any real modification.
 
 [tip
-  The [*Deep End] is located in the examples directory. Try looking for the __examples__.
+  If you want to start with the [*Deep End], head straight to the __examples__.
 ]
 
 [h3 Motivation]
@@ -43,12 +43,12 @@ A discussion about the benefits of CGI programming in C++ is beyond the scope of
 
 With web applications becoming increasingly complex and responsive (ie. asynchronous, vis-à-vis AJAX) all the while being required to scale boundlessly - the benefits of C++ begin to show.
 
-The generally poor support for CGI programming for C++ - most libraries are either unmaintained, or don't take advantage of modern C++ capabilities - has driven the development of this library. [-moremoremore]
+The generally poor support for CGI programming for C++ - most libraries are either unmaintained, or don't take advantage of modern C++ capabilities - has driven the development of this library.
 
 [section:using How to use this manual]
 
 [note
-At the moment, the Boost [@http://www.boost.org/more/lib_guide.htm#Guidelines style guidelines] aren't honoured properly or consistently. Please ignore this for now, as the ambiguity is half-intentional (['since this [*is not] a Boost library]). It's simple enough to rectify.
+At the moment, the Boost [@http://www.boost.org/more/lib_guide.htm#Guidelines style guidelines] aren't always honoured properly. Please ignore this for now, as the ambiguity is half-intentional (['since this [*is not] a Boost library]). It's simple enough to rectify.
 ]
 
 [h4 Naming Conventions]
@@ -65,7 +65,7 @@ At the moment, the Boost [@http://www.boost.org/more/lib_guide.htm#Guidelines st
 
 [h5 Namespaces]
 
-The classes/functions that are shared between protocols are in the `cgi::common` namespace. Using the above headers dumps these into the relevant namespace.
+The classes/functions that are shared between protocols are in the `boost::cgi::common` namespace. Using the above headers dumps these into the relevant namespace.
 
 [table
   [[Protocol] [`namespace`]]
@@ -98,7 +98,7 @@ The only public macros so far are:
   [[`BOOST_CGI_DEFAULT_CONTENT_TYPE`]    [This defaults to "text/plain" and causes a default "content-type" header to be output, but ['only when you don't output any other headers].
 	]]
 
-	[[`BOOST_CGI_NO_DEFAULT_CONTENT_TYPE`] [`#define` this when you don't want a default "content-type" header to be output. CGI scripts always need one of these, so you will be responsible for sending one!
+	[[`BOOST_CGI_NO_DEFAULT_CONTENT_TYPE`] [`#define` this when you don't want a default "content-type" header to be output. CGI scripts always need one of these, so you will be responsible for sending one!msv
 	]]
 
 ]

@@ -1,6 +1,6 @@
-//                  -- cgi_request.hpp --
+//                 -- cgi/request.hpp --
 //
-//            Copyright (c) Darren Garvey 2007.
+//          Copyright (c) Darren Garvey 2007-2009.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
@@ -9,23 +9,28 @@
 #ifndef CGI_CGI_REQUEST_HPP_INCLUDED__
 #define CGI_CGI_REQUEST_HPP_INCLUDED__
 
-#include "service.hpp"
-#include "request_service.hpp"
+#include "boost/cgi/detail/push_options.hpp"
+
+#include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/common/tags.hpp"
+#include "boost/cgi/cgi/service.hpp"
+#include "boost/cgi/cgi/request_service.hpp"
 #include "boost/cgi/fwd/basic_request_fwd.hpp"
-#include "boost/cgi/cgi/request_impl.hpp"
-#include "boost/cgi/basic_request.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
 
-  class cgi_service_impl;
-
-  typedef common::basic_request<cgi_request_service, cgi_service> cgi_request;
+  typedef
+    common::basic_request<
+        common::tags::cgi
+    >
+  cgi_request;
+  
   typedef cgi_request request;
 
- //namespace cgi {
- //  typedef cgi_request request;
- //} // namespace cgi
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
+
+#include "boost/cgi/basic_request.hpp"
+
+#include "boost/cgi/detail/pop_options.hpp"
 
 #endif // CGI_CGI_REQUEST_HPP_INCLUDED__

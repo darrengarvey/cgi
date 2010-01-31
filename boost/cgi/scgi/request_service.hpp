@@ -23,7 +23,7 @@
 #include "boost/cgi/detail/service_base.hpp"
 #include "boost/cgi/detail/extract_params.hpp"
 
-namespace cgi {
+namespace BOOST_CGI_NAMESPACE {
  namespace scgi {
 
   /// The IoObjectService class for a SCGI basic_request<>s
@@ -34,9 +34,9 @@ namespace cgi {
     /// The actual implementation date for an SCGI request.
     struct implementation_type
     {
-      typedef ::cgi::map                        map_type;
+      typedef ::BOOST_CGI_NAMESPACE::map        map_type;
       typedef tcp_connection                    connection_type;
-      typedef ::cgi::scgi_                      protocol_type;
+      typedef ::BOOST_CGI_NAMESPACE::scgi_      protocol_type;
       typedef basic_client<
         connection_type, protocol_type
       >                                         client_type;
@@ -69,7 +69,7 @@ namespace cgi {
     typedef type::implementation_type::protocol_type  protocol_type;
     typedef type::implementation_type::map_type       map_type;
 
-    scgi_request_service(::cgi::io_service& ios)
+    scgi_request_service(::BOOST_CGI_NAMESPACE::io_service& ios)
       : detail::service_base<scgi_request_service>(ios)
     {
     }
@@ -121,7 +121,7 @@ namespace cgi {
 
       std::vector<char> buf;
       // read the header content
-      //::cgi::read(impl.client_, buffer(buf, header_len), ec);
+      //::BOOST_CGI_NAMESPACE::read(impl.client_, buffer(buf, header_len), ec);
 /*
       const std::string& request_method = env(impl, "REQUEST_METHOD", ec);
       if (request_method == "GET")
@@ -311,10 +311,10 @@ namespace cgi {
     }
 
   private:
-    //cgi::io_service& io_service_;
+    //BOOST_CGI_NAMESPACE::io_service& io_service_;
   };
 
  } // namespace scgi
-} // namespace cgi
+} // namespace BOOST_CGI_NAMESPACE
 
 #endif // CGI_SCGI_REQUEST_SERVICE_HPP_INCLUDED__

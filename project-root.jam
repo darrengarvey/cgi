@@ -53,7 +53,7 @@ path-constant top : . ;
 path-constant include-dir : /usr/local/include ;
 
 # A relative path to boost (for documentation stuff)
-path-constant boost-root-relative : $(top)/../../../../boost/trunk/ ;
+path-constant boost-root-relative : $(top)/../../boost/trunk/ ;
 
 
 #############################################################################
@@ -135,5 +135,5 @@ path-constant htdocs : [ get-htdocs-dir ] ;
 use-project /boost/ : $(boost-root) ;
 use-project /boost/cgi/ : $(top)/libs/cgi/build ;
 
-project anon : build-dir bin.v2 ;
+# project anon : build-dir bin.v2 ;
 

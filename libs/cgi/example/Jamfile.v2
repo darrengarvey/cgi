@@ -13,25 +13,16 @@ project boost/cgi/example
 
 # Build all of the cgi examples
 build-project cgi ;
-# Build all of the acgi examples
-build-project acgi ;
 # Build all of the fcgi examples
 build-project fcgi ;
 # Build all of the xcgi examples
 build-project xcgi ;
 
-alias all_examples : cgi acgi fcgi xcgi ;
+alias all_examples : cgi fcgi xcgi ;
 
 install cgi-install
  : # sources
    cgi//install
- :
-   <location>$(cgi-bin)
- ;
-
-install acgi-install
- : # sources
-   acgi//install
  :
    <location>$(cgi-bin)
  ;
@@ -48,10 +39,9 @@ install xcgi-install
     xcgi//install
   ;
 
-alias install : cgi//install acgi//install fcgi//install xcgi//install ;
+alias install : cgi//install fcgi//install xcgi//install ;
 
 explicit cgi-install  ;
-explicit acgi-install ;
 explicit fcgi-install ;
 
 explicit install ;

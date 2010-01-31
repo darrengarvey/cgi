@@ -50,16 +50,7 @@ int handle_request(fcgi::request& req, boost::system::error_code& ec)
 
     //log_<< "Handled request, handling another." << std::endl;
 
-    // This funky macro finishes up:
-    return_(resp, req, 0);
-    // It is equivalent to the below, where the third argument is represented by
-    // `program_status`:
-    //
-    // resp.send(req.client());
-    // req.close(resp.status(), program_status);
-    // return program_status;
-    //
-    // Note: in this case `program_status == 0`.
+    return commit(req, resp);
   }
 
 /// The server is used to abstract away protocol-specific setup of requests.
@@ -107,7 +98,7 @@ public:
       }
   
       // Load in the request data so we can access it easily.
-      new_request->load(ec, true); // The 'true' means read and parse POST data.
+      new_request->load(parse_all, ec); // Read and parse POST data and cookies.
 
       ret = handler_(*new_request, ec);
 

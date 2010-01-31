@@ -2,7 +2,8 @@
 #define BOOST_CGI_EXAMPLES_XCGI_SERVER2_SERVER_HPP_INCLUDED_
 
 //[xcgi_server1_server
-#include <boost/cgi.hpp>
+#include <boost/cgi/cgi.hpp>
+#include <boost/cgi/fcgi.hpp>
 
 class Server
 {
@@ -24,11 +25,8 @@ public:
   template<typename Handler>
   int handle_cgi_request(Handler handler)
   {
-    // **FIXME**
-    // Uses acgi - would be better if boost::cgi::request was asynchronous.
-    boost::acgi::service srv;
-    boost::acgi::request req(srv);
-    boost::acgi::response resp;
+    boost::cgi::request req;
+    boost::cgi::response resp;
     return handler(req, resp);
   }
 

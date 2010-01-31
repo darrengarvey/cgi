@@ -9,11 +9,13 @@
 
 //#ifdef _MSC_VER
 
-//#pragma warning (disable:)
-//#define _CRT_SECURE_NO_DEPRECATE 1
-//#pragma warning (disable:4996)
-
-//#endif
+// You may want to remove these.
+#if defined (BOOST_WINDOWS)
+#   define _CRT_SECURE_NO_DEPRECATE 1
+#   define _SCL_SECURE_NO_WARNINGS 1
+#   define _CRT_SECURE_NO_WARNINGS 1
+#   define NOMINMAX
+#endif // defined (BOOST_WINDOWS)
 
 #if !defined(BOOST_CGI_INLINE)
 #  if defined(BOOST_CGI_BUILD_LIB)
@@ -23,3 +25,19 @@
 #  endif
 #endif
 
+#ifdef BOOST_CGI_EXPORTS
+#   define BOOST_CGI_API __declspec(dllexport)
+#else
+#   define BOOST_CGI_API __declspec(dllimport)
+#endif // BOOST_CGI_EXPORTS
+
+/// Keep empty query string variables.
+/** Empty query string parameters (eg.
+ *   `empty` in /path/to/script?empty&foo=bar)
+ * aren't guaranteed by the CGI spec to be kept, but you might want to use
+ * them. You just have to define `BOOST_CGI_KEEP_EMPTY_VARS` (**FIXME**
+ * currently on by default).
+ */
+#define BOOST_CGI_KEEP_EMPTY_VARS
+
+#include "boost/cgi/config.hpp"

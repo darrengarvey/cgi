@@ -10,7 +10,7 @@
 #define CGI_REQUEST_SERVICE_FWD_HPP_INCLUDED
 
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
 
   /// The generic service class for basic_request<>s
   /**
@@ -23,6 +23,6 @@ namespace cgi {
   template<typename Protocol>
   class request_service;
 
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_REQUEST_SERVICE_FWD_HPP_INCLUDED

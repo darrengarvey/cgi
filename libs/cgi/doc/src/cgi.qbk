@@ -8,10 +8,9 @@
 [library CGI
     [quickbook 1.4]
     [version 0.01]
-    [id boost.cgi]
     [dirname the_document_dir]
     [copyright 2007 2008 Darren Garvey]
-    [purpose Thoughts about CGI implementation]
+    [purpose Documentation for CGI / FastCGI Library]
     [authors [Garvey, Darren]]
     [license
         Distributed under the Boost Software License, Version 1.0.
@@ -20,8 +19,12 @@
     ]
 ]
 
-[def __this__    ["FSCGI"]] [/ name of the library]
+[template mdash[] '''&mdash; ''']
+[template indexterm1[term1] '''<indexterm><primary>'''[term1]'''</primary></indexterm>''']
+[template indexterm2[term1 term2] '''<indexterm><primary>'''[term1]'''</primary><secondary>'''[term2]'''</secondary></indexterm>''']
 
+
+[def __this__    ["FSCGI"]] [/ name of the library]
 [def __cgi__     [@http://en.wikipedia.org/wiki/Common_Gateway_Interface CGI]]
 [def __scgi__    [@http://en.wikipedia.org/wiki/Simple_Common_Gateway_Interface SCGI]]
 [def __fcgi__    [@http://en.wikipedia.org/wiki/FastCGI FastCGI]]
@@ -42,8 +45,8 @@
 
 [def __current_branch__ http://svn.boost.org/trac/boost/browser/sandbox/SOC/2007/cgi/branches/release]
 
-[def __examples__ [@http://svn.boost.org/trac/boost/browser/sandbox/SOC/2007/cgi/branches/release/libs/cgi/example examples]]
-[def __amort_example__ [@http://svn.boost.org/trac/boost/browser/sandbox/SOC/2007/cgi/branches/release/libs/cgi/example/acgi/amortization Amortization]]
+[def __examples__ [@/docs/examples/examples.html examples]]
+[def __amort_example__ [@/docs/examples/examples.html#cgi.examples.acgi_examples.amortization Amortization]]
 
 
 [def __GET__  `GET` ]
@@ -83,25 +86,13 @@ This manual does [*not] document a library that is a part of __Boost__. The majo
 These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sourceforge], or at [@http://svn.boost.org/svn/boost/browser/sandbox/SOC/2007/cgi svn.boost.org]. For free!
 ]
 
-[include preface.qbk]
+[/include preface.qbk]
 
-[include:intro introduction.qbk]
+[/include:intro introduction.qbk]
 
-[/
-/[section:gs Getting Started]
-/
-/This section of the documentation is probably best read before the [link __tutorial__ tutorial]. In a nutshell, this is a quick and dirty run-through of how to get and install the library [-and configure your server].
-/
-/[include:building user_guide/building.qbk]
-/
-/[include:server_config user_guide/server_configuration.qbk]
-/
-/[include:headers user_guide/headers.qbk]
-/
-/[endsect]
-/]
+[/include quickstart.qbk]
 
-[include user_guide.qbk]
+[/include user_guide.qbk]
 
 [/include:tutorial user_guide/tutorial.qbk]
 
@@ -113,14 +104,20 @@ These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sour
 
 [/xinclude ../cgi_dox.xml]
 
-[include:examples examples.qbk]
+[/include:examples examples.qbk]
 
-[include:reference reference.qbk]
+[/include:reference reference.qbk]
 
-[include:future future_development.qbk]
+[/include:future future_development.qbk]
 
-[include:server_support user_guide/server_support.qbk]
+[/include:server_support user_guide/server_support.qbk]
 
-[include troubleshooting.qbk]
+[/include troubleshooting.qbk]
 
-[include acknowledgements.qbk]
+[/include acknowledgements.qbk]
+
+[/xinclude index.xml]
+
+[/xinclude quickref.xml]
+
+[include reference.qbk]

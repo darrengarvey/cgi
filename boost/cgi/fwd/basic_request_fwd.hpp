@@ -12,16 +12,14 @@
 #include "boost/cgi/fwd/request_service_fwd.hpp"
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
-  template<typename RequestService
-          , typename ProtocolService
-          , typename Allocator = std::allocator<char> >
+  template<typename Protocol>
   class basic_request;
 
  } // namespace common
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_BASIC_REQUEST_FWD_HPP_INCLUDED__
 

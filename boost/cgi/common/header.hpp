@@ -11,8 +11,9 @@
 
 #include <string>
 #include <boost/lexical_cast.hpp>
+#include "boost/cgi/config.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
    template<typename CharT> struct basic_header;
@@ -47,12 +48,36 @@ namespace cgi {
      {
      }
 
+     /*
      /// Construct an header from a cookie.
      basic_header(const basic_cookie<char_type>& ck)
        : content("Set-cookie: " + ck.to_string())
      {
      }
+     */
+     
+     operator string_type () {
+        return content + "\r\n";
+     }
+     
+//     const_buffer_type data() {
+//        return boost::asio::buffer(
+//     }
 
+     string_type content;
+   };
+   
+   template<typename CharT>
+   struct charset_header
+   {
+     typedef CharT                             char_type;
+     typedef typename std::basic_string<CharT> string_type;
+    
+     charset_header(const string_type& _content)
+       : content(_content)
+     {
+     }
+     
      string_type content;
    };
 
@@ -72,8 +97,13 @@ namespace cgi {
 
 
    //{ Some shortcuts, to cut down on typing errors.
-   template<typename CharT, typename StringT> basic_header<CharT>
-     content_type(StringT const& str)
+   template<
+      typename CharT
+    , typename Traits
+    , typename Alloc
+    >
+   basic_header<CharT>
+     content_type(std::basic_string<CharT,Traits,Alloc> const& str)
    {
      return basic_header<CharT>("Content-type", str);
    }
@@ -84,14 +114,20 @@ namespace cgi {
      return basic_header<CharT>("Content-type", str);
    }
 
+   template<typename CharT> charset_header<CharT>
+     charset(const CharT* str)
+   {
+     return charset_header<CharT>(str);
+   }
+
    template<typename CharT> basic_header<CharT>
      content_encoding(std::basic_string<CharT> const& str)
    {
      return basic_header<CharT>("Content-encoding", str);
    }
 
-   template<typename CharT, typename T> basic_header<CharT>
-     content_length(const T& t)
+   template<typename CharT> basic_header<CharT>
+     content_length(const CharT * t)
    {
      return basic_header<CharT>("Content-length",
               boost::lexical_cast<std::basic_string<CharT> >(t));
@@ -137,7 +173,7 @@ namespace cgi {
    //}
 
  } // namespace common
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_HEADER_HPP_INCLUDED__
 

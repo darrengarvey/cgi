@@ -1,8 +1,10 @@
 #ifndef CGI_ROLE_TYPE_HPP_INCLUDED__
 #define CGI_ROLE_TYPE_HPP_INCLUDED__
+#include "boost/cgi/config.hpp"
 
-namespace cgi {
- namespace role {
+BOOST_CGI_NAMESPACE_BEGIN
+ namespace common {
+  namespace role {
 
    struct responder {};
    struct authorizer {};
@@ -17,6 +19,7 @@ namespace cgi {
   , filter
   };
 
-} // namespace cgi
+ } // namespace common
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_ROLE_TYPE_HPP_INCLUDED__

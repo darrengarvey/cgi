@@ -12,8 +12,9 @@
 #include "boost/cgi/detail/throw_error.hpp"
 #include "boost/cgi/detail/service_base.hpp"
 #include "boost/cgi/detail/protocol_traits.hpp"
+#include "boost/cgi/config.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
 
   template<typename Protocol>
   class request_acceptor_service
@@ -96,6 +97,6 @@ namespace cgi {
     //    basic_protocol_service<protocol_type>& pservice_;
   };
 
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_REQUEST_ACCEPTOR_SERVICE_HPP_INCLUDED

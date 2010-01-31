@@ -42,7 +42,7 @@ bjam link=static runtime-link=static
 ``
 
 [tip
-  To check what directories are searched for libraries, try one of the echo examples on your server and look for a variable like `LIB_DIR` or `LIB`.
+  To check what directories are searched for libraries, try one of the echo examples provided with the library. Run it with your server and look for a variable like `LIB_DIR` or `LIB`.
 ]
 
 [endsect] [/ static_linking]

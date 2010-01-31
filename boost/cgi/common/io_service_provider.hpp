@@ -19,8 +19,9 @@
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/import/io_service.hpp"
 #include "boost/cgi/fwd/io_service_provider_fwd.hpp"
+#include "boost/cgi/config.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
   /// Hold a set number of io_services and return them based on the Policy
@@ -53,7 +54,7 @@ namespace cgi {
     {
     }
 
-    ::cgi::common::io_service&
+    ::BOOST_CGI_NAMESPACE::common::io_service&
       get_io_service()
     {
       return io_service_;
@@ -74,7 +75,7 @@ namespace cgi {
       io_service_.reset();
     }
   private:
-    ::cgi::common::io_service io_service_;
+    ::BOOST_CGI_NAMESPACE::common::io_service io_service_;
   };
 
 
@@ -83,7 +84,7 @@ namespace cgi {
   class io_service_provider<tags::service_pool>
   {
   public:
-    typedef std::list<cgi::io_service> impl_type;
+    typedef std::list<BOOST_CGI_NAMESPACE::io_service> impl_type;
 
     io_service_provider(int pool_size)
       : io_services_(pool_size)
@@ -91,7 +92,7 @@ namespace cgi {
     {
     }
 
-    cgi::io_service& io_service()
+    BOOST_CGI_NAMESPACE::io_service& io_service()
     {
       return boost::ref(*current_++);
     }
@@ -99,19 +100,19 @@ namespace cgi {
     void run()
     {
       std::for_each(io_services_.begin(), io_services_.end()
-                    , boost::bind(&cgi::io_service::run, boost::ref(_1)));
+                    , boost::bind(&BOOST_CGI_NAMESPACE::io_service::run, boost::ref(_1)));
     }
 
     void stop()
     {
       std::for_each(io_services_.begin(), io_services_.end()
-                    , boost::bind(&cgi::io_service::stop, boost::ref(_1)));
+                    , boost::bind(&BOOST_CGI_NAMESPACE::io_service::stop, boost::ref(_1)));
     }
 
     void reset()
     {
       std::for_each(io_services_.begin(), io_services_.end()
-                    , boost::bind(&cgi::io_service::reset, boost::ref(_1)));
+                    , boost::bind(&BOOST_CGI_NAMESPACE::io_service::reset, boost::ref(_1)));
     }
 
     impl_type& impl()
@@ -269,7 +270,7 @@ namespace cgi {
  // **FIXME**
  using common::io_service_provider;
   
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #include "boost/cgi/detail/pop_options.hpp"
 

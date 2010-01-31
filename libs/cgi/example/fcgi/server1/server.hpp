@@ -59,14 +59,14 @@ public:
       }
 
       // Load in the request data so we can access it easily.
-      new_request->load(ec, true); // The 'true' means read and parse POST data.
+      // Read and parse POST data.
+      new_request->load(boost::fcgi::parse_post, ec);
 
-      // Call the request handler and capture the result of handling the request.
+      // Call the request handler and capture the result of handling
+      // the request.
       ret = handler_(*new_request, ec);
 
       // A non-zero return value indicates an error.
-      // Note: bailing out here isn't strictly necessary, but easier and safer,
-      //       given the current state of the library.
       if (ret)
         break;
     }

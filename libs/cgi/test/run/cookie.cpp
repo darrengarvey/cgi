@@ -17,8 +17,8 @@ BOOST_AUTO_TEST_CASE( cookie_constructor_delete )
   // Constructing a cookie with only a name should be a valid way to 
   // delete the cookie. ie. set its value to NULL and give it a date
   // in the past
-  using namespace cgi;
-  using cgi::common::cookie;
+  using namespace boost::cgi;
+  using boost::cgi::common::cookie;
   using namespace std;
 
   string ex("Fri, 05-Jun-1989 15:30:00 GMT");
@@ -38,8 +38,8 @@ BOOST_AUTO_TEST_CASE( cookie_constructor_delete )
 BOOST_AUTO_TEST_CASE( cookie_constructor_full )
 {
   // Check the full version of the constructor works (simple test)
-  using namespace cgi;
-  using cgi::common::cookie;
+  using namespace boost::cgi;
+  using boost::cgi::common::cookie;
   using namespace std;
 
   string ex("Wed, 03-Oct-2007 16:26:06 GMT");
@@ -63,8 +63,8 @@ BOOST_AUTO_TEST_CASE( cookie_stream_operator )
   // Constructing a cookie with only a name should be a valid way to 
   // delete the cookie. ie. set its value to NULL and give it a date
   // in the past
-  using namespace cgi;
-  using cgi::common::cookie;
+  using namespace boost::cgi;
+  using boost::cgi::common::cookie;
   using namespace std;
 
   string cookie_content(
@@ -96,3 +96,4 @@ BOOST_AUTO_TEST_CASE( cookie_stream_operator )
   string ostr(oss.str());
   BOOST_CHECK_EQUAL(ostr, cookie_content);  
 }
+

@@ -21,8 +21,9 @@
 #include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/common/io_service_provider.hpp"
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
+#include "boost/cgi/config.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
   /// Basic Protocol Service
@@ -41,31 +42,20 @@ namespace cgi {
     typedef typename traits::request_type                    request_type;
     typedef typename boost::shared_ptr<request_type>         request_ptr;
     typedef std::set<request_ptr>                            set_type;
-      //typename boost::mpl::if_<
-      //  boost::is_same<protocol_type, tags::acgi>::value
-      //  , request_type::pointer
-      //  , std::set<request_type::pointer>
-      //  >::type
-
     typedef std::queue<request_ptr>                          queue_type;
 
     basic_protocol_service(int pool_size_hint = 1)
       : ios_provider_(pool_size_hint)
-                          //, strand_(ios_provider_.io_service())
-                          //, gateway_(*this)
     {
     }
 
     basic_protocol_service(boost::asio::io_service& ios)
       : ios_provider_(ios)
-                          //, strand_(ios)
-                          //, gateway_(*this)
     {
     }
 
     ~basic_protocol_service()
     {
-      //gateway_.stop();
     }
 
     /// Run all the io_services contained by this service
@@ -98,8 +88,6 @@ namespace cgi {
     void reset()
     {
       request_queue_.clear();
-      //std::for_each(request_set_.begin(), request_set_.end()
-      //              , boost::bind(&request_type::abort, boost::arg<1>()));
       request_set_.clear();
       ios_provider_.reset();
     }
@@ -114,7 +102,7 @@ namespace cgi {
      * The order in which the underlying io_services are returned is determined
      * by what policy the IoServiceProvider uses.
      */
-    ::cgi::common::io_service& io_service()
+    ::BOOST_CGI_NAMESPACE::common::io_service& io_service()
     {
       return ios_provider_.get_io_service();
     }
@@ -136,9 +124,6 @@ namespace cgi {
   private:
     ios_provider_type ios_provider_;
 
-    /// A strand is used for guaranteeing handlers are dispatched sequentially
-    //boost::asio::strand strand_;
-
     /// A std::set of all the requests.
     set_type request_set_;
     /// A std::queue of the waiting (ie. not-being-handled) requests.
@@ -153,6 +138,6 @@ namespace cgi {
   };
 
  } // namespace common
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_BASIC_PROTOCOL_SERVICE_HPP_INCLUDED__

@@ -7,6 +7,8 @@
 # By default, just build the examples
 build-project hello_world ;
 build-project echo ;
+build-project cookies ;
+build-project file_browser ;
 
 # If the user explicitly passes "install" on the command line, build the
 # CGI examples and copy them to $(cgi-bin)
@@ -14,6 +16,8 @@ install install
   :
     hello_world
     echo
+    cookies
+    file_browser
   :
     <location>$(cgi-bin)
   ;

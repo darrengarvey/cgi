@@ -15,13 +15,13 @@
 
 #include <boost/asio/io_service.hpp>
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
   using boost::asio::io_service;
 
  } // namespace common
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_COMMON_IO_SERVICE_HPP_INCLUDED__
 

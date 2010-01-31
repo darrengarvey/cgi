@@ -17,6 +17,11 @@ The following example can be found [@../../src/user_guide/tutorial/10_min_intro.
 
 [main]
 
-That's all quite simple, right?
+[section:building Building]
+
+Now to compile and run the example. It's probably beyond the scope of these docs to go into too
+much detail here but 
+
+[endsect]
 
 [endsect]

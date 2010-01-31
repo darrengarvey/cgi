@@ -12,13 +12,13 @@
 #include "boost/cgi/basic_request_acceptor.hpp"
 #include "boost/cgi/scgi/request_acceptor_service.hpp"
 
-namespace cgi {
+namespace BOOST_CGI_NAMESPACE {
  namespace scgi {
 
    /// Typedef for common usage (SCGI)
    typedef basic_request_acceptor<scgi_request_acceptor_service<> > acceptor;
 
  } // namespace scgi
-} // namespace cgi
+} // namespace BOOST_CGI_NAMESPACE
 
 #endif // CGI_SCGI_ACCEPTOR_HPP_INCLUDED__

@@ -4,28 +4,45 @@
 
 #include <boost/fusion/include/at.hpp>
 ///////////////////////////////////////////////////////////
+#include "boost/cgi/config.hpp"
 #include "boost/cgi/common/map.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
-   enum env_data_type     { env,     env_data    };
-   enum get_data_type     { get,     get_data    };
-   enum post_data_type    { post,    post_data   };
-   enum cookie_data_type  { cookies, cookie_data };
-   enum form_data_type    { form,    form_data   };
+   /// Types of data sources and related enums.
+   /**
+    * Each data source is given a unique type. This is so the accessor
+    * operators on a `basic_request<>` are compile-time aliases to the
+    * internal data maps.
+    *
+    * If you want to add a new data type to a request you need to:
+    *   > Update this file
+    *   > Update map.hpp with a new map type
+    *   > Update `data_map_type` in the `request_base` class
+    */
 
    template<typename Impl>
-   env_map& env_vars(Impl& impl)       { return boost::fusion::at_c<0>(impl); }
+     env_map&
+       env_vars(Impl& impl)     { return boost::fusion::at_c<0>(impl); }
    template<typename Impl>
-   get_map& get_vars(Impl& impl)       { return boost::fusion::at_c<1>(impl); }
+     get_map&
+       get_vars(Impl& impl)     { return boost::fusion::at_c<1>(impl); }
    template<typename Impl>
-   post_map& post_vars(Impl& impl)     { return boost::fusion::at_c<2>(impl); }
+     post_map&
+       post_vars(Impl& impl)    { return boost::fusion::at_c<2>(impl); }
    template<typename Impl>
-   cookie_map& cookie_vars(Impl& impl) { return boost::fusion::at_c<3>(impl); }
+     cookie_map&
+       cookie_vars(Impl& impl)  { return boost::fusion::at_c<3>(impl); }
+   template<typename Impl>
+     upload_map&
+       upload_vars(Impl& impl)  { return boost::fusion::at_c<4>(impl); }
+   template<typename Impl>
+     session_map&
+       session_vars(Impl& impl) { return boost::fusion::at_c<5>(impl); }
 
  } // namespace common
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // BOOST_CGI_COMMON_SOURCE_ENUMS_HPP_INCLUDED__
 

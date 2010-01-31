@@ -27,7 +27,7 @@
 
 #include "boost/cgi/detail/protocol_traits.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
   /*** 05.02.2008 :
@@ -50,15 +50,14 @@ namespace cgi {
     typedef boost::mutex                              mutex_type;
     struct condition_type : public boost::condition_variable
         { typedef boost::shared_ptr<boost::condition_variable> pointer; };
-	typedef boost::mutex::scoped_lock                 scoped_lock_type;
+  	typedef boost::mutex::scoped_lock                 scoped_lock_type;
     typedef boost::asio::ip::tcp::socket              next_layer_type;
 
     /** FastCGI specific stuff **/
-    //typedef ::cgi::fcgi::client                      client_type;
-    typedef //typename
-      detail::protocol_traits<fcgi_>::request_type   request_type;
+    typedef
+      detail::protocol_traits<tags::fcgi>::request_type   request_type;
     typedef 
-      detail::protocol_traits<fcgi_>::request_ptr    request_ptr;
+      detail::protocol_traits<tags::fcgi>::request_ptr    request_ptr;
     typedef std::map<boost::uint16_t, request_type*> request_map_type;
     typedef std::vector<request_type*>               request_vector_type;
 
@@ -107,7 +106,7 @@ namespace cgi {
     void wait()
     {
       scoped_lock_type lock(mutex_);
-      if (locked_ = false)
+      if (locked_ == false)
         return;
       condition_.wait(lock);
     }
@@ -210,15 +209,14 @@ namespace cgi {
     std::set<int> deletable_request_ids_;
   };
 
-  // probably deletable typedef (leaving it here to keep an open mind)
-  typedef basic_connection<tags::shareable_tcp_socket> shareable_tcp_connection;
-
-  namespace connection {
-    typedef basic_connection<tags::shareable_tcp_socket> shareable_tcp;
-  } // namespace connection
-
  } // namespace common
-} // namespace cgi
+
+  namespace connections {
+    typedef common::basic_connection<
+      common::tags::shareable_tcp_socket> shareable_tcp;
+  } // namespace connections
+
+BOOST_CGI_NAMESPACE_END
 
 #include "boost/cgi/detail/pop_options.hpp"
 

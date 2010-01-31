@@ -1,6 +1,8 @@
 
 import modules ;
 
+#use-project /boost/ : $(boost-root) ;
+
 local DEFINES ;
 
 if [ MATCH "^(--build-cgi)" : [ modules.peek : ARGV ] ]
@@ -54,35 +56,37 @@ project boost/cgi
   : requirements
       <include>$(top)
       <include>$(boost-root)
-      <library>/boost/thread/
-      <library>/boost/system/
-      <library>/boost/regex/
-			<library>/boost/date_time/
+      <library>/boost//thread/
+      <library>/boost//system/
+      <library>/boost//regex/
+      <library>/boost//date_time/
       <define>_CRT_SECURE_NO_WARNINGS
       <define>_SCL_SECURE_NO_WARNINGS
       $(DEFINES)
   : usage-requirements
       <include>$(top)
       <include>$(boost-root)
-      <library>/boost/thread/
-      <library>/boost/system/
-      <library>/boost/regex/
-			<library>/boost/date_time/
+      <library>/boost//thread/
+      <library>/boost//system/
+      <library>/boost//regex/
+      <library>/boost//date_time/
       <define>_CRT_SECURE_NO_WARNINGS
       <define>_SCL_SECURE_NO_WARNINGS
       <os>unix:<linkflags>-pthread
+      <linkflags>-pthread
       #<tag>@$(__name__).tag
       $(DEFINES)
   ;
 
 if [ MATCH "^(--build-cgi)" : [ modules.peek : ARGV ] ]
-{ # compile library
+{ # compile the library
   ECHO "Building CGI library" ;
 
   # make BB recognise .ipp files as .cpp (source) files.
   import type ;
   type.register IPP : ipp : CPP ;
 
+  # library_sources.cpp includes all compilable source files.
   SOURCES = $(top)/libs/cgi/src/library_sources.cpp ;
 
   lib boost_cgi

@@ -12,12 +12,14 @@
 #ifndef CGI_DETAIL_SERVICE_ID_HPP_INCLUDED__
 #define CGI_DETAIL_SERVICE_ID_HPP_INCLUDED__
 
-#include <boost/asio/detail/push_options.hpp>
-
+#include <boost/noncopyable.hpp>
 #include <boost/asio/io_service.hpp>
+////////////////////////////////////////////////////////////////
+#include "boost/cgi/config.hpp"
 #include "boost/cgi/detail/service_id.hpp"
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
+
  namespace detail {
 
    // Special service base class to keep classes header-file only.
@@ -34,13 +36,12 @@ namespace cgi {
      {
      }
    };
-
+   
    template <typename Type>
    boost::asio::detail::service_id<Type> service_base<Type>::id;
 
  } // namespace detail
-} // namespace cgi
-
-#include <boost/asio/detail/pop_options.hpp>
+ 
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_DETAIL_SERVICE_ID_HPP_INCLUDED__

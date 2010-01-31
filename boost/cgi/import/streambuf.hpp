@@ -11,12 +11,12 @@
 
 #include <boost/asio/streambuf.hpp>
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
   using boost::asio::streambuf;
 
  } // namespace common
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_STREAMBUF_HPP_INCLUDED__

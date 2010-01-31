@@ -11,7 +11,7 @@
 
 #include <boost/noncopyable.hpp>
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace detail {
 
   /// basic_io_object alternative when an io_service isn't used
@@ -39,7 +39,7 @@ namespace cgi {
   };
 
  } // namespace detail
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_DETAIL_BASIC_SYNC_IO_OBJECT_HPP_INCLUDED__
 

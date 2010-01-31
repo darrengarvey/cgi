@@ -9,11 +9,11 @@
 #ifndef CGI_BASIC_ACCEPTOR_FWD_HPP_INCLUDED__
 #define CGI_BASIC_ACCEPTOR_FWD_HPP_INCLUDED__
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
 
   template<typename>
   class basic_acceptor;
 
-} // namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_BASIC_ACCEPTOR_FWD_HPP_INCLUDED__

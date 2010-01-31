@@ -9,13 +9,13 @@
 #ifndef CGI_FCGI_SPECIFICATION_HPP_INCLUDED__
 #define CGI_FCGI_SPECIFICATION_HPP_INCLUDED__
 
-//#include <inttypes.h>
 #include <boost/cstdint.hpp>
+#include <boost/asio/buffer.hpp>
 
 // NOTE: CamelCase style mimicks the FastCGI specification
 // SEE: http://www.fastcgi.com/devkit/doc/fcgi-spec.html#S8
 
-namespace cgi {
+BOOST_CGI_NAMESPACE_BEGIN
  namespace fcgi {
   namespace spec_detail {
 
@@ -37,18 +37,19 @@ namespace cgi {
       = (unsigned char)BOOST_CGI_FASTCGI_VERSION_1;
 
     // Values for the type component of Header
-    enum request_t { BEGIN_REQUEST     =  1
-                   , ABORT_REQUEST     =  2
-                   , END_REQUEST       =  3
-                   , PARAMS            =  4
-                   , STDIN             =  5
-                   , STDOUT            =  6
-                   , STDERR            =  7
-                   , DATA              =  8
-                   , GET_VALUES        =  9
-                   , GET_VALUES_RESULT = 10
-                   , UNKNOWN_TYPE      = 11
-                   , MAXTYPE           = UNKNOWN_TYPE
+    enum request_types
+      { BEGIN_REQUEST     =  1
+      , ABORT_REQUEST     =  2
+      , END_REQUEST       =  3
+      , PARAMS            =  4
+      , STDIN             =  5
+      , STDOUT            =  6
+      , STDERR            =  7
+      , DATA              =  8
+      , GET_VALUES        =  9
+      , GET_VALUES_RESULT = 10
+      , UNKNOWN_TYPE      = 11
+      , MAXTYPE           = UNKNOWN_TYPE
     };
 
     // a null request id is a management record
@@ -61,14 +62,14 @@ namespace cgi {
     const boost::uint16_t MAX_MSG_LEN = 65535;
 
     // Values for role component of BeginRequestBody
-    enum role_t { RESPONDER  = 1
+    enum role_types { RESPONDER  = 1
                 , AUTHORIZER = 2
                 , FILTER     = 3
                 , ANY
     };
 
     // Values for protocolStatus component of EndRequestBody
-    enum status_t { REQUEST_COMPLETE = 0
+    enum status_types { REQUEST_COMPLETE = 0
                   , CANT_MPX_CONN    = 1
                   , OVERLOADED       = 2
                   , UNKNOWN_ROLE     = 3
@@ -93,16 +94,37 @@ namespace cgi {
         unsigned char paddingLength_;
         unsigned char reserved_;
       } impl;
-
+      
     public:
-      Header() { memset(static_cast<void*>(&this->impl), 0, sizeof(this->impl)); }
+      typedef boost::asio::const_buffers_1   const_buffers_type;
+      typedef boost::asio::mutable_buffers_1 mutable_buffers_type;
 
-      Header(request_t t, int id, int len)
+      Header()
+      {
+        memset(static_cast<void*>(&this->impl)
+              , 0, sizeof(this->impl));
+      }
+
+      Header(request_types t, int id, int len)
       {
         reset(t, id, len);
       }
+      
+      mutable_buffers_type data()
+      {
+        return boost::asio::buffer(
+            static_cast<void*>(&impl)
+          , sizeof(impl));
+      }
 
-      void reset(request_t t, int id, int len)
+      const_buffers_type data() const 
+      {
+        return boost::asio::buffer(
+            static_cast<const void*>(&impl)
+          , sizeof(impl));
+      }
+
+      void reset(request_types t, int id, int len)
       {
         impl.version_         = (VERSION_NUM);
         impl.type_            = ((unsigned char)t);
@@ -197,16 +219,18 @@ namespace cgi {
       } impl;
 
     public:
+      typedef boost::asio::const_buffers_1   const_buffers_type;
+
       EndRequestBody() {}
 
       EndRequestBody( boost::uint64_t appStatus
-                    , status_t  procStatus
+                    , status_types  procStatus
                     )
       {
         reset(appStatus, procStatus);
       }
 
-      void reset( boost::uint64_t appStatus, status_t procStatus)
+      void reset( boost::uint64_t appStatus, status_types procStatus)
       {
         impl.appStatusB3_    = ( (appStatus >> 24) & 0xff );
         impl.appStatusB2_    = ( (appStatus >> 16) & 0xff );
@@ -215,6 +239,13 @@ namespace cgi {
         impl.protocolStatus_ = ((unsigned char)procStatus);
 
         memset(impl.reserved_, 0, sizeof(impl.reserved_));
+      }
+      
+      const_buffers_type data() const 
+      {
+        return boost::asio::buffer(
+            static_cast<const void*>(&impl)
+          , sizeof(impl));
       }
     };
 
@@ -234,7 +265,7 @@ namespace cgi {
     public:
       EndRequestRecord( boost::uint16_t id
                       , boost::uint64_t appStatus
-                      , status_t  procStatus
+                      , status_types  procStatus
                       )
       {
         impl.header_.reset( END_REQUEST, id, sizeof(EndRequestBody) );
@@ -301,9 +332,14 @@ namespace cgi {
   namespace specification {
 
 #include <boost/mpl/int.hpp>
+  
+    /// Define the FastCGI spec using types.
+    /**
+     * Types are better than macros.
+     */
 
     struct max_packet_size
-      : boost::mpl::int_<65535>
+      : boost::mpl::int_<65535u>
     {};
 
     struct header_length
@@ -324,9 +360,9 @@ namespace cgi {
     int get_version(Array& a) { return static_cast<int>(a[0]); }
     
     template<typename Array>
-    spec_detail::request_t get_type(Array& a)
+    spec_detail::request_types get_type(Array& a)
     {
-      return static_cast<spec_detail::request_t>(a[1]);
+      return static_cast<spec_detail::request_types>(a[1]);
     }
     
     template<typename Array>
@@ -389,6 +425,9 @@ namespace cgi {
         }
       }
     };
+    
+    typedef spec_detail::Header header;
+    typedef spec_detail::EndRequestBody end_request_body;
 
     struct begin_request
       : boost::mpl::int_<1>
@@ -397,24 +436,128 @@ namespace cgi {
       {
         typedef boost::mpl::int_<8> size;
       };
+      
+      typedef boost::array<
+                  unsigned char
+                , header_length::value
+              > buffer_type;
+      
+      buffer_type impl;
+
+      begin_request(buffer_type& buf)
+        : impl(buf)
+      {
+      }
+
+      spec_detail::role_types role()
+      {
+        return static_cast<spec_detail::role_types>(
+                 (impl[0] << 8) + impl[1] );
+      }
+
+      unsigned char flags()
+      {
+        return impl[2];
+      }
 
       template<typename Array>
-      static spec_detail::role_t
-        get_role(Array& a)
+      static spec_detail::role_types
+        role(Array& a)
       {
-        return static_cast<spec_detail::role_t>( (a[0] << 8) + a[1] );
+        return static_cast<spec_detail::role_types>(
+                 (a[0] << 8) + a[1] );
       }
 
       template<typename Array>
       static unsigned char
-        get_flags(Array& a)
+        flags(Array& a)
       {
         return a[2];
       }
-      
-      //typedef spec_detail::BEGIN_REQUEST type;
-
     };
+    
+    struct stdout_header
+      : spec_detail::Header
+    {
+      explicit stdout_header()
+        : Header(spec_detail::STDOUT,0,0)
+      {
+      }
+      explicit stdout_header(int request_id, int content_len)
+        : Header(spec_detail::STDOUT, request_id, content_len)
+      {
+      }
+      void reset(int request_id, int content_len)
+      {
+        spec_detail::Header::reset(
+            spec_detail::STDOUT
+          , request_id
+          , content_len);
+      }
+    };
+
+    struct end_request
+      : header
+      , end_request_body
+    {
+      explicit end_request
+      (
+          int request_id = 0
+        , boost::uint64_t app_status = 0
+        , spec_detail::status_types proc_status
+            = spec_detail::REQUEST_COMPLETE
+      )
+        : header(spec_detail::END_REQUEST, request_id
+                , sizeof(end_request_body))
+        , end_request_body(app_status, proc_status)
+      {
+      }
+      
+      void reset
+      (
+          int request_id
+        , boost::uint64_t app_status = 0
+        , spec_detail::status_types proc_status
+            = spec_detail::REQUEST_COMPLETE
+      )
+      {
+        header::reset(
+            spec_detail::END_REQUEST
+          , request_id
+          , sizeof(end_request_body));
+        end_request_body::reset(
+            app_status, proc_status);
+      }
+    };
+
+    class BeginRequestBody
+    {
+      /// The underlying type of a BeginRequestBody sub-header.
+      /**
+       * To guarantee the header is laid out exactly as we want, the
+       * structure must be a POD-type (see http://tinyurl.com/yo9eav).
+       */
+      struct implementation_type
+      {
+        unsigned char roleB1_;
+        unsigned char roleB0_;
+        unsigned char flags_;
+        unsigned char reserved_[5];
+      } impl;
+
+    public:
+
+      int role() const
+      {
+        return (impl.roleB1_ << 8 ) + impl.roleB0_;
+      }
+
+      unsigned char flags() const
+      {
+        return impl.flags_;
+      }
+    };
+
 
     struct role_type
     {
@@ -422,7 +565,7 @@ namespace cgi {
       static std::string to_string(Array& a)
       {
         using namespace spec_detail;
-        switch(begin_request::get_role(a))
+        switch(begin_request::role(a))
         {
         case RESPONDER:
           return "RESPONDER";
@@ -435,12 +578,12 @@ namespace cgi {
         }
       }
     };
-    //using namespace ::cgi::fcgi::detail;
+    //using namespace ::BOOST_CGI_NAMESPACE::fcgi::detail;
   }
 
   namespace spec = specification;
 
  } // namespace fcgi
-}// namespace cgi
+BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_FCGI_SPECIFICATION_HPP_INCLUDED__
