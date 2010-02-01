@@ -40,7 +40,7 @@ template<typename Request>
 void fill_amortization_dictionary(
   ctemplate::TemplateDictionary& dict, Request& req)
 {
-  dict.SetValue("LoanAmt", has_key(req.post, "LoanAmt")
+  dict.SetValue("LoanAmt", req.post.count("LoanAmt")
       ? "$250,000" : req.post["LoanAmt"]);
   dict.SetIntValue("YearlyIntRate", req.post.as("YearlyIntRate", 6.000));
 

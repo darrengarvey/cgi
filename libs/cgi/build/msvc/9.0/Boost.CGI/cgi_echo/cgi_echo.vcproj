@@ -61,7 +61,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="libboost_system-vc90-mt-gd-1_38.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="C:\Boost\lib"
 				GenerateDebugInformation="true"

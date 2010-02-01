@@ -6,7 +6,6 @@
 #include "TracebackServer.hpp"
 #include <cmath>
 
-using boost::cgi::form;
 using boost::cgi::request;
 using boost::cgi::response;
 using boost::cgi::header;

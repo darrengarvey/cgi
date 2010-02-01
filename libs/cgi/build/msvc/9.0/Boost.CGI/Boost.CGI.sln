@@ -27,8 +27,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cgi_file_browser", "cgi_fil
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fcgi_speed_check", "fcgi_speed_check\fcgi_speed_check.vcproj", "{8F7D1DD8-FE44-419B-BE93-6A78C708ACDA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cgi_cookie_game", "cgi_cookie_game\cgi_cookie_game.vcproj", "{10157442-F0A7-4D8D-8169-242F44FCF035}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cgi_ctemplate_cookie_game", "cgi_ctemplate_cookie_game\cgi_ctemplate_cookie_game.vcproj", "{C18D47EA-742B-4256-8D9B-A3D2A1EB6E1C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cgi_stencil", "cgi_stencil\cgi_stencil.vcproj", "{B08A2E6D-9973-42F3-9621-90F3BD4A1721}"
@@ -46,6 +44,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fcgi_stencil", "fcgi_stencil\fcgi_stencil.vcproj", "{6B94FB20-A187-4225-938E-A005352FDD12}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cgi_images", "cgi_images\cgi_images.vcproj", "{B59C59FA-E4A0-498D-A8CF-9FAD68B4315C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cgi_cookies", "cgi_cookies\cgi_cookies.vcproj", "{C51C82EE-A1BB-4EA7-AD66-20929A7A6E24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -104,10 +104,6 @@ Global
 		{8F7D1DD8-FE44-419B-BE93-6A78C708ACDA}.Debug|Win32.Build.0 = Debug|Win32
 		{8F7D1DD8-FE44-419B-BE93-6A78C708ACDA}.Release|Win32.ActiveCfg = Release|Win32
 		{8F7D1DD8-FE44-419B-BE93-6A78C708ACDA}.Release|Win32.Build.0 = Release|Win32
-		{10157442-F0A7-4D8D-8169-242F44FCF035}.Debug|Win32.ActiveCfg = Debug|Win32
-		{10157442-F0A7-4D8D-8169-242F44FCF035}.Debug|Win32.Build.0 = Debug|Win32
-		{10157442-F0A7-4D8D-8169-242F44FCF035}.Release|Win32.ActiveCfg = Release|Win32
-		{10157442-F0A7-4D8D-8169-242F44FCF035}.Release|Win32.Build.0 = Release|Win32
 		{C18D47EA-742B-4256-8D9B-A3D2A1EB6E1C}.Debug|Win32.ActiveCfg = Debug|Win32
 		{C18D47EA-742B-4256-8D9B-A3D2A1EB6E1C}.Debug|Win32.Build.0 = Debug|Win32
 		{C18D47EA-742B-4256-8D9B-A3D2A1EB6E1C}.Release|Win32.ActiveCfg = Release|Win32
@@ -144,6 +140,10 @@ Global
 		{B59C59FA-E4A0-498D-A8CF-9FAD68B4315C}.Debug|Win32.Build.0 = Debug|Win32
 		{B59C59FA-E4A0-498D-A8CF-9FAD68B4315C}.Release|Win32.ActiveCfg = Release|Win32
 		{B59C59FA-E4A0-498D-A8CF-9FAD68B4315C}.Release|Win32.Build.0 = Release|Win32
+		{C51C82EE-A1BB-4EA7-AD66-20929A7A6E24}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C51C82EE-A1BB-4EA7-AD66-20929A7A6E24}.Debug|Win32.Build.0 = Debug|Win32
+		{C51C82EE-A1BB-4EA7-AD66-20929A7A6E24}.Release|Win32.ActiveCfg = Release|Win32
+		{C51C82EE-A1BB-4EA7-AD66-20929A7A6E24}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

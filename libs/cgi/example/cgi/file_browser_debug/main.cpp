@@ -7,7 +7,7 @@
 //
 ////////////////////////////////////////////////////////////////
 //
-//[fcgi_file_browser
+//[cgi_file_browser
 //
 // This example is a simple browser-based file browser.
 //
@@ -17,12 +17,12 @@
 #include <boost/algorithm/string/find.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 ///////////////////////////////////////////////////////////
-#include "boost/cgi/fcgi.hpp"
+#include "boost/cgi/cgi.hpp"
 
 using std::cerr;
 using std::endl;
 using std::ifstream;
-using namespace boost::fcgi;
+using namespace boost::cgi;
 namespace fs = boost::filesystem;
 namespace algo = boost::algorithm;
 
@@ -181,7 +181,7 @@ boost::system::error_code& show_file(
           // Write out the response headers.
           std::string ctype (content_type(mime_type));
           std::string clen (content_length<char>(size));
-          clen += "\r\n";
+          clen += "\r\n\r\n";
           
           // Create an output buffer. This will only hold references
           // to the data so we need to ensure the data stays in memory
@@ -190,25 +190,31 @@ boost::system::error_code& show_file(
           // The purpose of this buffer is so efficient I/O operations 
           // (eg. scatter-gather) can be used under the hood. This vector
           // is light-weight so it can be copied cheaply.
-          std::vector<boost::asio::const_buffer> output(3);
+          std::vector<boost::asio::const_buffer> output(2);
           output.push_back(boost::asio::buffer(ctype));
           output.push_back(boost::asio::buffer(clen));
 
           // Read then write up to 1MB at a time.
           boost::uintmax_t bufsize = 1000000;
           boost::uintmax_t read_bytes;
-          char buf[1000000];
+          char buf[10000];
           ifs.seekg(0, std::ios::beg);
+          cerr<< "Writing file contents now." << endl;
           while (!ifs.eof() && size > 0 && !ec)
           {
-            ifs.read(buf, (std::streamsize)(size < bufsize ? size : bufsize));
+            std::streamsize num = (std::streamsize)(size < bufsize ? size : bufsize);
+            cerr<< "num = " << num << endl;
+            ifs.read(buf, num);
             read_bytes = ifs.gcount();
+            cerr<< "Read " << read_bytes << " bytes (buf size: " << strlen(buf) << "." << endl;
             size -= read_bytes;
 
-            output.push_back(boost::asio::buffer(buf, (std::size_t)read_bytes));
+            output.push_back(boost::asio::buffer(buf, read_bytes));
             // Write unbuffered (ie. not using a response).
             write(client, output
                  , boost::asio::transfer_all(), ec);
+
+            cerr<< "Written (got: " << ec.message() << ")." << endl;
             // This needs to go at the end, so the Content-type, etc. 
             // headers are sent the first time around.
             output.clear();
@@ -284,7 +290,7 @@ int handle_request(Request& req)
   //
   // Load in the request data so we can access it easily.
   //
-  req.load(parse_all); // Read and parse STDIN (ie. POST) data.
+  req.load(parse_get); // Read and parse STDIN (ie. POST) data.
 
   //
   // Construct a `response` object (makes writing/sending responses easier).
@@ -315,7 +321,7 @@ int handle_request(Request& req)
     // You can also stream text to a response. 
     // All of this just prints out the form 
     resp<< "<html>"
-           "<head><title>FastCGI File Browser Example</title><head>"
+           "<head><title>CGI File Browser Example</title><head>"
            "<body>";
 
     show_paths(resp, req.get["dir"], req.get["recurse"] == "1");
@@ -334,41 +340,19 @@ int main()
 {
 try {
 
-  // Make a `service` (more about this in other examples).
-  service s;
-  
-  using boost::asio::ip::tcp;
-
-  // Accept requests on port 8001. You should configure your HTTP
-  // server to try to connect on this port.
-  acceptor a(s, 8001);
-
-  int ret(0);
-  for (;;)
-  {
-    request req(s);
-
-    for (;;)
-    {
-      a.accept(req);
-      if (handle_request(req))
-        break;
-      req.clear();
-    }
-  }
-  
-  return ret;
+  request req;
+  return handle_request(req);
 
 }catch(boost::system::system_error const& se){
   // This is the type of error thrown by the library.
-  cerr<< "[fcgi] System error: " << se.what() << endl;
+  cerr<< "[cgi] System error: " << se.what() << endl;
   return -1;
 }catch(std::exception const& e){
   // Catch any other exceptions
-  cerr<< "[fcgi] Exception: " << e.what() << endl;
+  cerr<< "[cgi] Exception: " << e.what() << endl;
   return -1;
 }catch(...){
-  cerr<< "[fcgi] Uncaught exception!" << endl;
+  cerr<< "[cgi] Uncaught exception!" << endl;
   return -1;
 }
 }

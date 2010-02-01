@@ -51,7 +51,7 @@ int cgi_handler(request& req, response& resp)
            "</body>"
            "</html>";
     if (req.get["badger"] == "bait!")      throw std::runtime_error("You asked for an error, you got one.");
-    else if (has_key(req.get, "spam"))   return 33;
+    else if (req.get.count("spam"))   return 33;
     return 0;
 }
 

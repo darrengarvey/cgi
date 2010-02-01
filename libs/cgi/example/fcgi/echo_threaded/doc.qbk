@@ -1,0 +1,11 @@
+
+[section:echo_threaded Echo (threaded)]
+
+[import main.cpp]
+
+[fcgi_echo_threaded]
+
+See the [@../../example/fcgi/echo_threaded/main.cpp full source listing].
+
+[endsect][/ echo_threaded]
+

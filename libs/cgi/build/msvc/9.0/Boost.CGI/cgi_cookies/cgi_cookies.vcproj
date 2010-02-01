@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="cgi_file_browser"
-	ProjectGUID="{E266C18C-F482-459C-9805-EBAF5C68E50A}"
-	RootNamespace="cgi_echo"
+	Name="cgi_cookies"
+	ProjectGUID="{C51C82EE-A1BB-4EA7-AD66-20929A7A6E24}"
+	RootNamespace="acgi_cookie_game"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -40,9 +40,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/D &quot;_SCL_SECURE_NO_WARNINGS&quot;"
 				Optimization="0"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="_SCL_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,8 +62,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="libctemplate-debug.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="C:\Boost\lib"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -87,7 +89,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\cgi-bin\$(TargetName)&quot;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\cgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies\index.html&quot; &quot;c:\code\c++\boost.cgi\templates\index.html&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies\main.js&quot; &quot;c:\code\c++\boost.cgi\htdocs\js\main.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies\style.css&quot; &quot;c:\code\c++\boost.cgi\htdocs\css\style.css&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -117,7 +119,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="_SCL_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -135,8 +138,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="libctemplate.lib"
 				LinkIncremental="1"
-				GenerateDebugInformation="false"
+				AdditionalLibraryDirectories="C:\Boost\lib"
+				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -162,35 +167,17 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\cgi-bin\$(TargetName)&quot;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\cgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies\index.html&quot; &quot;c:\code\c++\boost.cgi\templates\index.html&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies\main.js&quot; &quot;c:\code\c++\boost.cgi\htdocs\js\main.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies\style.css&quot; &quot;c:\code\c++\boost.cgi\htdocs\css\style.css&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
 	<References>
 	</References>
 	<Files>
-		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+		<File
+			RelativePath="..\..\..\..\..\example\cgi\cookies\main.cpp"
 			>
-			<File
-				RelativePath="..\..\..\..\..\example\cgi\file_browser\main.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-		</Filter>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

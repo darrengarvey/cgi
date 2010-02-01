@@ -60,7 +60,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="libboost_system-vc90-mt-gd-1_38.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -133,7 +132,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="libboost_system-vc90-mt-1_38.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="false"
 				SubSystem="1"

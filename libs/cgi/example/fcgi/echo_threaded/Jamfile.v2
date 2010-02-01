@@ -1,0 +1,14 @@
+
+project boost/cgi/example/fcgi/echo_threaded ;
+
+exe fcgi_echo_threaded : main.cpp ;
+
+install install
+  :
+    fcgi_echo_threaded
+  :
+    <location>$(fcgi-bin)
+  ;
+
+explicit install ;
+
