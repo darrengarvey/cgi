@@ -11,6 +11,7 @@
 
 #include <cstdio>
 #include <string>
+#include <boost/config.hpp>
 #if BOOST_WINDOWS
 #   include <stdio.h> // for _setmode
 #   include <io.h>    // for _setmode

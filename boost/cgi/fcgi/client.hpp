@@ -178,7 +178,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     
     std::size_t total_buffer_size = static_cast<std::size_t>(header_.content_length());
     
-#ifndef NDEBUG
+#if !defined(BOOST_CGI_NO_LOGGING) && !defined(NDEBUG)
     if (ec)
       std::cerr<< "Error " << ec << ": " << ec.message() << '\n';
     else    
@@ -188,10 +188,10 @@ BOOST_CGI_NAMESPACE_BEGIN
         << " protocol) bytes (running total: "
         << total_sent_bytes_ << " bytes; "
         << total_sent_packets_ << " packets).\n";
-#endif // NDEBUG
+#endif // !defined(BOOST_CGI_NO_LOGGING) && !defined(NDEBUG)
 
     // Now remove the protocol overhead for the caller, who
-    // doesn't want to know about them.
+    // doesn't want to count it.
     bytes_transferred -= fcgi::spec::header_length::value;
     // Check everything was written ok.
     if (!ec && bytes_transferred != total_buffer_size)
