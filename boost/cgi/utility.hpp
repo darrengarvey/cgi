@@ -10,8 +10,7 @@
 #define CGI_UTILITY_HPP_INCLUDED__
 
 // #include all utility headers.
-#include "boost/cgi/utility/has_key.hpp"
-#include "boost/cgi/utility/get.hpp"
 #include "boost/cgi/utility/redirect.hpp"
+#include "boost/cgi/utility/stencil.hpp"
 
 #endif // CGI_UTILITY_HPP_INCLUDED__
