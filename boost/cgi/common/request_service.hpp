@@ -10,14 +10,10 @@
 #define CGI_REQUEST_SERVICE_HPP_INCLUDED
 
 #include "boost/cgi/detail/push_options.hpp"
-
-#include <boost/utility/enable_if.hpp>
-///////////////////////////////////////////////////////////
-#include "boost/cgi/import/io_service.hpp"
+#include "boost/cgi/common/protocol_traits.hpp"
 #include "boost/cgi/detail/service_base.hpp"
-#include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
-#include "boost/cgi/config.hpp"
+#include "boost/cgi/import/io_service.hpp"
 
 BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
@@ -35,7 +31,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     : public detail::service_base<request_service<Protocol> >
   {
     // The platform-specific implementation (only one for now)
-    typedef typename detail::protocol_traits<Protocol>::request_service_impl
+    typedef typename protocol_traits<Protocol>::request_service_impl
       service_impl_type;
 
   public:
@@ -103,52 +99,6 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       return service_impl_.set_header(impl, name, value, ec);
     }
-      
-/*
-    template<typename ConstBufferSequence>
-    std::size_t write_some(impl_type& impl, const ConstBufferSequence& buf
-                          , boost::system::error_code& ec)
-    {
-      return service_impl_.write_some(impl, buf, ec);
-    }
-
-    template<typename MutableBufferSequence>
-    std::size_t read_some(impl_type& impl, MutableBufferSequence buf
-                          , boost::system::error_code& ec)
-    {
-      return service_impl_.read_some(impl, buf, ec);
-    }
-    std::string
-      GET(impl_type& impl, const std::string& name
-         , boost::system::error_code& ec)
-    {
-      return service_impl_.GET(impl, name, ec);
-    }
-
-    std::string
-      POST(impl_type& impl, const std::string& name
-          , boost::system::error_code& ec)
-    {
-      return service_impl_.POST(impl, name, ec);
-    }
-
-    std::string
-      cookie(impl_type& impl, const std::string& name
-             , boost::system::error_code& ec)
-    {
-      return service_impl_.cookie(impl, name, ec);
-    }
-
-*/
-    /*
-    std::string
-      header(impl_type& impl, const std::string& name
-            , boost::system::error_code& ec)
-    {
-      return "";
-    }
-*/
-
   private:
     service_impl_type& service_impl_;
   };

@@ -1,0 +1,26 @@
+[/
+ / Copyright (c) 2007-2009 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section:fastcgi FastCGI Quickstart]
+
+['[*TODO]: FastCGI Quickstart]
+
+FastCGI is a protocol that was designed with efficiency in mind. One of the key features of FastCGI is that it allows a CGI-like program to serve multiple requests and outlive the lifetime of any one request. The application communicates with the server using TCP sockets[footnote This library currently only supports TCP sockets. The FastCGI protocol allows for "any reliable transport" and adding support for named pipes on Windows and UNIX sockets on linux is on the TODO list.] and the data is binary-encoded, which can be parsed quickly.
+
+For a full introduction on FastCGI, see the [@http://www.fastcgi.com/drupal/node/6?q=node/15 FastCGI White Paper].
+
+This library supports FastCGI on both linux and Windows. Windows support is currently limited to external FastCGI handlers only.
+
+[h3 10 minute intro]
+
+The following example is generated from the linked [@../src/tutorial/fastcgi_quickstart.cpp source file].
+
+[import fastcgi_quickstart.cpp]
+
+[fastcgi_quickstart]
+
+[endsect]

@@ -65,7 +65,7 @@ BOOST_CGI_NAMESPACE_BEGIN
           common::is_async<typename Service::protocol_type>,
           boost::mpl::not_<
             boost::is_same<
-              typename Service::protocol_type, tags::cgi
+              typename Service::protocol_type, common::tags::cgi
             >
           >
         >
@@ -117,7 +117,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       Service,
       typename boost::enable_if<
         boost::is_same<
-          typename Service::protocol_type, tags::cgi
+          typename Service::protocol_type, common::tags::cgi
         >
       >::type
     >

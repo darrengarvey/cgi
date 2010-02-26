@@ -29,6 +29,10 @@ BOOST_CGI_NAMESPACE_BEGIN
        string_type, pair_t
      > meta_data_map_type;
      
+     form_part() {}
+     form_part(string_type const& val) : value(val) {}
+     form_part(const char_type* val) : value(val) {}
+     
      ~form_part()
      {
      /*
@@ -84,6 +88,16 @@ BOOST_CGI_NAMESPACE_BEGIN
   {
     part.value.swap(part.name);
     part.name = n;
+    return std::make_pair(n, part);
+  }
+
+  inline
+  std::pair<common::name, common::form_part>
+    make_pair (const char* n, const char* v)
+  {
+    common::form_part part;
+    part.name = n;
+    part.value = v;
     return std::make_pair(n, part);
   }
 

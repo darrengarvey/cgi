@@ -11,6 +11,7 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/asio/buffer.hpp>
+#include "boost/cgi/config.hpp"
 
 // NOTE: CamelCase style mimicks the FastCGI specification
 // SEE: http://www.fastcgi.com/devkit/doc/fcgi-spec.html#S8
@@ -585,5 +586,11 @@ BOOST_CGI_NAMESPACE_BEGIN
 
  } // namespace fcgi
 BOOST_CGI_NAMESPACE_END
+
+namespace boost {
+  namespace fcgi {
+    using namespace ::BOOST_CGI_NAMESPACE::fcgi;
+  }
+}
 
 #endif // CGI_FCGI_SPECIFICATION_HPP_INCLUDED__

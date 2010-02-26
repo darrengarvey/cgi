@@ -154,7 +154,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     basic_response<char_type>&
       set_header(const string_type& value);
-      
+
     /// Format and add a header given name and value, appending CRLF.
     basic_response<char_type>&
       set_header(string_type const& name, string_type const& value);
@@ -236,9 +236,9 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
  
   protected:
-   // Vector of all the headers, each followed by a CRLF
+    // Vector of all the headers, each followed by a CRLF
     std::vector<string_type> headers_;
-    
+
     // The buffer is a shared_ptr, so you can keep it cached elsewhere.
     boost::shared_ptr<common::streambuf> buffer_;
 

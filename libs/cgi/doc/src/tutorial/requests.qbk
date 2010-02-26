@@ -1,0 +1,22 @@
+[/
+ / Copyright (c) 2007 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section Requests]
+
+The template class [classref cgi::basic_request `cgi::basic_request<>`] is the main entry point to the library. 
+
+The following `typedef`s are provided for typical usage:
+``
+cgi::request // CGI
+fcgi::request // FastCGI
+``
+
+[include:data variables.qbk]
+
+[/link ]
+
+[endsect]

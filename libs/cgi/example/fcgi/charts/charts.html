@@ -1,0 +1,95 @@
+{{! This is a comment. }}
+{{! Set the delimeter just for this introduction. }}
+{{=<< >>=}}
+<<! This is a comment for now.
+
+    Fields look like: {{variable}}
+    Sections look like: {{#section}}some stuff{{/section}}.
+    
+    Need to reset the delimeter now, back to the default.
+>>
+<<={{ }}=>>
+{{! This is a comment again. }}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>FastCGI Stencils (using Google cTemplate)</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+</head>
+<body>
+
+{{!
+    The response content is set to the `content` field.
+    
+    You can write to the stencil just as with a boost::cgi::response and when
+    the stencil is expanded, the body of the response is dumped into the
+    `content` field. If you don't want to display the content, simply remove
+    this field in the template.
+}}
+
+<p><a href="{{script_name}}">Reset Tests</a></p>
+
+<fieldset>
+    <legend>Test 1 - Original Response Content</legend>
+    <div id="content">
+        {{! Indenting works as you'd expect. }}
+        {{content}}
+    </div>
+</fieldset>
+
+<fieldset>
+    <legend>Test 2 - GET Variables</legend>
+    Here we test using values taken from the query string. The first value shows an HTML-escaped string.
+    The second line attempts type-casting to a short: If that fails, a default value of -1 is used.
+    <ul>
+        <li>
+            String: {{some_string:h}} (examples:
+            <a href="?string=hello, world!">plain string</a>,
+            <a href="?string=encoded-%A3$Q_%2F%A3%22(%A3">encoded string</a>)
+        </li>
+        <li>
+            {{short_bits}}-bit integer: {{some_short}} (examples:
+            <a href="?short=1666">valid number</a>,
+            <a href="?short=NaN">invalid number</a>)
+        </li>
+    </ul>
+</fieldset>
+
+<fieldset>
+    <legend>Test 3 - Optional Sections (<a href="?show={{show}}">{{show}}</a>)</legend>
+    {{#some_section}}
+    <div id="section">
+        This section is shown by default and has only plain text in it.
+    </div>
+    {{/some_section}}
+</fieldset>
+
+<fieldset>
+    <legend>Test 4 - Sections With a Single Field</legend>
+    Below are some variables, shown by expanding a section multiple times
+    (<a href="?count={{show_more}}">more</a> | <a href="?count={{show_less}}">less</a> | <a href="{{script_name}}">reset</a>):
+    {{#section_with_variable}}
+    <div class="section">
+        &lt; Section #{{some_section_variable:h}} &gt;
+     </div>
+    {{/section_with_variable}}
+</fieldset>
+
+<fieldset>
+    <legend>Test 5 - Embedded sections</legend>
+    {{#embedded}}
+    <ul>
+        {{#subsection}}
+        <li>The embedded section.<br />Test: {{test}} {{other}}</li>
+        {{/subsection}}
+    </ul>
+    {{/embedded}}
+</fieldset>
+
+<fieldset>
+    <legend>Test 6 - Include Files</legend>
+    {{>include}}
+</fieldset>
+
+</body>
+</html>

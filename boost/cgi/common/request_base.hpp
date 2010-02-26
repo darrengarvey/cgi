@@ -23,9 +23,9 @@
 #include "boost/cgi/common/map.hpp"
 #include "boost/cgi/common/form_part.hpp"
 #include "boost/cgi/common/parse_options.hpp"
+#include "boost/cgi/common/protocol_traits.hpp"
 #include "boost/cgi/common/request_status.hpp"
 #include "boost/cgi/detail/extract_params.hpp"
-#include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/detail/save_environment.hpp"
 #include "boost/cgi/config.hpp"
 
@@ -50,21 +50,18 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       typedef impl_base                              base_type;
       typedef Protocol                               protocol_type;
-      typedef detail::protocol_traits<Protocol>      traits;
-
-      typedef typename traits::char_type             char_type;
-      typedef typename traits::string_type           string_type;
+      typedef protocol_traits<Protocol>              traits;
       typedef typename traits::buffer_type           buffer_type;
-      typedef typename traits::const_buffers_type    const_buffers_type;
-      typedef typename traits::mutable_buffers_type  mutable_buffers_type;
-      
-      typedef typename traits::form_parser_type      form_parser_type;
- 
+      typedef typename traits::char_type             char_type;
       typedef typename traits::client_type           client_type;
       typedef typename traits::connection_type       connection_type;
-      typedef typename connection_type::pointer      conn_ptr;
-      typedef typename traits::request_type          request_type;
+      typedef typename traits::const_buffers_type    const_buffers_type;
+      typedef typename traits::form_parser_type      form_parser_type;
+      typedef typename traits::mutable_buffers_type  mutable_buffers_type;
       typedef typename traits::protocol_service_type protocol_service_type;
+      typedef typename traits::request_type          request_type;
+      typedef typename traits::string_type           string_type;
+      typedef typename connection_type::pointer      conn_ptr;
       
       /**
        * If you want to add a new data type to a request you need to:

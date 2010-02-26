@@ -18,23 +18,25 @@ BOOST_CGI_NAMESPACE_BEGIN
    /// Redirect a request to another place.
    /**
     * Note that without also outputting a content-type header, this will be a
-    * 'soft' redirect and the location won't be updated. If you want to do a
-    * 'hard' redirect, pass a 'Content-type: text/plain' header along with
-    * two CRLFs to complete the headers.
+    * 'soft' (internal) redirect. If you want to do a 'hard' redirect, pass a
+    * 'Content-type: text/plain' header along with two CRLFs to complete the
+    * headers.
     */
    template <typename RequestT>
    basic_header<typename RequestT::char_type>
    redirect(RequestT& req, typename RequestT::string_type const& dest
            , bool secure, boost::system::error_code& ec)
    {
-     std::string url(secure ? "https" : "http");
-     url += "://" + req.server_name();
-     if (dest[0] == '/')
-       url += dest;
-     else
-       url += "/" + dest;
-     basic_header<typename RequestT::char_type> hdr("Location", url);
-     return hdr;
+     typename RequestT::string_type url(dest);
+     if (url.find("://") == typename RequestT::string_type::npos) {
+       url = secure ? "https" : "http";
+       url += "://" + req.server_name();
+       if (dest[0] == '/')
+         url += dest;
+       else
+         url += "/" + dest;
+     }
+     return basic_header<typename RequestT::char_type>("Location", url);
    }
 
    template <typename RequestT>

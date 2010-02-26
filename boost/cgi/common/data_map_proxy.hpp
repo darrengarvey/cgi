@@ -55,7 +55,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     typedef typename map_type::const_reverse_iterator const_reverse_iterator;
     typedef typename map_type::allocator_type         allocator_type;
     
-    self_type()
+    data_map_proxy()
       : impl(NULL)
     {
     }
@@ -79,7 +79,22 @@ BOOST_CGI_NAMESPACE_BEGIN
     const_reverse_iterator rend() const {
        BOOST_CGI_MAP_ASSERT(impl); return impl->rend(); }
 
-
+    iterator insert( iterator pos, const value_type& pair ) {
+       BOOST_CGI_MAP_ASSERT(impl);
+       return impl->insert(pos, pair);
+    }
+    
+    template<typename InputIterator>
+    void insert(InputIterator start, InputIterator end) {
+       BOOST_CGI_MAP_ASSERT(impl);
+       return impl->insert(start, end);
+    }
+    
+    std::pair<iterator,bool> insert(const value_type& pair) {
+       BOOST_CGI_MAP_ASSERT(impl);
+       return impl->insert(pair);
+    }
+    
     void set(map_type& data) { impl = &data; }
 
     bool empty() { BOOST_CGI_MAP_ASSERT(impl); return impl->empty(); }
@@ -93,7 +108,7 @@ BOOST_CGI_NAMESPACE_BEGIN
        return impl->count(key);
     }
 
-    /// Get a value for the key, with fallback.
+    /// Get a value for the key, with a fallback when not found.
     mapped_type const&
       pick(key_type const& key, mapped_type const& default_value) const
     {
@@ -102,23 +117,35 @@ BOOST_CGI_NAMESPACE_BEGIN
       return iter == impl->end() ? default_value : iter->second;
     }
 
+    /// Get a value for the key as a specified type.
+    /**
+     * @param key   The name of CGI parameter to look for.
+     *
+     * If the key is found, attempts to convert the value into the type
+     * T. This throws a boost::bad_lexical_cast when it fails.
+     */
+    template<typename T>
+    T as(key_type const& key) const
+    {
+      BOOST_CGI_MAP_ASSERT(impl);
+      return boost::lexical_cast<T>((*impl)[key]);
+    }
+
     /// Get a value for the key as a specified type, with fallback.
     /**
      * @param key   The name of CGI parameter to look for.
      * @param default_value
      *              The default return value. If no data exists in the map
      *              for the specified key, or the data cannot be converted
-     *              into the type of the default_ value, then this value is
-     *              returned.
+     *              into the type T, then this value is returned.
      *
      * If the key cannot be found, returns a default-constructed object
      * of type T.
      *
-     * If the key is found, attempts to convert the value into the type
-     * T. This throws a boost::bad_lexical_cast when it fails.
+     * If the key is found, attempts to convert the value into the type T.
      */
     template<typename T>
-    T as(key_type const& key, T const& default_value = T()) const
+    T pick(key_type const& key, T const& default_value = T()) const
     {
       BOOST_CGI_MAP_ASSERT(impl);
       const_iterator iter = impl->find(key);
@@ -161,7 +188,7 @@ BOOST_CGI_NAMESPACE_BEGIN
   private:      
     map_type* impl;
   };
-
+  
  } // namespace common
 BOOST_CGI_NAMESPACE_END
 

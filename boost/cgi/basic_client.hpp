@@ -12,11 +12,11 @@
 #include <boost/shared_ptr.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/common/map.hpp"
+#include "boost/cgi/common/protocol_traits.hpp"
 #include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/common/request_status.hpp"
 #include "boost/cgi/connections/tcp_socket.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
-#include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/error.hpp"
 #include "boost/cgi/http/status_code.hpp"
 
@@ -53,23 +53,18 @@ BOOST_CGI_NAMESPACE_BEGIN
    *    clients aware of how busy the connection is and size its output packets
    *    accordingly... But I'm not doing that.
    */
-  template<typename Connection, typename Protocol>
+  template<typename Protocol>
   class basic_client
   {
   public:
-    //typedef BOOST_CGI_NAMESPACE::map                          map_type;
-    typedef ::BOOST_CGI_NAMESPACE::common::io_service   io_service_type;
-    typedef ::BOOST_CGI_NAMESPACE::common::map          map_type;
-    typedef Connection                        connection_type;
-    typedef Protocol                          protocol_type;
-    typedef typename connection_type::pointer connection_ptr;
-    typedef boost::array<unsigned char, 8>    header_buffer_type;
-    typedef boost::asio::mutable_buffers_1    mutable_buffers_type;
-    typedef typename 
-      detail::protocol_traits<
-          Protocol
-      >::role_type                              role_type;
-
+    typedef Protocol                              protocol_type;
+    typedef common::map                           map_type;
+    typedef protocol_traits<Protocol>             traits;
+    typedef typename traits::connection_type      connection_type;
+    typedef typename traits::mutable_buffers_type mutable_buffers_type;
+    typedef typename traits::header_buffer_type   header_buffer_type;
+    typedef typename connection_type::pointer     connection_ptr;
+    typedef typename traits::role_type            role_type;
 
     basic_client()
     {

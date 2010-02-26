@@ -22,7 +22,6 @@ BOOST_CGI_NAMESPACE_BEGIN
 
   typedef cgi_request request;
   using namespace common;
-  //typedef BOOST_CGI_NAMESPACE::cgi_service service; // to be added
   
 BOOST_CGI_NAMESPACE_END
 

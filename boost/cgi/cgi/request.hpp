@@ -11,7 +11,6 @@
 
 #include "boost/cgi/detail/push_options.hpp"
 
-#include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/common/tags.hpp"
 #include "boost/cgi/cgi/service.hpp"
 #include "boost/cgi/cgi/request_service.hpp"

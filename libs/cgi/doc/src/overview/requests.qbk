@@ -1,0 +1,8 @@
+
+[section:request Requests]
+
+['[*TODO]: Document using Requests]
+
+[include:loading requests/loading.qbk]
+
+[endsect] [/ requests]

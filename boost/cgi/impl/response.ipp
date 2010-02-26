@@ -20,7 +20,6 @@
 #include <boost/foreach.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/config.hpp"
-
 #include "boost/cgi/common/cookie.hpp"
 #include "boost/cgi/common/header.hpp"
 #include "boost/cgi/common/name.hpp"

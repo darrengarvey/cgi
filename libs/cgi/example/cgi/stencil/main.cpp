@@ -42,9 +42,9 @@ int handle_request(request& req)
   resp.set("short_bits", 8 * sizeof(short)); // Populates {{short_bits}}.
   if (req.get.count("short"))
   {
-    // Almost any type is supported by as<>
+    // Almost any type is supported by pick<>
     // (ie. any type supported by Boost.Lexical_cast.).
-    short some_short = req.get.as<short>("short", -1);
+    short some_short = req.get.pick<short>("short", -1);
     resp.set("some_short", some_short);
   }
   
@@ -60,7 +60,7 @@ int handle_request(request& req)
   
   //// Test 4.
   
-  int num = req.get.as("count", 0);
+  int num = req.get.pick("count", 0);
   if (num < 0) num = 0;
   resp.set("show_less", num ? num - 1 : 0);
   resp.set("show_more", num + 1);

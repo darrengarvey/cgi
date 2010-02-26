@@ -30,73 +30,73 @@ import quickbook ;
 #import auto-index ;
 
 # compile the doxygen sources here
-doxygen autodoc
-  :
+#doxygen autodoc
+#  :
 #   [ glob-tree ../../../boost/cgi/*.hpp : .svn ]
 #   [ glob-tree ../../../boost/libs/cgi/src/*.cpp : .svn ]
-
-    [ glob $(top)/boost/cgi/*.hpp ]
-    [ glob $(top)/boost/cgi/common/*.hpp ]
-    [ glob $(top)/boost/cgi/util/*.hpp ]
-    [ glob $(top)/boost/cgi/connections/*.hpp ]
-    [ glob $(top)/boost/cgi/cgi/*.hpp ]
-    [ glob $(top)/boost/cgi/fcgi/*.hpp ]
-    $(top)/boost/cgi/fcgi/client.hpp
-    $(top)/boost/cgi/fcgi/service.hpp
-    $(top)/boost/cgi/fcgi/acceptor.hpp
-    $(top)/boost/cgi/fcgi/request.hpp
-    $(top)/boost/cgi/cgi/service.hpp
-    $(top)/boost/cgi/cgi/request.hpp
-    $(top)/boost/cgi/http/status_code.hpp
-  :
-    <doxygen:param>TAB_SIZE=2
-    # <doxygen:param>EXTRACT_ALL=YES
-    <doxygen:param>HIDE_UNDOC_MEMBERS=NO
-    # Show all inherited members of a class in the documentation of that class
-    # as if those members were ordinary class members.
-    <doxygen:param>INLINE_INHERITED_MEMB=YES
-    <doxygen:param>SORT_MEMBER_DOCS=YES
-    #<doxygen:param>EXTRACT_PRIVATE=YES
-    <doxygen:param>EXTRACT_STATIC=YES
-    # If the EXTRACT_PRIVATE tag is set to YES all private members of a class
-    # will be included in the documentation
-    <doxygen:param>EXTRACT_PRIVATE=NO 
-    <doxygen:param>EXTRACT_LOCAL_CLASSES=YES
-    <doxygen:param>EXTRACT_LOCAL_METHODS=YES
-    # If the EXTRACT_LOCAL_CLASSES tag is set to YES classes (and structs) defined
-    # locally in source files will be included in the documentation.
-    <doxygen:param>EXTRACT_LOCAL_CLASSES=YES 
-    <doxygen:param>ENABLE_PREPROCESSING=YES
-    <doxygen:param>MACRO_EXPANSION=YES
-    <doxygen:param>EXPAND_ONLY_PREDEF=YES
-    <doxygen:param>SEARCH_INCLUDES=YES
+#
+#    [ glob $(top)/boost/cgi/*.hpp ]
+#    [ glob $(top)/boost/cgi/common/*.hpp ]
+#    [ glob $(top)/boost/cgi/util/*.hpp ]
+#    [ glob $(top)/boost/cgi/connections/*.hpp ]
+#    [ glob $(top)/boost/cgi/cgi/*.hpp ]
+#    [ glob $(top)/boost/cgi/fcgi/*.hpp ]
+#    $(top)/boost/cgi/fcgi/client.hpp
+#    $(top)/boost/cgi/fcgi/service.hpp
+#    $(top)/boost/cgi/fcgi/acceptor.hpp
+#    $(top)/boost/cgi/fcgi/request.hpp
+#    $(top)/boost/cgi/cgi/service.hpp
+#    $(top)/boost/cgi/cgi/request.hpp
+#    $(top)/boost/cgi/http/status_code.hpp
+#  :
+#    <doxygen:param>TAB_SIZE=2
+#    # <doxygen:param>EXTRACT_ALL=YES
+#    <doxygen:param>HIDE_UNDOC_MEMBERS=NO
+#    # Show all inherited members of a class in the documentation of that class
+#    # as if those members were ordinary class members.
+#    <doxygen:param>INLINE_INHERITED_MEMB=YES
+#    <doxygen:param>SORT_MEMBER_DOCS=YES
+#    #<doxygen:param>EXTRACT_PRIVATE=YES
+#    <doxygen:param>EXTRACT_STATIC=YES
+#    # If the EXTRACT_PRIVATE tag is set to YES all private members of a class
+#    # will be included in the documentation
+#    <doxygen:param>EXTRACT_PRIVATE=NO 
+#    <doxygen:param>EXTRACT_LOCAL_CLASSES=YES
+#    <doxygen:param>EXTRACT_LOCAL_METHODS=YES
+#    # If the EXTRACT_LOCAL_CLASSES tag is set to YES classes (and structs) defined
+#    # locally in source files will be included in the documentation.
+#    <doxygen:param>EXTRACT_LOCAL_CLASSES=YES 
+#    <doxygen:param>ENABLE_PREPROCESSING=YES
+#    <doxygen:param>MACRO_EXPANSION=YES
+#    <doxygen:param>EXPAND_ONLY_PREDEF=YES
+#    <doxygen:param>SEARCH_INCLUDES=YES
     # If the INLINE_INFO tag is set to YES (the default) then a tag [inline] is
     # inserted in the documentation for inline members.
-    <doxygen:param>INLINE_INFO=YES
+#    <doxygen:param>INLINE_INFO=YES
     # If the SORT_BRIEF_DOCS tag is set to YES then doxygen will sort the brief
     # descriptions of file, namespace and class members alphabetically by member
     # name.
-    <doxygen:param>SORT_BRIEF_DOCS=YES
+#    <doxygen:param>SORT_BRIEF_DOCS=YES
     # If the SORT_MEMBER_DOCS tag is set to YES (the default) then doxygen will
     # sort the (detailed) documentation of file and class members alphabetically
     # by member name.
-    <doxygen:param>SORT_MEMBER_DOCS=YES
+#    <doxygen:param>SORT_MEMBER_DOCS=YES
     # List of the files that are included by a file in the documentation of that
     # file.
-    <doxygen:param>SHOW_INCLUDE_FILES=NO
+#    <doxygen:param>SHOW_INCLUDE_FILES=NO
     # Prepend the brief description of a member or function before the detailed
     # description
-    <doxygen:param>REPEAT_BRIEF=YES
+#    <doxygen:param>REPEAT_BRIEF=YES
     # Include brief member descriptions after the members that are listed in the
     # file and class
-    <doxygen:param>BRIEF_MEMBER_DESC=YES
+#    <doxygen:param>BRIEF_MEMBER_DESC=YES
     # Treat a multi-line C++ special comment block (i.e. a block of //! or
     # /// comments) as a brief description.
-    <doxygen:param>MULTILINE_CPP_IS_BRIEF=YES
+#    <doxygen:param>MULTILINE_CPP_IS_BRIEF=YES
     # May be best to always use \brief and \details to avoid ambiguity?
-    <doxygen:param>INCLUDE_PATH=$(boost-root)
-    <doxygen:param>WARN_LOGFILE=$(top)/libs/cgi/doc/doxywarnings.log
-  ;
+#    <doxygen:param>INCLUDE_PATH=$(boost-root)
+#    <doxygen:param>WARN_LOGFILE=$(top)/libs/cgi/doc/doxywarnings.log
+#  ;
 
 xml cgi_xml : src/cgi.qbk ;
 
@@ -123,20 +123,21 @@ boostbook standalone
     # Use graphics not text for navigation:
     <xsl:param>navig.graphics=1
     # How far down we chunk nested sections, basically all of them:
-    <xsl:param>chunk.section.depth=10
+    <xsl:param>chunk.section.depth=2
     # Don't put the first section on the same page as the TOC:
     <xsl:param>chunk.first.sections=1
     # How far down sections get TOC's
     <xsl:param>toc.section.depth=10
     # Max depth in each TOC:
-    <xsl:param>toc.max.depth=4
+    <xsl:param>toc.max.depth=2
     # How far down we go with TOC's
     <xsl:param>generate.section.toc.level=1
     #<xsl:param>generate.toc="chapter nop section nop"
 
     #<xsl:param>root.filename="svg_plot"
     #<xsl:param>root.filename=cgi
-    <xsl:param>boost.image.src="../../../../boost/boostified/release/doc/html/images"
+    <xsl:param>boost.image.src="../doc/src/images"
+    <xsl:param>project.image.src="../doc/src/images"
 
     # <xsl:param>project.root=http://beta.boost.org/development
     # <xsl:param>annotation.support=1
@@ -168,7 +169,7 @@ boostbook standalone
     <format>pdf:<xsl:param>admon.graphics.path=$(images_location)/images/
     <format>pdf:<xsl:param>draft.mode="no"
 
-    <dependency>autodoc
+#    <dependency>autodoc
  	;
 
 install html

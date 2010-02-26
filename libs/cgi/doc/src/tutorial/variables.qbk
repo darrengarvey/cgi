@@ -1,0 +1,173 @@
+[/
+ / Copyright (c) 2007-2009 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[def __xss_footnote__ It is generally accepted that a CGI program should pay attention to where meta-data has come from (eg. [@http://www.google.com/search?q=XSS XSS]). In other words, since `basic_request<>::form` removes such distinctions, its use should be limited to places where the source of the variable doesn't matter. For example, a language toggle (like `"hl=en"`, as Google uses) could come from anywhere and doing so is not an issue.]
+
+[section:variables Using Request Variables]
+
+[warning
+A request [*must] be [link __loading__ loaded] before the request data can be accessed.
+]
+
+[table Request variable accessor functions
+  [[Function signature] [Purpose]]
+  [
+   [`common::env_map& env`]
+   [Return a complete map of the environment meta-data for the request.]
+  ]
+  [
+   [`common::get_map& get`]
+   [Return a complete map of the GET variables for the request.]
+  ]
+  [
+   [`common::post_map& post`]
+   [Return a complete map of the POST variables associated for the request. File uploads are not stored in this map.]
+  ]
+  [
+   [`common::form_map& form`]
+   [Return a complete map of the form variables associated with the request. This is equivalent to either `get` or `post`, depending on the `request_method()` of the request.]
+  ]
+  [
+   [`common::cookie_map& cookies`]
+   [Return a complete map of the cookies for a request.]
+  ]
+  [
+   [`common::upload_map& uploads`]
+   [A map of all of the file uploads for a request. An `upload_map` is equivalent to a `std::map<common::key, common::form_part&>`.]
+  ]
+]
+
+[h3 Example usage]
+
+``
+{
+// ...
+  cgi::request request(cgi::parse_all);
+  cgi::response response;
+
+  if (request.get.count("user_id")) {
+    std::string user_id ( request.get["user_id"] );
+  }
+  
+  int convert_to_int = request.get.as<int>("number");
+// ...
+}
+``
+
+The CGI specification defines a set of basic environment variables that you can expect to be set, which describe the context of the request.
+
+All of these are loaded into `basic_request<>::env` and are accessible the same as any other bit of request data:
+
+``
+cgi::request request;
+string request_method = request.env["request_method"];
+``
+
+Since looking up variables using raw strings can be error-prone, there is a safer way to reference the standard CGI environment variables. Not only are these short-cuts less error-prone, some of them convert the value into a suitable type. For instance, `content_length()` returns a `long`.
+
+The table below lists them, and briefly explains their function.[footnote Reference information largely drafted from [@http://hoohoo.ncsa.uiuc.edu/cgi/env.html] and [@http://www.ietf.org/rfc/rfc3875 RFC3875].]
+
+[table Standard CGI Meta-variables
+  [[CGI Variable] [Function signature] [Purpose]]
+  [
+   [`AUTH_TYPE`]
+   [`string_type& auth_type()`]
+   [If the server supports user authentication, and the script is protected, this is the protocol-specific authentication method used to validate the user.]
+  ]
+  [
+   [`CONTENT_LENGTH`]
+   [`long content_length()`]
+   [The size of the message-body attached to the request.]
+  ]
+  [
+   [`CONTENT_TYPE`]
+   [`string_type& content_type()`]
+   [The content type of data attached to the query, if any (ev. POST, PUT)]
+  ]
+  [
+   [`GATEWAY_INTERFACE`]
+   [`string_type& gateway_interface()`]
+   [The revision of the CGI specification to which this server complies. Format: CGI/revision, eg. `"CGI/1.1"`]
+  ]
+  [
+   [`PATH_INFO`]
+   [`common::path_info& path_info()`]
+   [The extra path information, as given by the client. In other words, scripts can be accessed by their virtual pathname, followed by extra information at the end of this path. The extra information is sent as PATH_INFO.]
+  ]
+  [
+   [`PATH_TRANSLATED`]
+   [`common::path_info& path_translated()`]
+   [The server provides a translated version of PATH_INFO, which takes the path and does any virtual-to-physical mapping to it.]
+  ]
+  [
+   [`QUERY_STRING`]
+   [`string_type& query_string()`]
+   [The information following the '?' in the URL. This is where the GET data is extracted from. Format: `"name1=value1&name2=value2..."` Any reserved characters are URL-encoded.]
+  ]
+  [
+   [`REMOTE_ADDR`]
+   [`string_type& remote_addr()`]
+   [The IP address of the remote host making the request. You should [*never] rely on the accuracy of this value, as it is easily forged.]
+  ]
+  [
+   [`REMOTE_HOST`]
+   [`string_type& remote_host()`]
+   [The hostname making the request.]
+  ]
+  [
+   [`REMOTE_IDENT`]
+   [`string_type& remote_ident()`]
+   [If the HTTP server supports [rfc 931] identification, then this variable will be set to the remote user name retrieved from the server. Usage of this variable should be limited to logging only.]
+  ]
+  [
+   [`REMOTE_USER`]
+   [`string_type& remote_user()`]
+   [If the server supports user authentication, and the script is protected, this is the username they have authenticated as.]
+  ]
+  [
+   [`REQUEST_METHOD`]
+   [`common::request_method& request_method()`]
+   [The method with which the request was made. For HTTP, this is "GET", "HEAD", "POST", etc.]
+  ]
+  [
+   [`SCRIPT_NAME`]
+   [`string_type& script_name()`]
+   [A virtual path to the script being executed, used for self-referencing URLs.]
+  ]
+  [
+   [`SCRIPT_URL`]
+   [`string_type& script_url()`]
+   [A virtual path to the script being executed, used for self-referencing URLs.]
+  ]
+  [
+   [`SCRIPT_URI`]
+   [`string_type& script_uri()`]
+   [A virtual path to the script being executed, used for self-referencing URLs.]
+  ]
+  [
+   [`SERVER_NAME`]
+   [`string_type& server_name()`]
+   [The server's hostname, DNS alias, or IP address as it would appear in self-referencing URLs.]
+  ]
+  [
+   [`SERVER_PORT`]
+   [`short server_port()`]
+   [The port number to which the request was sent.]
+  ]
+  [
+   [`SERVER_PROTOCOL`]
+   [`string_type& server_protocol()`]
+   [The name and revision of the information protcol this request came in with. Format: protocol/revision.]
+  ]
+  [
+   [`SERVER_SOFTWARE`]
+   [`string_type& server_software()`]
+   [The name and version of the information server software answering the request (and running the gateway). Format: name/version.]
+  ]
+]
+
+[endsect]

@@ -16,32 +16,29 @@
 
 #include "boost/cgi/detail/push_options.hpp"
 
-#include <boost/mpl/if.hpp>
-#include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/optional.hpp>
 #include <boost/functional/hash.hpp>
-#include <boost/asio/io_service.hpp>
 #include <boost/system/error_code.hpp>
-#include <boost/utility/enable_if.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/common/data_map_proxy.hpp"
 #include "boost/cgi/common/form_part.hpp"
-#include "boost/cgi/common/has_hidden_io_service.hpp"
 #include "boost/cgi/common/map.hpp"
 #include "boost/cgi/common/parse_options.hpp"
 #include "boost/cgi/common/path_info.hpp"
+#include "boost/cgi/common/protocol_traits.hpp"
 #include "boost/cgi/common/request_service.hpp"
 #include "boost/cgi/common/request_status.hpp"
 #include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/common/source_enums.hpp"
 #include "boost/cgi/detail/basic_io_object.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
-#include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/fwd/basic_request_fwd.hpp"
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 #include "boost/cgi/http/status_code.hpp"
+#ifdef BOOST_CGI_ENABLE_SESSIONS
+#  include "boost/cgi/utility/sessions.hpp"
+#endif // BOOST_CGI_ENABLE_SESSIONS
 
 #ifndef BOOST_CGI_POST_MAX
     /// Restrict POST data to less than 7MB per request.
@@ -83,13 +80,13 @@ BOOST_CGI_NAMESPACE_BEGIN
   template<typename Protocol>
   class basic_request
     : public detail::basic_io_object<
-        typename detail::protocol_traits<Protocol>::service_type
+        typename protocol_traits<Protocol>::service_type
     >
   {
   public:
     typedef basic_request<Protocol>                    self_type;
     typedef Protocol                                   protocol_type;
-    typedef detail::protocol_traits<protocol_type>     traits;
+    typedef protocol_traits<protocol_type>             traits;
     typedef typename traits::protocol_service_type     protocol_service_type;
     typedef typename traits::service_type              service_type;
     typedef typename traits::pointer                   pointer;
@@ -98,6 +95,13 @@ BOOST_CGI_NAMESPACE_BEGIN
     typedef typename traits::string_type               string_type;
     typedef typename traits::client_type               client_type;
     typedef typename traits::buffer_type               buffer_type;
+    typedef typename traits::session_type              session_type;
+
+    string_type session_id_;
+    
+#ifdef BOOST_CGI_ENABLE_SESSIONS
+    session_type session;
+#endif // BOOST_CGI_ENABLE_SESSIONS
     
     common::data_map_proxy<env_map>    env;
     common::data_map_proxy<post_map>   post;
@@ -178,6 +182,23 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       //if (is_open())
       //  close(http::internal_server_error, 0);
+#ifdef BOOST_CGI_ENABLE_SESSIONS
+      try {
+          if (!session_id_.empty())
+          {
+            if (session.id().empty())
+              session.id(session_id_);
+            this->implementation.service_->save(session);
+          }
+      } catch(...) {
+         // pass
+      }
+#endif // BOOST_CGI_ENABLE_SESSIONS
+    }
+    
+    protocol_service_type& get_protocol_service()
+    {
+      return *(this->implementation.service_);
     }
     
     static pointer create(protocol_service_type& ps)
@@ -259,8 +280,12 @@ BOOST_CGI_NAMESPACE_BEGIN
           post.set(post_vars(this->implementation.vars_));
         if (parse_opts & parse_get_only || parse_opts & parse_get_only)
           uploads.set(upload_vars(this->implementation.vars_));
-        if (parse_opts & parse_cookies)
+        if (parse_opts & parse_cookies) {
           cookies.set(cookie_vars(this->implementation.vars_));
+          if (cookies.count("$ssid")) {
+            session_id_ = cookies["$ssid"];
+          }
+        }
         if (parse_opts & parse_form_only)
         {
           common::name rm(request_method().c_str());
@@ -269,6 +294,13 @@ BOOST_CGI_NAMESPACE_BEGIN
                 rm == "POST" ? post : env
           );
         }
+#ifdef BOOST_CGI_ENABLE_SESSIONS
+        if (!session_id_.empty())
+        {
+          session.id(session_id_);
+          this->implementation.service_->load(session);
+        }
+#endif // BOOST_CGI_ENABLE_SESSIONS
       }
       return ec;
     }
@@ -405,19 +437,6 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       return this->service.read_some(this->implementation, buf, ec);
     }
-
-    /// Set the output for the request
-    /**
-     * Not Implemented Yet ******************
-     *
-     * Set the output sink as `stdout_`, `stderr_`, or `stdout_ | stderr_`
-     */
-    /*
-    void set_output(BOOST_CGI_NAMESPACE::sink dest, boost::system::error_code& ec)
-    {
-      this->service(this->implementation, dest, ec);
-    }
-    */
 
     /////////////////////////////////////////////////////////
     // Helper-functions for the basic CGI 1.1 meta-variables.
@@ -620,29 +639,29 @@ BOOST_CGI_NAMESPACE_BEGIN
       return this->service.status(this->implementation);
     }
     
+    /// Set the status of a request.
     void status(common::request_status const& status)
-    {
-      this->service.status(this->implementation, status);
-    }
-    
-    common::http::status_code status(common::http::status_code const& status) const
-    {
-      return this->service.status(this->implementation);
-    }
-    
-    void status(common::http::status_code const& status)
     {
       this->service.status(this->implementation, status);
     }
    };
 
+   /// Support for Boost.Hash
+   /**
+    * `basic_request<>` supports Boost.Hash. A request will have the same hash
+    * value if all of the following are the same:
+    *
+    * * PATH_INFO
+    * * QUERY_STRING
+    * * REQUEST_METHOD
+    * * REQUEST_URI
+    */
    template<typename P>
    std::size_t hash_value(basic_request<P> const& req)
    {
      boost::hash<typename basic_request<P>::string_type> hasher;
-     return hasher(req.env["REMOTE_ADDR"] + ":"
-                 + req.env["REMOTE_PORT"] + ":"
-                 + req.env["HTTP_USER_AGENT"] + ":"
+     return hasher(req.env["PATH_INFO"] + ":"
+                 + req.env["QUERY_STRING"] + ":"
                  + req.env["REQUEST_METHOD"] + ":"
                  + req.env["REQUEST_URI"]);
    }

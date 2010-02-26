@@ -1,5 +1,7 @@
 
-[section:responses Writing Responses]
+[section:responses Responses]
+
+['[*TODO]: Document using Responses]
 
 While you may sometimes want to respond to a request by writing directly back to the client, more often that not it is preferable to buffer your response. You can never tell how successful a request is going to be from the start(or when an exception is going to be throw), so being able to rewrite your response at any time is a requirement.
 
@@ -7,7 +9,7 @@ The library provides the [classref cgi::response] class to make buffering your r
 
 [section:example Short Example]
 
-[import __doxamples__/response_1.cpp]
+[/import __doxamples__/response_1.cpp]
 
 First, include the correct header.
 
@@ -42,14 +44,6 @@ And that's most of what you need to know to get using the `response`. Check out 
 [endsect] [/ example]
 
 [section:api `cgi::response` Interface]
-
-[variablelist Interface
- 
-[
-
-]
-
-]
 
 [endsect] [/ api]
 

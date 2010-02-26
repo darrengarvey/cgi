@@ -121,6 +121,8 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename T>
     operator std::basic_string<T> () { return value; }
     
+    bool operator==(string_type const& other) { return value == other; }
+    
     template<typename T>
     friend std::ostream& operator<<(std::ostream& os, basic_cookie<T> const& ck);
   };
@@ -129,9 +131,8 @@ BOOST_CGI_NAMESPACE_BEGIN
   std::pair<common::name, common::cookie>
     make_pair (const char* n, common::cookie& ck)
   {
-    ck.value.swap(ck.name);
-    ck.name = n;
-    return std::make_pair(n, ck);
+    common::cookie new_cookie(n, ck.name);
+    return std::make_pair(n, new_cookie);
   }
 
   template<typename CharT>

@@ -27,6 +27,10 @@
 #include "boost/cgi/import/read.hpp"
 #include "boost/cgi/import/streambuf.hpp"
 #include "boost/cgi/import/write.hpp"
+#include "boost/cgi/utility/redirect.hpp"
+#ifdef BOOST_CGI_ENABLE_SESSIONS
+#  include "boost/cgi/utility/sessions.hpp"
+#endif // BOOST_CGI_ENABLE_SESSIONS
 
 #endif // CGI_DETAIL_COMMON_HEADERS_HPP_INCLUDED__
 

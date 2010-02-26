@@ -9,12 +9,15 @@
 
 //#ifdef _MSC_VER
 
+#include "boost/cgi/config.hpp"
+
 // You may want to remove these.
 #if defined (BOOST_WINDOWS)
 #   define _CRT_SECURE_NO_DEPRECATE 1
 #   define _SCL_SECURE_NO_WARNINGS 1
 #   define _CRT_SECURE_NO_WARNINGS 1
 #   define NOMINMAX
+#   pragma warning( disable : 4503 ) // warning: decorated  name length exceeded
 #endif // defined (BOOST_WINDOWS)
 
 #if !defined(BOOST_CGI_INLINE)
@@ -39,5 +42,3 @@
  * currently on by default).
  */
 #define BOOST_CGI_KEEP_EMPTY_VARS
-
-#include "boost/cgi/config.hpp"

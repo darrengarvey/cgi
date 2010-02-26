@@ -1,15 +1,15 @@
 [/
- / Copyright (c) 2007 Darren Garvey
+ / Copyright (c) 2007-2009 Darren Garvey
  /
  / Distributed under the Boost Software License, Version 1.0. (See accompanying
  / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
  /]
 
 [library CGI
-    [quickbook 1.4]
-    [version 0.01]
+    [quickbook 1.5]
+    [version 0.02]
     [dirname the_document_dir]
-    [copyright 2007 2008 Darren Garvey]
+    [copyright 2007-2009 Darren Garvey]
     [purpose Documentation for CGI / FastCGI Library]
     [authors [Garvey, Darren]]
     [license
@@ -92,6 +92,12 @@ These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sour
 
 [/include quickstart.qbk]
 
+[include tutorial.qbk]
+
+[include overview.qbk]
+
+[include utilities.qbk]
+
 [/include user_guide.qbk]
 
 [/include:tutorial user_guide/tutorial.qbk]
@@ -120,4 +126,4 @@ These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sour
 
 [/xinclude quickref.xml]
 
-[include reference.qbk]
+[/include reference.qbk]

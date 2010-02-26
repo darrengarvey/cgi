@@ -23,12 +23,13 @@ test-suite run_test_suite
   :
     #[ run [ glob *.cpp ] ]
     
-    [ run cookie.cpp ]
-    [ run response.cpp  ]
-    [ run cgi_simple_request.cpp ]
-    [ run name_test.cpp ]
-    [ run map_test.cpp ]
-    [ run parse_options.cpp ]
+    #[ run cookie.cpp ]
+    #[ run response.cpp  ]
+    #[ run cgi_simple_request.cpp ]
+    #[ run name_test.cpp ]
+    #[ run map_test.cpp ]
+    #[ run parse_options.cpp ]
+    [ run data_map_proxy.cpp ]
     #[ run has_key.cpp ]
   ;
 

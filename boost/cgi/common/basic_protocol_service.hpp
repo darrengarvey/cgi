@@ -16,12 +16,15 @@
 #include <boost/asio/strand.hpp>
 #include <boost/detail/workaround.hpp>
 ///////////////////////////////////////////////////////////
-#include "boost/cgi/import/io_service.hpp"
-#include "boost/cgi/fwd/basic_request_fwd.hpp"
-#include "boost/cgi/detail/protocol_traits.hpp"
-#include "boost/cgi/common/io_service_provider.hpp"
-#include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 #include "boost/cgi/config.hpp"
+#include "boost/cgi/common/protocol_traits.hpp"
+#include "boost/cgi/common/io_service_provider.hpp"
+#include "boost/cgi/fwd/basic_request_fwd.hpp"
+#include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
+#include "boost/cgi/import/io_service.hpp"
+#ifdef BOOST_CGI_ENABLE_SESSIONS
+#  include "boost/cgi/utility/sessions.hpp"
+#endif // BOOST_CGI_ENABLE_SESSIONS
 
 BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
@@ -33,16 +36,18 @@ BOOST_CGI_NAMESPACE_BEGIN
    */
   template<typename Protocol, typename IoServiceProvider>
   class basic_protocol_service
-    //: public protocol_traits<Protocol> // do this!
   {
   public:
-    typedef Protocol                                         protocol_type;
-    typedef IoServiceProvider                                ios_provider_type;
-    typedef typename detail::protocol_traits<Protocol>::type traits;
-    typedef typename traits::request_type                    request_type;
-    typedef typename boost::shared_ptr<request_type>         request_ptr;
-    typedef std::set<request_ptr>                            set_type;
-    typedef std::queue<request_ptr>                          queue_type;
+    typedef Protocol                                 protocol_type;
+    typedef IoServiceProvider                        ios_provider_type;
+    typedef typename protocol_traits<Protocol>::type traits;
+    typedef typename traits::request_type            request_type;
+    typedef typename request_type::pointer           request_ptr;
+    typedef std::set<request_ptr>                    set_type;
+    typedef std::queue<request_ptr>                  queue_type;
+#ifdef BOOST_CGI_ENABLE_SESSIONS
+    typedef typename traits::session_manager_type    session_manager_type;
+#endif // BOOST_CGI_ENABLE_SESSIONS
 
     basic_protocol_service(int pool_size_hint = 1)
       : ios_provider_(pool_size_hint)
@@ -121,6 +126,22 @@ BOOST_CGI_NAMESPACE_BEGIN
       ios_provider_.get_io_service().dispatch(handler);
     }
 
+#ifdef BOOST_CGI_ENABLE_SESSIONS
+    template<typename T>
+    void save(basic_session<T>& sesh) {
+      session_mgr_.save(sesh);
+    }
+
+    template<typename T>
+    void load(basic_session<T>& sesh) {
+      session_mgr_.load(sesh);
+    }
+    
+  private:
+    session_manager_type session_mgr_;
+
+#endif // BOOST_CGI_ENABLE_SESSIONS
+
   private:
     ios_provider_type ios_provider_;
 
@@ -128,7 +149,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     set_type request_set_;
     /// A std::queue of the waiting (ie. not-being-handled) requests.
     queue_type request_queue_;
-
+    
 #if BOOST_WORKAROUND(BOOST_MSVC, BOOST_TESTED_AT(1400))
     friend typename traits::request_type;//typename request_type;
 #else

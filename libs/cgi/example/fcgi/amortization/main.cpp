@@ -60,7 +60,7 @@ void fill_amortization_dictionary(
       string_from_currency(req.post["LoanAmt"]));
     double i = req.post.as<double>("YearlyIntRate", 1) / 1200;
     double n = req.post.as<double>("TermYrs", 1) * 12;
-    double monthly_payments = (P*i) / (1 - std::pow((1+i), -n));
+    double monthly_payments = (P*i) / (1 - std::pow((1+i), -n));+
     
     ctemplate::TemplateDictionary* sub_dict
       = dict.AddSectionDictionary("RegPmtSummary");

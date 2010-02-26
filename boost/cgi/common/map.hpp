@@ -29,10 +29,7 @@ BOOST_CGI_NAMESPACE_BEGIN
   typedef map        get_map;
   typedef map        post_map;
   typedef map        form_map;
-  typedef std::map<
-      ::BOOST_CGI_NAMESPACE::common::name,
-      ::BOOST_CGI_NAMESPACE::common::cookie
-  >                  cookie_map;
+  typedef map        cookie_map;
   typedef std::map<
       ::BOOST_CGI_NAMESPACE::common::name,
       ::BOOST_CGI_NAMESPACE::common::form_part

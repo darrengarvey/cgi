@@ -1,0 +1,97 @@
+[/
+ / Copyright (c) 2007-2009 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section:loading Loading Requests]
+
+After a request has been accepted, it should also be 'loaded'. Before being loaded the request is in an undefined state and it is unsafe to access any data associated with the request - although you may still read/write with the request. For CGI, the request's constructor calls load implicitly (this is optional behaviour), in most other situations, one of the following functions are used:
+
+[table
+  [[Method Name] [Function signature] [Purpose]]
+  [
+    [`load`]
+    [`void (parse_options& )`]
+    [Loads the request meta-data according to the passed `parse_options`. If an error occurs, a `boost::system::system_error` is thrown.]
+  ]
+  [
+    [`load`]
+    [`boost::system::error_code& (parse_options&, boost::system::error_code&)`]
+    [Loads the request meta-data according to the passed `parse_options`. If an error occurs, an `error_code` is returned with detail about the error.]
+  ]
+  [
+    [`async_load`]
+    [`template<typename Handler> void (parse_options&, Handler)`]
+    [Asynchronously loads the request meta-data according to the passed `parse_options`. `handler` must be a model of __Handler__ and will be invoked when the loading has completed. The function always returns immediately.]
+  ]
+] [/table]
+
+What the call does is acquire the request environment data as necessary and parse the CGI `GET` and `HTTP_COOKIE` variables. Also reads and parses form data (ie. `POST` data). If the form data include file uploads, these are saved to disk and information about the file is stored in the request (see `basic_request<>::uploads`).
+
+[h5 CGI example]
+
+``
+#include <boost/cgi/cgi.hpp>
+
+namespace cgi = boost::cgi;
+
+int main()
+{
+
+  // Delay loading the request data
+  cgi::request request(cgi::parse_none);
+  cgi::response response;
+
+  // ...
+
+  // Load the request now (including parsing stdin)
+  boost::system::error_code& ec;
+  request.load(cgi::parse_all, ec);
+
+  if (ec)
+  {
+    response<< "Failed to load response.";
+    return cgi::commit(request, response, cgi::http::internal_server_error);
+  }
+
+  response<< "Loaded response OK.";
+  return cgi::commit(request, response);
+}
+``
+
+[h5 Synchronous FastCGI example]
+
+``
+#include <boost/cgi/fcgi.hpp>
+
+namespace fcgi = boost::fcgi;
+
+int handler(fcgi::request& request)
+{
+    request.load(fcgi::parse_env); // minimal parsing.
+    
+    fcgi::response response;
+    response<< "Hello, world.";
+    return fcgi::commit(request, response);
+}
+
+int main()
+{
+  // Create a ProtocolService
+  fcgi::service service;
+
+  // Create an acceptor
+  fcgi::acceptor acceptor(service);
+
+  int status(0);
+  while (!status) {
+    status = acceptor.accept(&handler);
+  }
+
+  return status;
+}
+``
+
+[endsect]

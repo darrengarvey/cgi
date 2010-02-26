@@ -1,0 +1,26 @@
+[/
+ / Copyright (c) 2007-2009 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section:cgi CGI Quickstart]
+
+[tip
+    If you are familiar with the CGI protocol, you can skip straight to the 10 Minute Intro.
+]
+
+CGI is a simple protocol for writing dynamic web-enabled applications. The protocol's simplicity is key to its success, but the simplicity brings with it some limitations.
+
+By far the most significant limitation is that a CGI program handles one request before exiting. If handling a request involves resources that are expensive to initialise (eg. opening a database), then CGI may not scale as well as you would like. For true scalability, you may want [link cgi.tutorial.fastcgi FastCGI].
+
+[h3 10 Minute Intro]
+
+The following example is generated from the linked [@../src/tutorial/cgi_quickstart.cpp source file].
+
+[import cgi_quickstart.cpp]
+
+[cgi_quickstart]
+
+[endsect]

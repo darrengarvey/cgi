@@ -1,0 +1,101 @@
+
+[section "Hello, World."]
+
+Let's start at the beginning, with the eponymous "Hello world" example:
+
+``
+#include <boost/cgi.hpp>
+using namespace boost::cgi;
+
+int main()
+{
+  request req;
+  response resp; 
+
+  resp<< "Hello, world.";
+
+  return_(resp, req, 0); // note the underscore.
+}
+``
+
+This is as simple as it gets. Don't worry though, the library isn't about having the shortest examples; it just so happens that hello world is easy to do. It is probably self-explanatory, but here is what is happening:
+
+``
+#include <boost/cgi.hpp>
+using namespace boost::cgi;
+``
+
+The `boost/cgi.hpp` header includes the headers for CGI, aCGI (CGI with asynchronous I/O support) SCGI and FastCGI. If you only want the CGI stuff you can `#include <boost/cgi/cgi.hpp>`, or similarly for the other protocols (eg. `<boost/cgi/fcgi.hpp>` for FastCGI bits).
+
+``
+request req;
+response resp;
+``
+
+A CGI script is quite simple in principle: the server accepts a request, spawns your CGI program to handle it and sends the response back to the client. These three concepts map directly to the library, with the request, response and client classes.
+
+The request class (be it a `boost::cgi::request` or a `boost::fcgi::request`) is the heart of the library. The response class is a helper class that you can use similarly to `std::cout`, but with some important differences (more on this later). You aren't forced to use the response class with this library, but it's use is highly recommended. .
+
+While a `boost::cgi::request` isn't directly compatible with a `boost::fcgi::request`, a response is independent of protocol and any request you choose to use it with - that makes it easy to reuse for different requests.
+
+
+[tip The `response` class resides in the `boost::cgi::common` namespace and is aliased in the `cgi`/`fcgi`/etc. namespaces when including a protocol-specific header.
+
+eg.
+``
+#include <boost/cgi/fcgi.hpp>
+
+
+int main()
+{
+	boost::cgi::response resp1;
+	boost::cgi::response resp2;
+	
+	assert(typeid(resp1) == typeid(resp2));
+	return 0;
+}
+``]
+
+Default constructing a `boost::cgi::request` automatically parses everything you need (this is optional), so you can instantly write a response:
+
+``
+resp<< "Hello, world.";
+``
+
+You can stream data to a response just like you can with std::cout. In addition, you can stream things like `content_type("text/html")` and `cookie("whatever", "value")` or even `redirect("http://google.com")`. More on this later.
+
+`content_type()` is one of the ['`header` factories] provided by the library. In other words it is a function which returns a `header` object, so the following type lines do the same thing:
+
+``
+response resp;
+resp<< content_type("text/plain")
+	<< header("Content-type", "text/plain");	
+``
+
+Both are equivalent, but the former is more concise and (partly) checked at compile time making it less error prone. Note that the actual content type (ie. `"text/plain"`) isn't checked at all - doing this seems unnecessary.
+
+The `response` class understands `header`s and keeps them separate from the rest of the response. This allows you to add headers at any point, so long as you haven't flushed/sent the response already. For instance, you could add a custom header "Running-time" just before you send the response, which stated the time it took to handle the request.
+
+As mentioned in the _preface_, all CGI scripts require at least a "Content-type" header. However, if you don't stream any headers to a response, a default "Content-type: text/plain" header is added. You can customise this using the macro `BOOST_CGI_DEFAULT_CONTENT_TYPE`.
+
+``
+#define BOOST_CGI_DEFAULT_CONTENT_TYPE "text/html" // Default output is HTML.
+``
+
+Since the response class buffers your data, so you must send it at some point. This doesn't happen automatically. It is sent to the ['Client] associated with a request - ie. `req.client()`. A Client might actually be a connection to your HTTP server, but you should view it as a handle on a connection to the machine that made the request in the first place. You don't really need to know anything else about the Client concept for now. The library provides a convenient macro return_ to keep things clean:
+
+``
+return_(resp, req, 0);
+``
+
+This macro is equivalent to doing:
+
+``
+resp.send(req.client());
+req.close(resp.status(), 0);
+return 0; // Returns 0 to the OS
+``
+
+[tip A CGI request is effectively closed when the application exits, so you don't need to call `close()` on it. Since FastCGI and SCGI can handle multiple requests before the process exits you must explicitly close each one.]
+
+[endsect]

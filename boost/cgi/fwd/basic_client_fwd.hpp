@@ -12,7 +12,7 @@
 BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
-  template<typename Connection, typename Protocol>
+  template<typename Protocol>
   class basic_client;
 
  } // namespace common

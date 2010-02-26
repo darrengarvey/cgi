@@ -32,9 +32,9 @@
 #undef max
 #include <algorithm>
 
-#ifndef NDEBUG
+#if !defined(BOOST_CGI_NO_LOGGING) && !defined(NDEBUG)
 #   include <iostream>
-#endif 
+#endif
 
 BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
@@ -43,8 +43,7 @@ BOOST_CGI_NAMESPACE_BEGIN
   /// Construct
   template<>
   basic_client<
-      connections::shareable_tcp
-    , ::BOOST_CGI_NAMESPACE::common::tags::fcgi
+      ::BOOST_CGI_NAMESPACE::common::tags::fcgi
   >::basic_client()
     : request_id_(-1)
     , status_(none_)
@@ -59,9 +58,8 @@ BOOST_CGI_NAMESPACE_BEGIN
   /// Construct
   template<>
   basic_client<
-      connections::shareable_tcp
-    , ::BOOST_CGI_NAMESPACE::common::tags::fcgi
-  >::basic_client(io_service_type& ios)
+      ::BOOST_CGI_NAMESPACE::common::tags::fcgi
+  >::basic_client(common::io_service& ios)
     : request_id_(-1)
     , status_(none_)
     , total_sent_bytes_(0)
@@ -85,8 +83,7 @@ BOOST_CGI_NAMESPACE_BEGIN
   template<>
   boost::system::error_code
   basic_client<
-      connections::shareable_tcp
-    , ::BOOST_CGI_NAMESPACE::common::tags::fcgi
+      ::BOOST_CGI_NAMESPACE::common::tags::fcgi
   >::close(boost::uint64_t app_status, boost::system::error_code& ec)
   {
     // Note that the request may already be closed if the client aborts
@@ -121,8 +118,7 @@ BOOST_CGI_NAMESPACE_BEGIN
   template<typename ConstBufferSequence>
   void
   basic_client<
-      connections::shareable_tcp
-    , ::BOOST_CGI_NAMESPACE::common::tags::fcgi
+      ::BOOST_CGI_NAMESPACE::common::tags::fcgi
   >::prepare_buffer(const ConstBufferSequence& buf)
   {
     typename ConstBufferSequence::const_iterator iter = buf.begin();
@@ -169,8 +165,7 @@ BOOST_CGI_NAMESPACE_BEGIN
   template<>
   void
   basic_client<
-      connections::shareable_tcp
-    , ::BOOST_CGI_NAMESPACE::common::tags::fcgi
+      ::BOOST_CGI_NAMESPACE::common::tags::fcgi
   >::handle_write(std::size_t bytes_transferred, boost::system::error_code& ec)
   {
     total_sent_bytes_ += bytes_transferred;
@@ -204,8 +199,7 @@ BOOST_CGI_NAMESPACE_BEGIN
   template<typename ConstBufferSequence>
   std::size_t 
   basic_client<
-      connections::shareable_tcp
-    , ::BOOST_CGI_NAMESPACE::common::tags::fcgi
+      ::BOOST_CGI_NAMESPACE::common::tags::fcgi
   >::write_some(
       const ConstBufferSequence& buf
     , boost::system::error_code& ec
@@ -228,8 +222,7 @@ BOOST_CGI_NAMESPACE_BEGIN
   template<typename ConstBufferSequence, typename Handler>
   void
   basic_client<
-      connections::shareable_tcp
-    , ::BOOST_CGI_NAMESPACE::common::tags::fcgi
+    ::BOOST_CGI_NAMESPACE::common::tags::fcgi
   >::async_write_some(
       const ConstBufferSequence& buf
     , Handler handler
@@ -249,7 +242,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 namespace fcgi {
     typedef
       common::basic_client<
-        connections::shareable_tcp, ::BOOST_CGI_NAMESPACE::common::tags::fcgi
+        ::BOOST_CGI_NAMESPACE::common::tags::fcgi
       >
     client;
 } // namespace fcgi

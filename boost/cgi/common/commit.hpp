@@ -28,6 +28,11 @@ BOOST_CGI_NAMESPACE_BEGIN
     int commit(Request& req, Response& resp, int program_status
               , boost::system::error_code& ec)
     {
+#ifdef BOOST_CGI_ENABLE_SESSIONS
+      if (!req.session_id_.empty()) {
+        resp<< cookie("$ssid", req.session_id_);
+      }
+#endif // BOOST_CGI_ENABLE_SESSIONS
       resp.send(req.client(), ec);
       return ec ? -1 : req.close(resp.status(), program_status, ec);
     }
