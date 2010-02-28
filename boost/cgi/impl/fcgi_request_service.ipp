@@ -45,10 +45,10 @@ BOOST_CGI_NAMESPACE_BEGIN
      struct async_load_helper
      {
        async_load_helper(T& t, typename T::implementation_type& impl
-                        , bool parse_stdin, Handler h)
+                        , common::parse_options opts, Handler h)
          : type(t)
          , impl_(impl)
-         , parse_stdin_(parse_stdin)
+         , parse_opts_(opts)
          , handler_(h)
        {
        }
@@ -56,13 +56,13 @@ BOOST_CGI_NAMESPACE_BEGIN
        void operator()()
        {
          boost::system::error_code ec;
-         type.load(impl_, parse_stdin_, ec);
+         type.load(impl_, parse_opts_, ec);
          handler_(ec);
        }
 
        T& type;
        typename T::implementation_type& impl_;
-       bool parse_stdin_;
+       common::parse_options parse_opts_;
        Handler handler_;
      };
      
@@ -239,7 +239,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     BOOST_CGI_INLINE
     void fcgi_request_service::do_load(
         implementation_type& impl, common::parse_options opts,
-        Handler handler, boost::system::error_code const& ec
+        Handler handler, boost::system::error_code& ec
       )
     {
       impl.client_.construct(impl, ec);
@@ -253,8 +253,9 @@ BOOST_CGI_NAMESPACE_BEGIN
     BOOST_CGI_INLINE
     void fcgi_request_service::handle_read_header(
         implementation_type& impl, 
+        common::parse_options opts,
         Handler handler,
-        boost::system::error_code const& ec,
+        boost::system::error_code& ec,
         const std::size_t bytes_transferred
       )
     {
@@ -300,8 +301,9 @@ BOOST_CGI_NAMESPACE_BEGIN
     BOOST_CGI_INLINE
     void fcgi_request_service::handle_begin_request_header(
         implementation_type& impl,
+        common::parse_options opts,
         Handler handler,
-        boost::system::error_code const& ec
+        boost::system::error_code& ec
       )
     {
       if (//impl.request_status_ < common::env_read &&
@@ -351,14 +353,16 @@ BOOST_CGI_NAMESPACE_BEGIN
     void fcgi_request_service::async_load(
         implementation_type& impl, common::parse_options opts, Handler handler)
     {
+      /*
       strand_.post(
           boost::bind(&self_type::do_load<Handler>,
               this, boost::ref(impl), opts, handler
             )
         );
+      */
         
-      this->io_service().post(
-        detail::async_load_helper<self_type, Handler>(this, opts & common::parse_post_only, handler)
+      strand_.post(
+        detail::async_load_helper<self_type, Handler>(this, opts, handler)
       );
     }
 
@@ -483,6 +487,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     BOOST_CGI_INLINE void
     fcgi_request_service::async_read_header(
         implementation_type& impl
+      , common::parse_options opts
       , Handler handler
       , boost::system::error_code& ec)
     {
@@ -494,12 +499,12 @@ BOOST_CGI_NAMESPACE_BEGIN
         , boost::asio::transfer_all()
         , strand_.wrap(
               boost::bind(&self_type::handle_read_header,
-                  this, boost::ref(impl), handler,
+                  this, boost::ref(impl), opts, handler,
                   boost::asio::placeholders::error,
                   boost::asio::placeholders::bytes_transferred
                 )
             )
-        )
+        );
     }
 
     /*** Various handlers go below here; they might find a

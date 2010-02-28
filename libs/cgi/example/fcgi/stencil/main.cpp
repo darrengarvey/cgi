@@ -42,9 +42,14 @@ int handle_request(request& req)
   resp.set("short_bits", 8 * sizeof(short)); // Populates {{short_bits}}.
   if (req.get.count("short"))
   {
-    // Almost any type is supported by as<>
+    // Almost any type is supported by pick<>
     // (ie. any type supported by Boost.Lexical_cast.).
-    short some_short = req.get.as<short>("short", -1);
+    // This is equivalent to request::as<>, but returns the second parameter
+    // iff there is no item in the map and / or the value could not be
+    // cast to the specified type. In this case, we shall explicitly cast
+    // to a `short`. In general, however, the default type that the value is
+    // cast to is inferred from the type of the second parameter.
+    short some_short = req.get.pick<short>("short", -1);
     resp.set("some_short", some_short);
   }
   
@@ -60,7 +65,7 @@ int handle_request(request& req)
   
   //// Test 4.
   
-  int num = req.get.as("count", 0);
+  int num = req.get.pick("count", 0);
   if (num < 0) num = 0;
   resp.set("show_less", num ? num - 1 : 0);
   resp.set("show_more", num + 1);

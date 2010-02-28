@@ -1,4 +1,4 @@
-#           Copyright (c) 2007, 2008 Darren Garvey
+#           Copyright (c) 2007-2009 Darren Garvey
 #
 # Distributed under the Boost Software License, Version 1.0.
 #     (See accompanying file LICENSE_1_0.txt or copy 
@@ -9,6 +9,9 @@ project boost/cgi/example/fcgi ;
 # By default, just build the examples
 build-project hello_world ;
 build-project echo ;
+build-project amortization ;
+build-project file_browser ;
+build-project stencil ;
 build-project server1 ;
 build-project server2 ;
 build-project server3 ;
@@ -19,6 +22,9 @@ install install
   :
     hello_world
     echo
+    amortization
+    file_browser 
+    stencil
     server1
     server2
     server3

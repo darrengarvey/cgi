@@ -21,7 +21,6 @@
 #include <iostream>
 #include <iomanip>
 #include <boost/cgi/fcgi.hpp>
-#include <boost/cgi/utility.hpp>
 #include <boost/algorithm/string/regex.hpp>
 #include <ctemplate/template.h>
 
@@ -42,7 +41,7 @@ void fill_amortization_dictionary(
 {
   dict.SetValue("LoanAmt", req.post.count("LoanAmt")
       ? "$250,000" : req.post["LoanAmt"]);
-  dict.SetIntValue("YearlyIntRate", req.post.as("YearlyIntRate", 6.000));
+  dict.SetIntValue("YearlyIntRate", req.post.pick("YearlyIntRate", 6.000));
 
   boost::array<std::string, 8> year_opts
     = {{ "5", "7", "10", "20", "30", "40", "50" }};
@@ -58,9 +57,9 @@ void fill_amortization_dictionary(
   {
     double P = boost::lexical_cast<double>(
       string_from_currency(req.post["LoanAmt"]));
-    double i = req.post.as<double>("YearlyIntRate", 1) / 1200;
-    double n = req.post.as<double>("TermYrs", 1) * 12;
-    double monthly_payments = (P*i) / (1 - std::pow((1+i), -n));+
+    double i = req.post.pick("YearlyIntRate", 1.0) / 1200;
+    double n = req.post.pick("TermYrs", 1.0) * 12;
+    double monthly_payments = (P*i) / (1 - std::pow((1+i), -n));
     
     ctemplate::TemplateDictionary* sub_dict
       = dict.AddSectionDictionary("RegPmtSummary");
@@ -112,7 +111,7 @@ int write_amortization_template(Request& req, response& resp)
   std::string h("Content-type: text/html\r\n\r\n");
   write(req.client(), buffer(h));
 
-  int arg = req.get.as("arg", 2); // 2 is the default.
+  int arg = req.get.pick("arg", 2); // 2 is the default.
 
   // Different, but equivalent ways of writing the output.
   std::string output;

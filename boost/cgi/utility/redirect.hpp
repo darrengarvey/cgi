@@ -27,8 +27,9 @@ BOOST_CGI_NAMESPACE_BEGIN
    redirect(RequestT& req, typename RequestT::string_type const& dest
            , bool secure, boost::system::error_code& ec)
    {
-     typename RequestT::string_type url(dest);
-     if (url.find("://") == typename RequestT::string_type::npos) {
+     typedef typename RequestT::string_type string_type;
+     string_type url(dest);
+     if (url.find("://") == string_type::npos) {
        url = secure ? "https" : "http";
        url += "://" + req.server_name();
        if (dest[0] == '/')

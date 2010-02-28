@@ -59,6 +59,7 @@ project boost/cgi
       <library>/boost//thread/
       <library>/boost//system/
       <library>/boost//regex/
+      <library>/boost//filesystem/
       <library>/boost//date_time/
       <define>_CRT_SECURE_NO_WARNINGS
       <define>_SCL_SECURE_NO_WARNINGS
@@ -68,6 +69,7 @@ project boost/cgi
       <include>$(boost-root)
       <library>/boost//thread/
       <library>/boost//system/
+      <library>/boost//filesystem/
       <library>/boost//regex/
       <library>/boost//date_time/
       <define>_CRT_SECURE_NO_WARNINGS

@@ -228,12 +228,12 @@ BOOST_CGI_NAMESPACE_BEGIN
   )
   {
     prepare_buffer(buf);
-    
+    boost::system::error_code ec;
     std::size_t bytes_transferred
       = boost::asio::write(*connection_, outbuf_
                           , boost::asio::transfer_all(), ec);
-
     handle_write(bytes_transferred, ec);
+    handler(bytes_transferred, ec);
   }
 
  } // namespace common

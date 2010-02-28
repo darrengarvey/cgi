@@ -1,4 +1,4 @@
-#             Copyright (c) 2007 Darren Garvey
+#             Copyright (c) 2009 Darren Garvey
 #
 # Distributed under the Boost Software License, Version 1.0.
 #     (See accompanying file LICENSE_1_0.txt or copy 
@@ -6,10 +6,27 @@
 
 project boost/cgi/example/cgi/stencil ;
 
+# Note: to compile this example you need to download and install
+# cTemplate from Google. You can download it from here:
+#
+#   http://code.google.com/p/google-ctemplate/
+#
+# The stencil class is a lightweight wrapper over ctemplate, which
+# started out as just an experiment but some may find it useful.
+#
+# Also in your user-config.jam (this is just a text file you should
+# create in your "HOME" directory - Boost.Build uses this for configuration),
+# you should add a line that looks like (not the space before the
+# trailing ';'):
+# 
+#   lib ctemplate : <file>path/to/ctemplate ;
+#
+
 exe cgi_stencil
   :
      main.cpp /boost/regex/ /boost/cgi/
   :
+     <library>ctemplate
   ;
 
 

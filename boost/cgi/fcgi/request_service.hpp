@@ -146,29 +146,46 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename Handler>
     void do_load(
         implementation_type& impl, common::parse_options opts,
-        Handler handler, boost::system::error_code const& ec
+        Handler handler, boost::system::error_code& ec
       );
 
     template<typename Handler>
     void handle_read_header(
         implementation_type& impl, 
+        ::BOOST_CGI_NAMESPACE::common::parse_options opts,
         Handler handler,
-        boost::system::error_code const& ec,
+        boost::system::error_code& ec,
         const std::size_t bytes_transferred
       );
 
     template<typename Handler>
     void handle_begin_request_header(
         implementation_type& impl,
+        common::parse_options opts,
         Handler handler,
-        boost::system::error_code const& ec
+        boost::system::error_code& ec
       );
+
+    /// Asynchronously read a single header, but do nothing with it.
+    template<typename Handler>
+    void async_read_header(
+        implementation_type& impl,
+        common::parse_options opts,
+        Handler handler)
+    {
+      // clear the header first (might be unneccesary).
+      impl.header_buf_ = implementation_type::header_buffer_type();
+
+      async_read(*impl.client_.connection(), buffer(impl.header_buf_)
+                , boost::asio::transfer_all(), handler);
+    }
 
     template<typename Handler>
     void async_read_header(
-        implementation_type& impl
-      , Handler handler
-      , boost::system::error_code& ec);
+        implementation_type& impl,
+        common::parse_options opts,
+        Handler handler,
+        boost::system::error_code& ec);
 
   protected:
     /// Read and parse the cgi POST meta variables (greedily)
@@ -200,18 +217,6 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Read a single header, buf do nothing with it.
     boost::system::error_code
       read_header(implementation_type& impl, boost::system::error_code& ec);
-
-    /// Asynchronously read a single header, but do nothing with it.
-    template<typename Handler>
-    void async_read_header(implementation_type& impl, Handler handler)
-    {
-      // clear the header first (might be unneccesary).
-      impl.header_buf_ = implementation_type::header_buffer_type();
-
-      async_read(*impl.client_.connection(), buffer(impl.header_buf_)
-                , boost::asio::transfer_all(), handler);
-    }
-
 
     /*** Various handlers go below here; they might find a
      * better place to live ***/

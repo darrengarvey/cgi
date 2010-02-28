@@ -296,7 +296,8 @@ BOOST_CGI_NAMESPACE_BEGIN
      int accept(implementation_type& impl, accept_handler_type handler
              , endpoint_type* endpoint, boost::system::error_code& ec)
      {
-       typedef std::pair<std::set<request_type::pointer>::iterator, bool> pair_t;
+       typedef typename std::set<request_ptr>::iterator iter_t;
+       typedef std::pair<iter_t, bool> pair_t;
        
        request_ptr new_request;
        pair_t insert_result;
