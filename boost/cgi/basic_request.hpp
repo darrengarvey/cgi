@@ -95,11 +95,10 @@ BOOST_CGI_NAMESPACE_BEGIN
     typedef typename traits::string_type               string_type;
     typedef typename traits::client_type               client_type;
     typedef typename traits::buffer_type               buffer_type;
+#ifdef BOOST_CGI_ENABLE_SESSIONS
     typedef typename traits::session_type              session_type;
 
     string_type session_id_;
-    
-#ifdef BOOST_CGI_ENABLE_SESSIONS
     session_type session;
 #endif // BOOST_CGI_ENABLE_SESSIONS
     
@@ -276,15 +275,17 @@ BOOST_CGI_NAMESPACE_BEGIN
           env.set(env_vars(this->implementation.vars_));
         if (parse_opts & parse_get_only)
           get.set(get_vars(this->implementation.vars_));
-        if (parse_opts & parse_post_only)
+        if (parse_opts & parse_post_only) {
           post.set(post_vars(this->implementation.vars_));
-        if (parse_opts & parse_get_only || parse_opts & parse_get_only)
           uploads.set(upload_vars(this->implementation.vars_));
+        }
         if (parse_opts & parse_cookies) {
           cookies.set(cookie_vars(this->implementation.vars_));
+#ifdef BOOST_CGI_ENABLE_SESSIONS
           if (cookies.count("$ssid")) {
             session_id_ = cookies["$ssid"];
           }
+#endif // BOOST_CGI_ENABLE_SESSIONS
         }
         if (parse_opts & parse_form_only)
         {

@@ -21,12 +21,12 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/system/error_code.hpp>
 ///////////////////////////////////////////////////////////
+#include "boost/cgi/common/protocol_traits.hpp"
 #include "boost/cgi/fcgi/error.hpp"
 #include "boost/cgi/fcgi/request.hpp"
 #include "boost/cgi/import/io_service.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
 #include "boost/cgi/detail/service_base.hpp"
-#include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 
 BOOST_CGI_NAMESPACE_BEGIN
@@ -86,7 +86,7 @@ BOOST_CGI_NAMESPACE_BEGIN
    
      typedef acceptor_service_impl<Protocol>        self_type;
      typedef Protocol                               protocol_type;
-     typedef detail::protocol_traits<Protocol>      traits;
+     typedef common::protocol_traits<Protocol>      traits;
      typedef typename traits::protocol_service_type protocol_service_type;
      typedef typename traits::native_protocol_type  native_protocol_type;
      typedef typename traits::native_type           native_type;
@@ -103,7 +103,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      struct implementation_type
      {
        typedef Protocol                               protocol_type;
-       typedef detail::protocol_traits<Protocol>      traits;
+       typedef common::protocol_traits<Protocol>      traits;
        typedef typename traits::protocol_service_type protocol_service_type;
        typedef typename traits::native_protocol_type  native_protocol_type;
        typedef typename traits::request_type          request_type;

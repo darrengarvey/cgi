@@ -20,7 +20,6 @@
 #include "boost/cgi/common/tags.hpp"
 #include "boost/cgi/connections/shareable_tcp_socket.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
-#include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/fcgi/specification.hpp"
 #include "boost/cgi/fwd/basic_request_fwd.hpp"
 #include "boost/cgi/error.hpp"

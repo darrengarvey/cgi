@@ -12,13 +12,12 @@
 
 #include <boost/utility/enable_if.hpp>
 ///////////////////////////////////////////////////////////
-#include "boost/cgi/import/io_service.hpp"
+#include "boost/cgi/common/tags.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
 #include "boost/cgi/detail/service_base.hpp"
-#include "boost/cgi/common/tags.hpp"
-#include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/fcgi/acceptor_service_impl.hpp"
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
+#include "boost/cgi/import/io_service.hpp"
 
 BOOST_CGI_NAMESPACE_BEGIN
 

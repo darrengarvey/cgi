@@ -26,7 +26,6 @@ BOOST_CGI_NAMESPACE_END
 /// Dump fcgi stuff into the boost namespace
 namespace boost {
  namespace fcgi {
-   using ::BOOST_CGI_NAMESPACE::detail::protocol_traits;
    using namespace ::BOOST_CGI_NAMESPACE::fcgi;
    using namespace ::BOOST_CGI_NAMESPACE::common; // import common elements.
  } // namespace fcgi

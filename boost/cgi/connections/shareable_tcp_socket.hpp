@@ -25,7 +25,7 @@
 #include "boost/cgi/detail/push_options.hpp"
 #include "boost/cgi/common/connection_base.hpp"
 
-#include "boost/cgi/detail/protocol_traits.hpp"
+#include "boost/cgi/common/protocol_traits.hpp"
 
 BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
@@ -53,14 +53,12 @@ BOOST_CGI_NAMESPACE_BEGIN
   	typedef boost::mutex::scoped_lock                 scoped_lock_type;
     typedef boost::asio::ip::tcp::socket              next_layer_type;
 
+    typedef common::protocol_traits<tags::fcgi>       traits;
     /** FastCGI specific stuff **/
-    typedef
-      detail::protocol_traits<tags::fcgi>::request_type   request_type;
-    typedef 
-      detail::protocol_traits<tags::fcgi>::request_ptr    request_ptr;
-    typedef std::map<boost::uint16_t, request_type*> request_map_type;
-    typedef std::vector<request_type*>               request_vector_type;
-
+    typedef traits::request_type                      request_type;
+    typedef traits::request_ptr                       request_ptr;
+    typedef std::map<boost::uint16_t, request_type*>  request_map_type;
+    typedef std::vector<request_type*>                request_vector_type;
     /** End FastCGI stuff      **/
 
     // A wrapper to provide condition_type::pointer
