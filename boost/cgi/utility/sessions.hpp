@@ -70,7 +70,7 @@ public:
     ofstream ofs((sesh.id() + ".arc").c_str());
     if (ofs) {
       boost::archive::text_oarchive archive(ofs);
-      archive<< static_cast<basic_session<T>::value_type&>(sesh);
+      archive<< static_cast<typename basic_session<T>::value_type&>(sesh);
     }
   }
 
@@ -80,7 +80,7 @@ public:
     ifstream ifs((sesh.id() + ".arc").c_str());
     if (ifs) {
       boost::archive::text_iarchive archive(ifs);
-      archive>> static_cast<basic_session<T>::value_type&>(sesh);
+      archive>> static_cast<typename basic_session<T>::value_type&>(sesh);
     }
   }
 };

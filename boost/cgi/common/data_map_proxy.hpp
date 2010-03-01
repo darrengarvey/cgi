@@ -14,7 +14,7 @@
 # ifndef NDEBUG
 #   define BOOST_CGI_MAP_ASSERT(x) if (!x) throw map_read_error<map_type>()
 # else
-#   define BOOST_CGI_MAP_ASSERT(x) void
+#   define BOOST_CGI_MAP_ASSERT(x)
 # endif // NDEBUG
 #endif // BOOST_CGI_MAP_ASSERT
 
