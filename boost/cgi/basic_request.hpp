@@ -50,17 +50,16 @@
 #endif 
 
 BOOST_CGI_NAMESPACE_BEGIN
- 
  namespace common {
 
-   /// Get a hashed interpretation of the request.
-   /**
-    * You cannot consider this completely unique to each
-    * request, but it should be quite useful anyway.
-    * You can use this for logging or tracking, for example.
-    */
-   template<typename P>
-   std::size_t hash_value(basic_request<P> const& req);
+  /// Get a hashed interpretation of the request.
+  /**
+   * You cannot consider this completely unique to each
+   * request, but it should be quite useful anyway.
+   * You can use this for logging or tracking, for example.
+   */
+  template<typename P>
+  std::size_t hash_value(basic_request<P> const& req);
 
   /// The basic_request class, primary entry point to the library
   /**
@@ -98,7 +97,6 @@ BOOST_CGI_NAMESPACE_BEGIN
 #ifdef BOOST_CGI_ENABLE_SESSIONS
     typedef typename traits::session_type              session_type;
 
-    string_type session_id_;
     session_type session;
 #endif // BOOST_CGI_ENABLE_SESSIONS
     
@@ -114,6 +112,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       , char** base_env = NULL)
         : detail::basic_io_object<service_type>()
     {
+      set_protocol_service();
       if ((parse_options)opts > parse_none) load((parse_options)opts, base_env);
     }
 
@@ -122,6 +121,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       , char** base_env = NULL)
         : detail::basic_io_object<service_type>()
     {
+      set_protocol_service();
       if (opts > parse_none) load(opts, base_env);
     }
 
@@ -131,6 +131,7 @@ BOOST_CGI_NAMESPACE_BEGIN
                  , char** base_env = NULL)
       : detail::basic_io_object<service_type>()
     {
+      set_protocol_service();
       if (opts > parse_none) load(opts, ec);
     }
 
@@ -183,18 +184,23 @@ BOOST_CGI_NAMESPACE_BEGIN
       //  close(http::internal_server_error, 0);
 #ifdef BOOST_CGI_ENABLE_SESSIONS
       try {
-          if (!session_id_.empty())
-          {
-            if (session.id().empty())
-              session.id(session_id_);
-            this->implementation.service_->save(session);
-          }
+          if (!session.id().empty())
+            this->service.session_manager().save(session);
       } catch(...) {
          // pass
       }
 #endif // BOOST_CGI_ENABLE_SESSIONS
     }
     
+#ifdef BOOST_CGI_ENABLE_SESSIONS
+    void start_session()
+    {
+      std::cerr<< "Starting session" << std::endl;
+      if (session.id().empty())
+        session.id(this->service.make_session_id());
+      std::cerr<< "Started session" << std::endl;
+    }
+#endif // BOOST_CGI_ENABLE_SESSIONS
     protocol_service_type& get_protocol_service()
     {
       return *(this->implementation.service_);
@@ -208,6 +214,11 @@ BOOST_CGI_NAMESPACE_BEGIN
     static pointer create()
     {
       return pointer(new self_type());
+    }
+
+    void set_protocol_service()
+    {
+      //this->service.set_service(this->implementation, ps);
     }
 
     void set_protocol_service(protocol_service_type& ps)
@@ -281,11 +292,6 @@ BOOST_CGI_NAMESPACE_BEGIN
         }
         if (parse_opts & parse_cookies) {
           cookies.set(cookie_vars(this->implementation.vars_));
-#ifdef BOOST_CGI_ENABLE_SESSIONS
-          if (cookies.count("$ssid")) {
-            session_id_ = cookies["$ssid"];
-          }
-#endif // BOOST_CGI_ENABLE_SESSIONS
         }
         if (parse_opts & parse_form_only)
         {
@@ -296,10 +302,24 @@ BOOST_CGI_NAMESPACE_BEGIN
           );
         }
 #ifdef BOOST_CGI_ENABLE_SESSIONS
-        if (!session_id_.empty())
+        if (parse_opts & parse_session_only)
         {
-          session.id(session_id_);
-          this->implementation.service_->load(session);
+          if (!!cookies && cookies.count("$ssid"))
+          {
+            std::cerr<< "Loading pre-existing session." << std::endl;
+            session.id(cookies["$ssid"]);
+          }
+          else
+          if (traits::auto_start_session)
+          {
+            std::cerr<< "Starting new session." << std::endl;
+            session.id(this->service.make_session_id());
+          }
+          if (!session.id().empty())
+          {
+            this->service.session_manager().load(session);
+            std::cerr<< "Started session" << std::endl;
+          }
         }
 #endif // BOOST_CGI_ENABLE_SESSIONS
       }

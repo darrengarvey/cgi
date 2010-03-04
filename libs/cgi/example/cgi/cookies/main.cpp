@@ -20,7 +20,6 @@
 // [1] - http://code.google.com/p/google-ctemplate/
 //
 #include <boost/cgi/cgi.hpp>
-#include <boost/cgi/utility.hpp>
 #include <ctemplate/template.h>
 #include <boost/throw_exception.hpp>
 #include <boost/system/system_error.hpp>

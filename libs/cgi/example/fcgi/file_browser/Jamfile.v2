@@ -4,21 +4,18 @@
 #     (See accompanying file LICENSE_1_0.txt or copy 
 #        at http://www.boost.org/LICENSE_1_0.txt)
 
-project boost/cgi/example/cgi/cookies ;
+project boost/cgi/example/fcgi/file_browser ;
 
-exe cgi_cookies
-  :
-     main.cpp /boost/regex/ /boost/cgi/
-  :
-     <linkflags>-lctemplate
-  ;
-
+exe fcgi_file_browser : main.cpp /boost/regex/ ;
 
 # Our install rule (builds binaries and copies them to <location>)
 install install
- : cgi_cookies
- : <location>$(cgi-bin)
+ :
+   fcgi_file_browser
+ : 
+   <location>$(fcgi-bin)
  ;
 
 # Only install example if you use `bjam install' or equivalent
 explicit install ;
+

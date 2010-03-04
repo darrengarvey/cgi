@@ -98,7 +98,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     void construct(implementation_type& impl)
     {
       impl.client_.set_connection(
-        implementation_type::connection_type::create(this->get_io_service())
+        connection_type::create(this->get_io_service())
       );
     }
 

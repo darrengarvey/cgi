@@ -24,6 +24,7 @@
 #include "boost/cgi/fwd/form_parser_fwd.hpp"
 #ifdef BOOST_CGI_ENABLE_SESSIONS
 #  include "boost/cgi/utility/sessions.hpp"
+#  include <boost/uuid/uuid_generators.hpp>
 #endif // BOOST_CGI_ENABLE_SESSIONS
 
 BOOST_CGI_NAMESPACE_BEGIN
@@ -96,6 +97,9 @@ BOOST_CGI_NAMESPACE_BEGIN
                 std::map<string_type, string_type> 
               >                                      session_type;
       typedef session_manager                        session_manager_type;
+      static const bool auto_start_session = true;
+
+      typedef boost::uuids::random_generator          uuid_generator_type;
 #endif // BOOST_CGI_ENABLE_SESSIONS
       static const common::parse_options parse_opts = common::parse_all;
     };
@@ -145,6 +149,7 @@ BOOST_CGI_NAMESPACE_BEGIN
                 std::map<string_type, string_type> 
               >                                      session_type;
       typedef session_manager                        session_manager_type;
+      static const bool auto_start_session = true;
 #endif // BOOST_CGI_ENABLE_SESSIONS
 
       static const common::parse_options parse_opts = common::parse_none;

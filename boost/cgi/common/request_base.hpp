@@ -28,6 +28,12 @@
 #include "boost/cgi/detail/extract_params.hpp"
 #include "boost/cgi/detail/save_environment.hpp"
 #include "boost/cgi/config.hpp"
+#ifdef BOOST_CGI_ENABLE_SESSIONS
+#  include "boost/cgi/utility/sessions.hpp"
+#  include <boost/uuid/uuid.hpp>
+#  include <boost/uuid/uuid_generators.hpp>
+#  include <boost/uuid/uuid_io.hpp>
+#endif // BOOST_CGI_ENABLE_SESSIONS
 
 BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
@@ -42,7 +48,25 @@ BOOST_CGI_NAMESPACE_BEGIN
   {
   public:
     typedef common::request_base<Protocol> base_type;
+    typedef Protocol                               protocol_type;
+    typedef protocol_traits<Protocol>              traits;
+    typedef typename traits::buffer_type           buffer_type;
+    typedef typename traits::char_type             char_type;
+    typedef typename traits::client_type           client_type;
+    typedef typename traits::connection_type       connection_type;
+    typedef typename traits::const_buffers_type    const_buffers_type;
+    typedef typename traits::form_parser_type      form_parser_type;
+    typedef typename traits::mutable_buffers_type  mutable_buffers_type;
+    typedef typename traits::protocol_service_type protocol_service_type;
+    typedef typename traits::request_type          request_type;
+    typedef typename traits::string_type           string_type;
+    typedef typename connection_type::pointer      conn_ptr;
+#ifdef BOOST_CGI_ENABLE_SESSIONS
+    typedef typename traits::uuid_generator_type   uuid_generator_type;
+    typedef typename traits::session_manager_type  session_manager_type;
+#endif // BOOST_CGI_ENABLE_SESSIONS
 
+ 
   protected:
     // impl_base is the common base class for all request types'
     // implementation_type and should be inherited by it.
@@ -62,7 +86,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       typedef typename traits::request_type          request_type;
       typedef typename traits::string_type           string_type;
       typedef typename connection_type::pointer      conn_ptr;
-      
+
       /**
        * If you want to add a new data type to a request you need to:
        *   > Update this file (just below)
@@ -170,7 +194,8 @@ BOOST_CGI_NAMESPACE_BEGIN
         bool is_command_line
       )
     {
-      if (is_command_line) ++base_environment;
+      if (is_command_line && base_environment != NULL)
+        ++base_environment;
       detail::save_environment(env_vars(impl.vars_), base_environment);
     }
 
@@ -353,6 +378,36 @@ BOOST_CGI_NAMESPACE_BEGIN
       }  
       return ec;
     }
+
+#ifdef BOOST_CGI_ENABLE_SESSIONS
+  public:
+    /// Get the session manager.
+    session_manager_type& session_manager() { return session_mgr_; }
+    /// Get the session manager.
+    session_manager_type const& session_manager() const { return session_mgr_; }
+
+    /// Get a new UUID as a string, suitable as a session id.
+    string_type make_session_id()
+    {
+      string_type val;
+      try {
+         val = boost::lexical_cast<string_type>(make_uuid());
+      } catch (...) {
+         std::cerr<< "Caught error." << std::endl;
+      }
+      return val;
+    }
+
+    /// Generate a new UUID.
+    boost::uuids::uuid make_uuid() { return generator_(); }
+    
+  private:
+    session_manager_type session_mgr_;
+    uuid_generator_type generator_;
+
+#endif // BOOST_CGI_ENABLE_SESSIONS
+
+
   };
 
  } // namespace common

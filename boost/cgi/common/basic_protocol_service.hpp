@@ -22,9 +22,6 @@
 #include "boost/cgi/fwd/basic_request_fwd.hpp"
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 #include "boost/cgi/import/io_service.hpp"
-#ifdef BOOST_CGI_ENABLE_SESSIONS
-#  include "boost/cgi/utility/sessions.hpp"
-#endif // BOOST_CGI_ENABLE_SESSIONS
 
 BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
@@ -41,22 +38,34 @@ BOOST_CGI_NAMESPACE_BEGIN
     typedef Protocol                                 protocol_type;
     typedef IoServiceProvider                        ios_provider_type;
     typedef typename protocol_traits<Protocol>::type traits;
+    typedef typename traits::string_type             string_type;
     typedef typename traits::request_type            request_type;
     typedef typename request_type::pointer           request_ptr;
     typedef std::set<request_ptr>                    set_type;
     typedef std::queue<request_ptr>                  queue_type;
-#ifdef BOOST_CGI_ENABLE_SESSIONS
-    typedef typename traits::session_manager_type    session_manager_type;
-#endif // BOOST_CGI_ENABLE_SESSIONS
+
+    basic_protocol_service()
+      : ios_provider_()
+      , request_set_()
+      , request_queue_()
+    {
+   	std::cerr<< "Constructing" << std::endl; 
+    }
 
     basic_protocol_service(int pool_size_hint = 1)
       : ios_provider_(pool_size_hint)
+      , request_set_()
+      , request_queue_()
     {
+   	std::cerr<< "2.. Constructing" << std::endl; 
     }
 
     basic_protocol_service(boost::asio::io_service& ios)
       : ios_provider_(ios)
+      , request_set_()
+      , request_queue_()
     {
+   	std::cerr<< "3... Constructing" << std::endl; 
     }
 
     ~basic_protocol_service()
@@ -80,7 +89,6 @@ BOOST_CGI_NAMESPACE_BEGIN
      */
     void stop()
     {
-      //gateway_.stop();
       ios_provider_.stop();
     }
 
@@ -107,7 +115,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      * The order in which the underlying io_services are returned is determined
      * by what policy the IoServiceProvider uses.
      */
-    ::BOOST_CGI_NAMESPACE::common::io_service& io_service()
+    ::BOOST_CGI_NAMESPACE::common::io_service& get_io_service()
     {
       return ios_provider_.get_io_service();
     }
@@ -125,22 +133,6 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       ios_provider_.get_io_service().dispatch(handler);
     }
-
-#ifdef BOOST_CGI_ENABLE_SESSIONS
-    template<typename T>
-    void save(basic_session<T>& sesh) {
-      session_mgr_.save(sesh);
-    }
-
-    template<typename T>
-    void load(basic_session<T>& sesh) {
-      session_mgr_.load(sesh);
-    }
-    
-  private:
-    session_manager_type session_mgr_;
-
-#endif // BOOST_CGI_ENABLE_SESSIONS
 
   private:
     ios_provider_type ios_provider_;

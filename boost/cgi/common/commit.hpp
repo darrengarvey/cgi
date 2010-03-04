@@ -29,8 +29,8 @@ BOOST_CGI_NAMESPACE_BEGIN
               , boost::system::error_code& ec)
     {
 #ifdef BOOST_CGI_ENABLE_SESSIONS
-      if (!req.session_id_.empty()) {
-        resp<< cookie("$ssid", req.session_id_);
+      if (!req.session.id().empty()) {
+        resp<< cookie("$ssid", req.session.id());
       }
 #endif // BOOST_CGI_ENABLE_SESSIONS
       resp.send(req.client(), ec);

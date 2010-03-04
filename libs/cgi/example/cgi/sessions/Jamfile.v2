@@ -4,20 +4,25 @@
 #     (See accompanying file LICENSE_1_0.txt or copy 
 #        at http://www.boost.org/LICENSE_1_0.txt)
 
-project boost/cgi/example/cgi/cookies ;
+project boost/cgi/example/cgi/sesssions ;
 
-exe cgi_cookies
+exe cgi_sessions
   :
-     main.cpp /boost/regex/ /boost/cgi/
+    main.cpp
   :
-     <linkflags>-lctemplate
+    <define>BOOST_CGI_ENABLE_SESSIONS
+    <library>/boost/cgi/
+    <library>/boost/filesystem/
+    <library>/boost/serialization/
   ;
 
 
 # Our install rule (builds binaries and copies them to <location>)
 install install
- : cgi_cookies
- : <location>$(cgi-bin)
+ :
+   cgi_sessions
+ :
+   <location>$(cgi-bin)
  ;
 
 # Only install example if you use `bjam install' or equivalent

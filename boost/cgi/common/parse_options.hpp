@@ -23,7 +23,13 @@ BOOST_CGI_NAMESPACE_BEGIN
      , parse_cookie       = parse_cookie_only | parse_env
      , parse_cookies_only = parse_cookie_only
      , parse_cookies      = parse_cookies_only | parse_env
+#ifdef BOOST_CGI_ENABLE_SESSIONS
+     , parse_session_only = 16
+     , parse_session      = parse_session_only | parse_cookies
+     , parse_all          = parse_env | parse_form | parse_cookie | parse_session
+#else
      , parse_all          = parse_env | parse_form | parse_cookie
+#endif // BOOST_CGI_ENABLE_SESSIONS
    };
 
  } // namespace common
