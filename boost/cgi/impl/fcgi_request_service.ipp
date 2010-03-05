@@ -82,7 +82,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     BOOST_CGI_INLINE int
     fcgi_request_service::close(
         implementation_type& impl
-      , ::BOOST_CGI_NAMESPACE::common::http::status_code&
+      , ::BOOST_CGI_NAMESPACE::common::http::status_code& hsc
       , int program_status)
     {
       boost::system::error_code ec;

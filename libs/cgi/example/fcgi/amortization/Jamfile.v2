@@ -14,9 +14,9 @@ exe fcgi_amort
     /boost/regex/
     
   :
-    <library>/site-config//ctemplate
+    #<library>/site-config//ctemplate
   :
-    #<linkflags>-lctemplate
+    <linkflags>-lctemplate
   ;
 
 # Our install rule (builds binaries and copies them to <location>)

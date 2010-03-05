@@ -80,8 +80,8 @@ public:
   string const& id () const { return id_; }
   void id (string const& new_id) { id_ = new_id; }
   
-  operator T() { return static_cast<T&>(*this); }
-  operator T() const { return static_cast<T const&>(*this); }
+  operator T& () { return static_cast<T&>(*this); }
+  operator T const& () const { return static_cast<T const&>(*this); }
 
   bool const& loaded() const { return loaded_; }
   void loaded(bool status) { loaded_ = status; }
