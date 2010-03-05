@@ -49,7 +49,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     explicit basic_request_acceptor(
           common::basic_protocol_service<protocol_type, IoServiceProvider>& ps,
           port_number_type port_num = 0)
-      : boost::asio::basic_io_object<RequestAcceptorService>(ps.io_service())
+      : boost::asio::basic_io_object<RequestAcceptorService>(ps.get_io_service())
     {
       this->service.set_protocol_service(this->implementation, ps);
       this->implementation.port_num_ = port_num;
@@ -84,7 +84,7 @@ BOOST_CGI_NAMESPACE_BEGIN
           common::basic_protocol_service<protocol_type, IoServiceProvider>& ps,
           const boost::asio::ip::basic_endpoint<InternetProtocol>& endpoint,
           bool reuse_addr = true)
-      : boost::asio::basic_io_object<RequestAcceptorService>(ps.io_service())
+      : boost::asio::basic_io_object<RequestAcceptorService>(ps.get_io_service())
     {
       this->service.set_protocol_service(this->implementation, ps);
 
@@ -104,7 +104,7 @@ BOOST_CGI_NAMESPACE_BEGIN
           common::basic_protocol_service<protocol_type, IoServiceProvider>& ps,
           const InternetProtocol& ip,
           const native_type& native_acceptor)
-      : boost::asio::basic_io_object<RequestAcceptorService>(ps.io_service())
+      : boost::asio::basic_io_object<RequestAcceptorService>(ps.get_io_service())
     {
       this->service.set_protocol_service(this->implementation, ps);
       boost::system::error_code ec;

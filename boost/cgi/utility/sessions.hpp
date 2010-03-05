@@ -42,6 +42,10 @@
 #  define BOOST_CGI_SESSIONS_DIRECTORY "../sessions/"
 #endif // BOOST_CGI_SESSIONS_DIRECTORY
 
+#ifndef BOOST_CGI_SESSION_COOKIE_NAME
+#  define BOOST_CGI_SESSION_COOKIE_NAME ".ssid"
+#endif // BOOST_CGI_SESSION_COOKIE_NAME
+
 BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
@@ -58,16 +62,19 @@ public:
 
   basic_session(string const& id = "")
     : id_(id)
+    , loaded_(false)
   {}
   
   basic_session(T& t, string const& id = "")
     : T(t)
     , id_(id)
+    , loaded_(false)
   {}
   
   basic_session(T const& t, string const& id = "")
     : T(t)
     , id_(id)
+    , loaded_(false)
   {}
 
   string const& id () const { return id_; }

@@ -112,7 +112,6 @@ BOOST_CGI_NAMESPACE_BEGIN
       , char** base_env = NULL)
         : detail::basic_io_object<service_type>()
     {
-      set_protocol_service();
       if ((parse_options)opts > parse_none) load((parse_options)opts, base_env);
     }
 
@@ -139,7 +138,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     basic_request(protocol_service_type& s
                  , const parse_options opts = traits::parse_opts
                  , char** base_env = NULL)
-      : detail::basic_io_object<service_type>(s.io_service())
+      : detail::basic_io_object<service_type>(s.get_io_service())
     {
       set_protocol_service(s);
       if (opts > parse_none) load(opts, base_env);
@@ -150,7 +149,7 @@ BOOST_CGI_NAMESPACE_BEGIN
                  , boost::system::error_code& ec
                  , const parse_options opts = traits::parse_opts
                  , char** base_env = NULL)
-      : detail::basic_io_object<service_type>(s.io_service())
+      : detail::basic_io_object<service_type>(s.get_io_service())
     {
       set_protocol_service(s);
       if (opts > parse_none) load(opts, ec, base_env);
@@ -159,7 +158,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Make a new mutiplexed request from an existing connection.
     // Throws.
     basic_request(implementation_type& impl)
-      : detail::basic_io_object<service_type>(impl.service_->io_service())
+      : detail::basic_io_object<service_type>(impl.service_->get_io_service())
     {
       set_protocol_service(*impl.service_);
       boost::system::error_code ec;
@@ -171,7 +170,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Make a new mutiplexed request from an existing connection.
     // Won't throw.
     basic_request(implementation_type& impl, boost::system::error_code& ec)
-      : detail::basic_io_object<service_type>(impl.service_->io_service())
+      : detail::basic_io_object<service_type>(impl.service_->get_io_service())
     {
       set_protocol_service(*impl.service_);
       this->service.begin_request_helper(this->implementation
@@ -193,14 +192,24 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
     
 #ifdef BOOST_CGI_ENABLE_SESSIONS
+    /// Start a session, or load the session from a cookie.
     void start_session()
     {
-      std::cerr<< "Starting session" << std::endl;
-      if (session.id().empty())
-        session.id(this->service.make_session_id());
-      std::cerr<< "Started session" << std::endl;
+      if (!session.loaded() && session.id().empty())
+      {
+        // Assume cookies have been loaded. This will throw at runtime (in
+        // a debug build) if `request.load(parse_cookie)` hasn't been called
+        // by now.
+        string_type ssid (cookies.pick(BOOST_CGI_SESSION_COOKIE_NAME, ""));
+        if (!ssid.empty()) {
+          session.id(ssid);
+          this->service.session_manager().load(session);
+        } else
+          session.id(this->service.make_session_id());
+      }
     }
 #endif // BOOST_CGI_ENABLE_SESSIONS
+
     protocol_service_type& get_protocol_service()
     {
       return *(this->implementation.service_);
@@ -304,22 +313,13 @@ BOOST_CGI_NAMESPACE_BEGIN
 #ifdef BOOST_CGI_ENABLE_SESSIONS
         if (parse_opts & parse_session_only)
         {
-          if (!!cookies && cookies.count("$ssid"))
-          {
-            std::cerr<< "Loading pre-existing session." << std::endl;
-            session.id(cookies["$ssid"]);
-          }
+          if (!!cookies && cookies.count(BOOST_CGI_SESSION_COOKIE_NAME))
+            session.id(cookies[BOOST_CGI_SESSION_COOKIE_NAME]);
           else
           if (traits::auto_start_session)
-          {
-            std::cerr<< "Starting new session." << std::endl;
             session.id(this->service.make_session_id());
-          }
           if (!session.id().empty())
-          {
             this->service.session_manager().load(session);
-            std::cerr<< "Started session" << std::endl;
-          }
         }
 #endif // BOOST_CGI_ENABLE_SESSIONS
       }

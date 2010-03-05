@@ -42,8 +42,15 @@ template<>
 struct protocol_traits<session_enabled_cgi>
   : protocol_traits<boost::cgi::tags::cgi>
 {
-  typedef basic_session<context> session_type;
-  static const bool auto_start_session = false;
+  typedef basic_session<context> session_type; /*<
+The session_type for the request holds all session-related data, which in this
+example is everything stored in the `context` class defined above.
+>*/
+  static const bool auto_start_session = false; /*<
+`auto_start_session` is `true` by default. Here we override it to be `false`,
+which means we must explicitly call `basic_request<>::start_session()` for
+any sessions to be created / loaded.
+>*/
 };
 
 } } } // namespace boost::cgi::common
@@ -56,19 +63,14 @@ typedef basic_request<session_enabled_cgi> my_request;
 
 int main(int, char**)
 {
-  cerr<< "Started: " << time(NULL) << endl;
   try
   {
-    boost::uuids::basic_random_generator<boost::rand48> generator;
-    cerr<< "Here" << endl;
-    boost::uuids::uuid u = generator();
-    cerr<< "generated" << endl;
- 
-
     my_request req;
     response resp;
 
-    //req.load(parse_session);
+    // Start the session. It is safe to call `start_session()` if a session
+    // is already open, but you shouldn't have to do that...
+    req.start_session();
 
     resp<< "one = " << req.session.data["one"]
         << ", two = " << req.session.data["two"]
@@ -79,18 +81,12 @@ int main(int, char**)
     req.session.data["two"] = 2;
     req.session.data["ten"] = 10;
 
-    // Set the session id, so the data is saved.    
-    //req.session_id_ = "1";
-
-    resp<< content_type("text/plain") << "\nBlah\n";
-    
-    commit(req, resp);
-
-    return 0;
+    // The session is saved by `commit()`.
+    return commit(req, resp);
   
   } catch (std::exception& e) {
     cerr<< "Error: " << e.what() << endl;
   }
 
-  cout<< "Content-type: text/html\r\n\r\nBoom";
+  cout<< "Content-type: text/html\r\n\r\nAn error occurred.";
 }

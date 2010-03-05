@@ -50,7 +50,7 @@ namespace boost {
 /// Library assertions, only in debug mode.
 #ifndef BOOST_CGI_DEBUG_ASSERT
 # ifdef NDEBUG
-#   define BOOST_CGI_DEBUG_ASSERT(x) void
+#   define BOOST_CGI_DEBUG_ASSERT(x) /** void **/
 # else
 #   define BOOST_CGI_DEBUG_ASSERT(x) assert(x)
 # endif // NDEBUG

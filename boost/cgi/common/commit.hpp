@@ -30,7 +30,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
 #ifdef BOOST_CGI_ENABLE_SESSIONS
       if (!req.session.id().empty()) {
-        resp<< cookie("$ssid", req.session.id());
+        resp<< cookie(BOOST_CGI_SESSION_COOKIE_NAME, req.session.id());
       }
 #endif // BOOST_CGI_ENABLE_SESSIONS
       resp.send(req.client(), ec);

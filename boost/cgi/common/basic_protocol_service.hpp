@@ -44,20 +44,11 @@ BOOST_CGI_NAMESPACE_BEGIN
     typedef std::set<request_ptr>                    set_type;
     typedef std::queue<request_ptr>                  queue_type;
 
-    basic_protocol_service()
-      : ios_provider_()
-      , request_set_()
-      , request_queue_()
-    {
-   	std::cerr<< "Constructing" << std::endl; 
-    }
-
     basic_protocol_service(int pool_size_hint = 1)
       : ios_provider_(pool_size_hint)
       , request_set_()
       , request_queue_()
     {
-   	std::cerr<< "2.. Constructing" << std::endl; 
     }
 
     basic_protocol_service(boost::asio::io_service& ios)
@@ -65,7 +56,6 @@ BOOST_CGI_NAMESPACE_BEGIN
       , request_set_()
       , request_queue_()
     {
-   	std::cerr<< "3... Constructing" << std::endl; 
     }
 
     ~basic_protocol_service()
