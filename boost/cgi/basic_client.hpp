@@ -70,11 +70,6 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
     }
 
-    basic_client(io_service& ios)
-      //: io_service_(ios)
-    {
-    }
-    
     /// Construct the client by claiming a request id.
     /**
      * Before loading a request, it will usually not have a request id. This

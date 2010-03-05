@@ -5,8 +5,6 @@
 
 // Include the CGI headers.
 #include <boost/cgi/cgi.hpp>
-// Include the utilities (ie. has_key)
-#include <boost/cgi/utility.hpp>
 // Uses a server class that catches and reports errors in your handler.
 #include "TracingServer.hpp"
 

@@ -7,24 +7,14 @@
 # A symbolic name for this project.
 project boost.cgi.examples.fcgi.amortization ;
 
-import os ;
-
-if [ os.name ] = NT
-{
-  lib ctemplate : : <file>c:/cc/src/ctemplate/ctemplate-0.9/Release/libctemplate.lib ;
-}
-else
-{
-  lib ctemplate ;
-}
-
 
 exe fcgi_amort
   :
     main.cpp
     /boost/regex/
+    
   :
-    <library>ctemplate
+    <library>/site-config//ctemplate
   :
     #<linkflags>-lctemplate
   ;

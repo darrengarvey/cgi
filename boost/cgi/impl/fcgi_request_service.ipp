@@ -82,7 +82,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     BOOST_CGI_INLINE int
     fcgi_request_service::close(
         implementation_type& impl
-      , ::BOOST_CGI_NAMESPACE::common::http::status_code& hsc
+      , ::BOOST_CGI_NAMESPACE::common::http::status_code&
       , int program_status)
     {
       boost::system::error_code ec;
@@ -94,7 +94,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     BOOST_CGI_INLINE int
     fcgi_request_service::close(
         implementation_type& impl
-      , ::BOOST_CGI_NAMESPACE::common::http::status_code& hsc
+      , ::BOOST_CGI_NAMESPACE::common::http::status_code&
       , int program_status
       , boost::system::error_code& ec)
     {
@@ -512,7 +512,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     // **FIXME**
     BOOST_CGI_INLINE void
-    fcgi_request_service::handle_admin_request(implementation_type& impl)
+    fcgi_request_service::handle_admin_request(implementation_type& /* impl */)
     {
       //std::cerr<< std::endl << "**FIXME** " << __FILE__ << ":" << __LINE__ 
       //  << " handle_admin_request()" << std::endl;
@@ -520,7 +520,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     // **FIXME**
     BOOST_CGI_INLINE void
-    fcgi_request_service::handle_other_request_header(implementation_type& impl)
+    fcgi_request_service::handle_other_request_header(implementation_type& /* impl */)
     {
       //std::cerr<< std::endl << "**FIXME** " << __FILE__ << ":" << __LINE__ 
       //  << " handle_other_request_header()" << std::endl;

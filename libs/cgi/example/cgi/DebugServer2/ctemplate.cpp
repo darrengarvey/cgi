@@ -1,7 +1,6 @@
 
 #include <iostream>
 #include <boost/cgi/cgi.hpp>
-#include <boost/cgi/utility.hpp>
 #include <ctemplate/template.h>
 #include "TracebackServer.hpp"
 #include <cmath>
@@ -14,7 +13,7 @@ using boost::cgi::content_type;
 
 int cgi_handler(request& req, response& resp)
 {
-    /*
+    /* Waste time.
     for(long i=10000000; i != 0; --i)
     {
         std::sqrt(123.456L); // waste time

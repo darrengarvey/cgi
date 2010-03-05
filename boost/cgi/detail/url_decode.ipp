@@ -14,13 +14,6 @@
 BOOST_CGI_NAMESPACE_BEGIN
  namespace detail {
 
-   /// Convert a char into a hexadecimal value
-   BOOST_CGI_INLINE
-   std::string char_to_hex(char const& ch)
-   {
-     return std::string(); // **FIXME**
-   }
-
    /// Convert two characters into a single, hex-encoded character
    BOOST_CGI_INLINE
    char hex_to_char(char const& c1, char const& c2)

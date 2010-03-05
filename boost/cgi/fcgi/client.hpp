@@ -54,21 +54,6 @@ BOOST_CGI_NAMESPACE_BEGIN
   {
   }
 
-  /// Construct
-  template<>
-  basic_client<
-      ::BOOST_CGI_NAMESPACE::common::tags::fcgi
-  >::basic_client(common::io_service& ios)
-    : request_id_(-1)
-    , status_(none_)
-    , total_sent_bytes_(0)
-    , total_sent_packets_(0)
-    , header_()
-    , outbuf_()
-    , keep_connection_(false)
-  {
-  }
-
   /// Override basic_client::close().
   /**
    * Closing a FastCGI means sending an END_REQUEST header

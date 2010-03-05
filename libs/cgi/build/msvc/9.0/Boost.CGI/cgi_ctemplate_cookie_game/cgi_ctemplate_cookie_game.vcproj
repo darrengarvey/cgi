@@ -88,7 +88,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\cgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookie_game2\style.css&quot; &quot;c:\code\c++\boost.cgi\htdocs\css\style.css&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookie_game2\main.js&quot; &quot;c:\code\c++\boost.cgi\htdocs\js\style.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookie_game2\index.html&quot; &quot;c:\code\c++\boost.cgi\templates\index.html&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\cgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\style.css&quot; &quot;c:\code\c++\boost.cgi\htdocs\css\style.css&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\main.js&quot; &quot;c:\code\c++\boost.cgi\htdocs\js\main.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\index.html&quot; &quot;c:\code\c++\boost.cgi\templates\index.html&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -164,7 +164,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\cgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookie_game2\style.css&quot; &quot;c:\code\c++\boost.cgi\htdocs\css\style.css&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookie_game2\main.js&quot; &quot;c:\code\c++\boost.cgi\htdocs\js\main.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookie_game2\index.html&quot; &quot;c:\code\c++\boost.cgi\templates\index.html&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\cgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\style.css&quot; &quot;c:\code\c++\boost.cgi\htdocs\css\style.css&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\main.js&quot; &quot;c:\code\c++\boost.cgi\htdocs\js\main.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\index.html&quot; &quot;c:\code\c++\boost.cgi\templates\index.html&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -177,7 +177,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\..\example\cgi\cookie_game2\main.cpp"
+				RelativePath="..\..\..\..\..\example\cgi\cookies2\main.cpp"
 				>
 			</File>
 		</Filter>
@@ -194,15 +194,15 @@
 			>
 		</Filter>
 		<File
-			RelativePath="..\..\..\..\..\example\cgi\cookie_game2\index.html"
+			RelativePath="..\..\..\..\..\example\cgi\cookies2\index.html"
 			>
 		</File>
 		<File
-			RelativePath="..\..\..\..\..\example\cgi\cookie_game2\main.js"
+			RelativePath="..\..\..\..\..\example\cgi\cookies2\main.js"
 			>
 		</File>
 		<File
-			RelativePath="..\..\..\..\..\example\cgi\cookie_game2\style.css"
+			RelativePath="..\..\..\..\..\example\cgi\cookies2\style.css"
 			>
 		</File>
 	</Files>
