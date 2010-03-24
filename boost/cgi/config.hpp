@@ -1,6 +1,6 @@
-//                   -- form_parser.hpp --
+//                    -- config.hpp --
 //
-//            Copyright (c) Darren Garvey 2007.
+//          Copyright (c) Darren Garvey 2007-2009.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
@@ -64,5 +64,19 @@ namespace boost {
 #   define BOOST_CGI_ASSERT(x) BOOST_CGI_DEBUG_ASSERT(x)
 # endif // NDEBUG
 #endif // BOOST_CGI_ASSERT
+
+#ifndef BOOST_CGI_OVERRIDE_PROTOCOL
+# define BOOST_CGI_OVERRIDE_PROTOCOL(p, tag, brace_enclosed_traits) \
+    namespace boost { namespace cgi { namespace common {\
+    \
+      template<>\
+      struct protocol_traits<tag>\
+        : protocol_traits<tags::cgi>\
+        brace_enclosed_traits\
+     ; } } } \
+    typedef boost::cgi::common::basic_request_acceptor<tag> acceptor;\
+    typedef boost::cgi::common::basic_request<tag>          request;\
+    typedef boost::cgi::common::basic_protocol_service<tag> service;
+#endif // BOOST_CGI_OVERRIDE_PROTOCOL
 
 #endif // BOOST_CGI_CONFIG_HPP_INCLUDED__

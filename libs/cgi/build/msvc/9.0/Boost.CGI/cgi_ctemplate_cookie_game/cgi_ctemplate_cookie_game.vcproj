@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="libboost_system-vc90-mt-gd-1_38.lib&#x0D;&#x0A;libctemplate-debug.lib"
+				AdditionalOptions="libctemplate-debug.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"

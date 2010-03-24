@@ -2,6 +2,7 @@
 #ifndef BOOST_CGI_DATA_MAP_PROXY_HPP_INCLUDED_20091206_
 #define BOOST_CGI_DATA_MAP_PROXY_HPP_INCLUDED_20091206_
 
+#include <exception>
 #include <boost/assert.hpp>
 #include <boost/lexical_cast.hpp>
 ///////////////////////////////////////////////////////////
@@ -41,8 +42,9 @@ BOOST_CGI_NAMESPACE_BEGIN
    * into a type the user specifies.
    */
   template<typename MapType>
-  struct data_map_proxy
+  class data_map_proxy
   {
+  public:
     typedef MapType                                   map_type;
     typedef data_map_proxy<map_type>                  self_type;
     typedef typename map_type::key_type               key_type;

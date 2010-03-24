@@ -156,6 +156,14 @@ BOOST_CGI_NAMESPACE_BEGIN
     return ostream_.write(buf.begin(), buf.end());
   }
 
+  template<typename T>
+  BOOST_CGI_INLINE
+  basic_response<T>& basic_response<T>::put(char_type ch)
+  {
+    ostream_.put(ch);
+    return *this;
+  }
+
   /// Synchronously flush the data to the supplied SyncWriteStream
   /**
    * This call uses throwing semantics. ie. an exception will be thrown on

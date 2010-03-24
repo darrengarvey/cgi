@@ -15,6 +15,7 @@
 //#include "boost/cgi/logger.hpp"
 #include "boost/cgi/config.hpp"
 #include "boost/cgi/basic_request.hpp"
+#include "boost/cgi/basic_request_acceptor.hpp"
 #include "boost/cgi/common/header.hpp"
 #include "boost/cgi/common/map.hpp"
 #include "boost/cgi/common/commit.hpp"

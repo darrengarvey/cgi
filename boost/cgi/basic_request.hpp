@@ -195,18 +195,20 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Start a session, or load the session from a cookie.
     void start_session()
     {
-      if (!session.loaded() && session.id().empty())
+      if (!session.loaded())
       {
         // Assume cookies have been loaded. This will throw at runtime (in
         // a debug build) if `request.load(parse_cookie)` hasn't been called
         // by now.
-        string_type ssid (cookies.pick(BOOST_CGI_SESSION_COOKIE_NAME, ""));
-        if (!ssid.empty()) {
-          session.id(ssid);
-          this->service.session_manager().load(session);
-        } else
-          session.id(this->service.make_session_id());
+        this->service.session_manager().start(
+            session, cookies.pick(BOOST_CGI_SESSION_COOKIE_NAME, ""));
       }
+    }
+
+    /// Stop the session and delete the stored session data.
+    void stop_session()
+    {
+      this->service.session_manager().stop(session);
     }
 #endif // BOOST_CGI_ENABLE_SESSIONS
 

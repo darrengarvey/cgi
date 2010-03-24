@@ -71,8 +71,8 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     /// Create a cookie.
     basic_cookie(const string_type& _name, const string_type& _val
-                , const string_type& _expires = ""
                 , const string_type& _path = "/"
+                , const string_type& _expires = ""
                 , const string_type& _domain = ""
                 , bool _secure = false
                 , bool HttpOnly = false)

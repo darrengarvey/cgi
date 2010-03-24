@@ -72,6 +72,9 @@ BOOST_CGI_NAMESPACE_BEGIN
      */
     template<typename SyncWriteStream>
     void flush(SyncWriteStream& sws);
+    
+    /// Put a character into the stream.
+    self_type& put (char_type c);
 
     /// Synchronously flush the data via the supplied request
     /**
