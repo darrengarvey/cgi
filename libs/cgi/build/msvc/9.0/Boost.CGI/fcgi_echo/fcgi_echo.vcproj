@@ -87,7 +87,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\fcgi-bin\$(TargetName)&quot;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;\code\c++\boost.cgi\fcgi-bin\$(TargetName)&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -116,7 +116,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE; _SCL_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -161,7 +161,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\fcgi-bin\$(TargetName)&quot;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;\code\c++\boost.cgi\fcgi-bin\$(TargetName)&quot;"
 			/>
 		</Configuration>
 	</Configurations>

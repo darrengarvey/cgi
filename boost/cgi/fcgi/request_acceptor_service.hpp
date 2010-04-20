@@ -15,7 +15,11 @@
 #include "boost/cgi/common/tags.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
 #include "boost/cgi/detail/service_base.hpp"
-#include "boost/cgi/fcgi/acceptor_service_impl.hpp"
+#if defined(BOOST_WINDOWS)
+#  include "boost/cgi/fcgi/win32_acceptor_service_impl.hpp"
+#else
+#  include "boost/cgi/fcgi/acceptor_service_impl.hpp"
+#endif // defined(BOOST_WINDOWS)
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 #include "boost/cgi/import/io_service.hpp"
 
@@ -29,21 +33,28 @@ BOOST_CGI_NAMESPACE_BEGIN
    * constructor which takes a ProtocolService (**LINK**). If the protocol
    * isn't async then the class can be used without a ProtocolService.
    */
-  template<typename Protocol_ = common::tags::fcgi>
+  template<typename Protocol = common::tags::fcgi>
   class fcgi_request_acceptor_service
-    : public detail::service_base<fcgi_request_acceptor_service<Protocol_> >
+    : public detail::service_base<fcgi_request_acceptor_service<Protocol> >
   {
   public:
     //typedef typename service_impl_type::impl_type     impl_type;
 
-    typedef fcgi::acceptor_service_impl<>               service_impl_type;
-    typedef service_impl_type::implementation_type      implementation_type;
-    typedef service_impl_type::native_type              native_type;
-    typedef service_impl_type::protocol_service_type    protocol_service_type;
-    typedef service_impl_type::accept_handler_type      accept_handler_type;
-    typedef implementation_type::protocol_type          protocol_type;
-    typedef implementation_type::endpoint_type          endpoint_type;
-    typedef implementation_type::acceptor_service_type  acceptor_service_type;
+    typedef Protocol                                    protocol_type;
+    typedef common::protocol_traits<protocol_type>      traits;
+    typedef typename traits::endpoint_type              endpoint_type;
+    typedef typename traits::acceptor_service_type      acceptor_service_type;
+    typedef typename traits::protocol_service_type      protocol_service_type;
+
+#if defined(BOOST_WINDOWS)
+    typedef fcgi::win32_acceptor_service_impl<Protocol> service_impl_type;
+#else
+    typedef fcgi::acceptor_service_impl<Protocol>       service_impl_type;
+#endif // defined(BOOST_WINDOWS)
+
+    typedef typename service_impl_type::implementation_type      implementation_type;
+    typedef typename service_impl_type::native_type              native_type;
+    typedef typename service_impl_type::accept_handler_type      accept_handler_type;
 
     /// The unique service identifier
     //static boost::asio::io_service::id id;
@@ -69,7 +80,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       service_impl_.shutdown_service();
     }
 
-    service_impl_type::protocol_service_type&
+    protocol_service_type&
       protocol_service(implementation_type const& impl) const
     {
       return service_impl_.service(impl);
@@ -154,7 +165,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       impl.service_ = &ps;
     }
 
-    typename implementation_type::endpoint_type
+    endpoint_type
       local_endpoint(implementation_type& impl, boost::system::error_code& ec)
     {
       return service_impl_.local_endpoint(impl, ec);
@@ -168,8 +179,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       return service_impl_.assign(impl, protocol, native_acceptor, ec);
     }
 
-    service_impl_type::native_type
-    native(implementation_type& impl)
+    native_type native(implementation_type& impl)
     {
       return service_impl_.native(impl);
     }

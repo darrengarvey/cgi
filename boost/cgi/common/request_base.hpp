@@ -223,8 +223,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     
     /// Return the connection associated with the request
     template<typename ImplType>
-    typename ImplType::client_type&
-      client(ImplType& impl)
+    client_type& client(ImplType& impl)
     {
       return impl.client_;
     }

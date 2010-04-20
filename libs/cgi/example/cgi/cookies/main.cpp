@@ -137,11 +137,11 @@ int main()
     dict.SetValue("SCRIPT_NAME", req.script_name());
     // pick() looks up the key in the map, returns a default value
     // (ie. anonymous) if the key isn't found.
-    dict.SetValue("COOKIE_NAME", req.form.pick("name", "anonymous"));
+    dict.SetValue("COOKIE_NAME", req.form["name"]);
     dict.SetValue("COOKIE_VALUE", req.form["value"]);
 
     // Load the HTML stencil now from the index.html file.
-    stencil_type* stencil = get_stencil("../templates/index.html");
+    stencil_type* stencil = get_stencil("../stencils/index.html");
 
     // Expand the stencil with the the given dictionary into `output`.
     std::string output;

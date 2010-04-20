@@ -65,18 +65,21 @@ namespace boost {
 # endif // NDEBUG
 #endif // BOOST_CGI_ASSERT
 
+/// Shortcut macro for defining custom protocols based on existing ones.
 #ifndef BOOST_CGI_OVERRIDE_PROTOCOL
-# define BOOST_CGI_OVERRIDE_PROTOCOL(p, tag, brace_enclosed_traits) \
+# define BOOST_CGI_OVERRIDE_PROTOCOL(protocol, tag, brace_enclosed_traits) \
+    struct tag##;\
     namespace boost { namespace cgi { namespace common {\
-    \
       template<>\
       struct protocol_traits<tag>\
-        : protocol_traits<tags::cgi>\
+        : protocol_traits<tags::##protocol>\
         brace_enclosed_traits\
-     ; } } } \
-    typedef boost::cgi::common::basic_request_acceptor<tag> acceptor;\
-    typedef boost::cgi::common::basic_request<tag>          request;\
-    typedef boost::cgi::common::basic_protocol_service<tag> service;
+      ; } } } \
+    struct tag##{\
+      typedef boost::cgi::common::basic_request_acceptor<tag> acceptor;\
+      typedef boost::cgi::common::basic_request<tag>          request;\
+      typedef boost::cgi::common::basic_protocol_service<tag> service;\
+    };
 #endif // BOOST_CGI_OVERRIDE_PROTOCOL
 
 #endif // BOOST_CGI_CONFIG_HPP_INCLUDED__

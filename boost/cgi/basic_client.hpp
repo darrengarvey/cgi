@@ -15,7 +15,11 @@
 #include "boost/cgi/common/protocol_traits.hpp"
 #include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/common/request_status.hpp"
-#include "boost/cgi/connections/tcp_socket.hpp"
+#if defined(BOOST_WINDOWS)
+#  include "boost/cgi/connections/anonymous_pipe.hpp"
+#else
+#  include "boost/cgi/connections/tcp_socket.hpp"
+#endif // defined(BOOST_WINDOWS)
 #include "boost/cgi/detail/throw_error.hpp"
 #include "boost/cgi/error.hpp"
 #include "boost/cgi/http/status_code.hpp"
@@ -111,8 +115,6 @@ BOOST_CGI_NAMESPACE_BEGIN
      */
     bool set_connection(connection_type* conn)
     {
-      // make sure there isn't already a connection associated with the client
-      //if (!connection_) return false;
       connection_.reset(conn);
       return true;
     }
@@ -125,9 +127,6 @@ BOOST_CGI_NAMESPACE_BEGIN
      */
     bool set_connection(const typename connection_type::pointer& conn)
     {
-      // make sure there isn't already a connection associated with the client
-      //if (!connection_) return false;
-      //BOOST_ASSERT(conn != NULL);
       connection_  = conn;
       return true;
     }
@@ -158,20 +157,11 @@ BOOST_CGI_NAMESPACE_BEGIN
     std::size_t read_some(const MutableBufferSequence& buf
                          , boost::system::error_code& ec)
     {
-      //if (boost::asio::buffer_size(buf) > bytes_left_)
-      //{
-        std::size_t bytes_read = connection_->read_some(buf, ec);
-        bytes_left_ -= bytes_read;
-        if (ec == boost::asio::error::eof)
-          ec = boost::system::error_code();
-        return bytes_left_ > 0 ? bytes_read : (bytes_read + bytes_left_);
-      //}
-      //else
-      //{
-      //  
-      //  ec = boost::asio::error::eof;
-      //  return 0;
-      //}
+      std::size_t bytes_read = connection_->read_some(buf, ec);
+      bytes_left_ -= bytes_read;
+      if (ec == boost::asio::error::eof)
+        ec = boost::system::error_code();
+      return bytes_left_ > 0 ? bytes_read : (bytes_read + bytes_left_);
     }
 
     /// Asynchronously write some data to the client.

@@ -337,11 +337,7 @@ try {
   // Make a `service` (more about this in other examples).
   service s;
   
-  using boost::asio::ip::tcp;
-
-  // Accept requests on port 8001. You should configure your HTTP
-  // server to try to connect on this port.
-  acceptor a(s, 8001);
+  acceptor a(s);
 
   int ret(0);
   for (;;)

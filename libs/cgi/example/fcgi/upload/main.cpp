@@ -24,7 +24,7 @@ try {
   // as well as cookies.
   cgi::request req(service);
   
-  cgi::acceptor acceptor(service, 8050);
+  cgi::acceptor acceptor(service);
   
   int ret(0);
   

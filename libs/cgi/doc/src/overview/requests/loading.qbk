@@ -46,7 +46,8 @@ int main()
 
   // ...
 
-  // Load the request now (including parsing stdin)
+  // Load the request now (including parsing stdin).
+  // Passing an `error_code` argument stops exceptions being thrown.
   boost::system::error_code& ec;
   request.load(cgi::parse_all, ec);
 
@@ -70,8 +71,10 @@ namespace fcgi = boost::fcgi;
 
 int handler(fcgi::request& request)
 {
+    // It is undefined behaviour to use a request without loading it.
     request.load(fcgi::parse_env); // minimal parsing.
     
+    // Create a Response
     fcgi::response response;
     response<< "Hello, world.";
     return fcgi::commit(request, response);
@@ -82,7 +85,7 @@ int main()
   // Create a ProtocolService
   fcgi::service service;
 
-  // Create an acceptor
+  // Create a RequestAcceptor
   fcgi::acceptor acceptor(service);
 
   int status(0);

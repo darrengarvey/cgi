@@ -120,10 +120,10 @@ int handle_request(request& req)
            "Process ID = " << process_id() << "<br />"
            "<form method=post enctype=\"multipart/form-data\">"
              "<input type=text name=name value='"
-      <<         req.post["name"] << "' />"
+      <<         req.post.pick("name", "") << "' />"
              "<br />"
              "<input type=text name=hello value='"
-      <<         req.post["hello"] << "' />"
+      <<         req.post.pick("hello", "") << "' />"
              "<br />"
              "<input type=file name=user_file />"
              "<input type=hidden name=cmd value=multipart_test />"
@@ -161,23 +161,18 @@ int main()
 {
 try {
 
-  std::cerr<< "*** Ping! ***" << '\n';
   // Make a `service` (more about this in other examples).
   service s;
   
   // Make an `acceptor` for accepting requests through.
-#if defined (BOOST_WINDOWS)
-  acceptor a(s, 8009);    // Accept requests on port 8009.
-#else
   acceptor a(s);
-#endif // defined (BOOST_WINDOWS)
 
   //
   // After the initial setup, we can enter a loop to handle one request at a
   // time until there's an error of some sort.
   //
   int ret(0);
-  for (;;)
+  for (int i(5);i;--i)
   {
     //
     // An acceptor can take a request handler as an argument to `accept` and it

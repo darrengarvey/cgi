@@ -45,6 +45,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cgi_sessions", "cgi_session
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cgi_custom_sessions", "cgi_custom_sessions\cgi_custom_sessions.vcproj", "{FF4B6C26-B292-47FF-89B6-F2930AAA020B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sessions_quickstart", "sessions_quickstart\sessions_quickstart.vcproj", "{F254F24F-5249-4A73-A6DA-61DF9BFDC489}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -139,6 +141,10 @@ Global
 		{FF4B6C26-B292-47FF-89B6-F2930AAA020B}.Debug|Win32.Build.0 = Debug|Win32
 		{FF4B6C26-B292-47FF-89B6-F2930AAA020B}.Release|Win32.ActiveCfg = Release|Win32
 		{FF4B6C26-B292-47FF-89B6-F2930AAA020B}.Release|Win32.Build.0 = Release|Win32
+		{F254F24F-5249-4A73-A6DA-61DF9BFDC489}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F254F24F-5249-4A73-A6DA-61DF9BFDC489}.Debug|Win32.Build.0 = Debug|Win32
+		{F254F24F-5249-4A73-A6DA-61DF9BFDC489}.Release|Win32.ActiveCfg = Release|Win32
+		{F254F24F-5249-4A73-A6DA-61DF9BFDC489}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

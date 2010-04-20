@@ -106,7 +106,7 @@ int write_amortization_template(Request& req, response& resp)
   fill_amortization_dictionary(dict, req);
 
   ctemplate::Template* tmpl
-    = ctemplate::Template::GetTemplate("../templates/amortization.html", ctemplate::STRIP_WHITESPACE);
+    = ctemplate::Template::GetTemplate("../stencils/amortization.html", ctemplate::STRIP_WHITESPACE);
 
   std::string h("Content-type: text/html\r\n\r\n");
   write(req.client(), buffer(h));
@@ -175,7 +175,7 @@ int main()
   try{
 
     service s;
-    acceptor a(s, 8010); // Listen on port 8010.
+    acceptor a(s);
 
     for(;;)
     {

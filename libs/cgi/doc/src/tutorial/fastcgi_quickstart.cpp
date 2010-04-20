@@ -192,9 +192,8 @@ int main(int, char**)
 A Service handles asynchronous operations and some of the protocol-specific
 bits.
 >*/
-  fcgi::acceptor acceptor(service, 8008); /*<
-An `Acceptor` handles accepting requests and little else. The `8008` argument
-is the port on the localhost to listen on.
+  fcgi::acceptor acceptor(service); /*<
+An `Acceptor` handles accepting requests and little else.
 >*/
   fcgi::response response; /*<
 The `response` class provides a streaming interface for writing replies. You

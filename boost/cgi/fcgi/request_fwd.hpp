@@ -15,9 +15,10 @@ BOOST_CGI_NAMESPACE_BEGIN
   namespace fcgi {
 
     typedef service service_t;
+    template<typename Protocol>
     class fcgi_request_service;
 
-    typedef basic_request<fcgi_request_service, service_t> request;
+    typedef basic_request<fcgi_request_service<common::tags::fcgi>, service_t> request;
 
   } // namespace fcgi
 BOOST_CGI_NAMESPACE_END

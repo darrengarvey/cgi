@@ -3,9 +3,14 @@
 
 ['[*TODO]: Document using Responses]
 
-While you may sometimes want to respond to a request by writing directly back to the client, more often that not it is preferable to buffer your response. You can never tell how successful a request is going to be from the start(or when an exception is going to be throw), so being able to rewrite your response at any time is a requirement.
+While you may sometimes want to respond to a request by writing directly back to the client, more often that not it is preferable to buffer your response. You can never tell how successful a request is going to be from the start, or whether an exception is going to be throw. Being able to rewrite your response at any time is a requirement for real-world applications.
 
-The library provides the [classref cgi::response] class to make buffering your response simpler. Here is an example of using it:
+The library provides the [classref boost::cgi::response response] class to make buffering your response simpler. Here is an example of using it:
+
+[tip
+  If you're keen to use HTML templates, consider looking at the [classref boost::cgi::stencil stencil] class, which uses cTemplate to allow you to write
+maintainable [@http://wikipedia.org/wiki/Model%2Dview%2Dcontroller Model-View-Controller] apps. This class is just a wrapper over cTemplate and is [*currently experimental].
+]
 
 [section:example Short Example]
 

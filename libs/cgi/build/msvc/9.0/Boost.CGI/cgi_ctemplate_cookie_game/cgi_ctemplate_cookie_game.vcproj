@@ -88,7 +88,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\cgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\style.css&quot; &quot;c:\code\c++\boost.cgi\htdocs\css\style.css&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\main.js&quot; &quot;c:\code\c++\boost.cgi\htdocs\js\main.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\index.html&quot; &quot;c:\code\c++\boost.cgi\templates\index.html&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;\code\c++\boost.cgi\cgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\style.css&quot; &quot;c:\code\c++\boost.cgi\htdocs\css\style.css&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\main.js&quot; &quot;c:\code\c++\boost.cgi\htdocs\js\main.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\index.html&quot; &quot;c:\code\c++\boost.cgi\stencils\index.html&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -164,7 +164,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\cgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\style.css&quot; &quot;c:\code\c++\boost.cgi\htdocs\css\style.css&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\main.js&quot; &quot;c:\code\c++\boost.cgi\htdocs\js\main.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\index.html&quot; &quot;c:\code\c++\boost.cgi\templates\index.html&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;\code\c++\boost.cgi\cgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\style.css&quot; &quot;c:\code\c++\boost.cgi\htdocs\css\style.css&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\main.js&quot; &quot;c:\code\c++\boost.cgi\htdocs\js\main.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\cookies2\index.html&quot; &quot;c:\code\c++\boost.cgi\stencils\index.html&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>

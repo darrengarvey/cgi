@@ -1,13 +1,13 @@
-//           -- fcgi/acceptor_service_impl.hpp --
+//       -- fcgi/win32_acceptor_service_impl.hpp --
 //
-//            Copyright (c) Darren Garvey 2007.
+//         Copyright (c) Darren Garvey 2007-2009.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
 //
 ////////////////////////////////////////////////////////////////
-#ifndef CGI_FCGI_ACCEPTOR_SERVICE_IMPL_HPP_INCLUDED__
-#define CGI_FCGI_ACCEPTOR_SERVICE_IMPL_HPP_INCLUDED__
+#ifndef CGI_FCGI_WIN32_ACCEPTOR_SERVICE_IMPL_HPP_INCLUDED_
+#define CGI_FCGI_WIN32_ACCEPTOR_SERVICE_IMPL_HPP_INCLUDED_
 
 #include "boost/cgi/detail/push_options.hpp"
 
@@ -57,6 +57,45 @@ BOOST_CGI_NAMESPACE_BEGIN
        Handler handler;
      };
 
+     
+    template<typename Pipe>
+    boost::system::error_code
+      accept_named_pipe(HANDLE& listen_handle, Pipe& pipe, boost::system::error_code& ec)
+    {
+        OVERLAPPED overlapped;
+        ::ZeroMemory(&overlapped, sizeof(overlapped)); 
+        overlapped.hEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL); 
+        if (!overlapped.hEvent) 
+            ec = boost::system::error_code(::GetLastError(), boost::system::system_category); 
+        if (! ::ConnectNamedPipe(listen_handle, &overlapped)) 
+        { 
+          switch(::GetLastError())
+          {
+          case ERROR_IO_PENDING:
+            if (::WaitForSingleObject(overlapped.hEvent, INFINITE) == WAIT_FAILED) 
+            { 
+              ::CloseHandle(overlapped.hEvent); 
+              ec = boost::system::error_code(::GetLastError(), boost::system::system_category); 
+            } 
+            break;
+          case ERROR_PIPE_CONNECTED:
+            // ok, a valid connection.
+            break;
+          default:
+            ::CloseHandle(overlapped.hEvent); 
+            ec = boost::system::error_code(::GetLastError(), boost::system::system_category); 
+          }
+        }
+        ::CloseHandle(overlapped.hEvent);
+
+        pipe.file_handle = listen_handle;
+        if (!pipe.is_open()) 
+          ::DisconnectNamedPipe(listen_handle);
+
+      return ec;
+    }
+
+
    } // namespace detail
 
   namespace fcgi {
@@ -77,14 +116,14 @@ BOOST_CGI_NAMESPACE_BEGIN
     * ProtocolService.
     */
    template<typename Protocol = common::tags::fcgi>
-   class acceptor_service_impl
+   class win32_acceptor_service_impl
      : public detail::service_base<
-         ::BOOST_CGI_NAMESPACE::fcgi::acceptor_service_impl<Protocol>
+         ::BOOST_CGI_NAMESPACE::fcgi::win32_acceptor_service_impl<Protocol>
        >
    {
    public:
    
-     typedef acceptor_service_impl<Protocol>        self_type;
+     typedef win32_acceptor_service_impl<Protocol>  self_type;
      typedef Protocol                               protocol_type;
      typedef common::protocol_traits<Protocol>      traits;
      typedef typename traits::protocol_service_type protocol_service_type;
@@ -121,10 +160,12 @@ BOOST_CGI_NAMESPACE_BEGIN
        
      };
 
-     explicit acceptor_service_impl(::BOOST_CGI_NAMESPACE::common::io_service& ios)
-       : detail::service_base< ::BOOST_CGI_NAMESPACE::fcgi::acceptor_service_impl<Protocol> >(ios)
+     explicit win32_acceptor_service_impl(::BOOST_CGI_NAMESPACE::common::io_service& ios)
+       : detail::service_base< ::BOOST_CGI_NAMESPACE::fcgi::win32_acceptor_service_impl<Protocol> >(ios)
        , acceptor_service_(boost::asio::use_service<acceptor_service_type>(ios))
        , strand_(ios)
+       , listen_handle(INVALID_HANDLE_VALUE)
+       , is_cgi_(false)
      {
      }
 
@@ -138,11 +179,41 @@ BOOST_CGI_NAMESPACE_BEGIN
      boost::system::error_code
        default_init(implementation_type& impl, boost::system::error_code& ec)
      {
-       // I've never got the default initialisation working on Windows...
-#if ! defined(BOOST_WINDOWS)
-       return acceptor_service_.assign(impl.acceptor_, boost::asio::ip::tcp::v4()
-                                      , 0, ec);
-#endif
+       //
+       if((::GetStdHandle(STD_OUTPUT_HANDLE) == INVALID_HANDLE_VALUE) &&
+          (::GetStdHandle(STD_ERROR_HANDLE)  == INVALID_HANDLE_VALUE) &&
+          (::GetStdHandle(STD_INPUT_HANDLE)  != INVALID_HANDLE_VALUE) )
+       {
+         DWORD pipe_mode = PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT;
+         HANDLE stdin_handle = ::GetStdHandle(STD_INPUT_HANDLE);
+
+         if (!::DuplicateHandle(::GetCurrentProcess(), stdin_handle,
+                                ::GetCurrentProcess(), &listen_handle,
+                                0, TRUE, DUPLICATE_SAME_ACCESS))
+           ec = error::unable_to_duplicate_handle;
+         else
+         if (!::SetStdHandle(STD_INPUT_HANDLE, listen_handle))
+           ec = error::failed_to_redirect_stdin;
+         else
+         {
+           ::CloseHandle(stdin_handle);
+           if (::SetNamedPipeHandleState(listen_handle, &pipe_mode, NULL, NULL))
+           {
+             // Synchronous pipe.
+             is_cgi_ = false;
+           }
+           else
+           {
+             // error, a TCP socket is being used, which isn't supported
+             // on Windows for now.
+             is_cgi_ = false;
+             ec = error::unsupported_handle_type;
+           }
+         }
+       }
+       else
+         is_cgi_ = true;
+
        return ec;
      }
 
@@ -155,7 +226,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      protocol_service_type&
        get_protocol_service(implementation_type& impl)
      {
-       BOOST_ASSERT(impl.service_ != NULL);
+       BOOST_CGI_ASSERT(impl.service_ != NULL);
        return *impl.service_;
      }
 
@@ -178,7 +249,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      /// Check if the given implementation is open.
      bool is_open(implementation_type& impl)
      {
-       return acceptor_service_.is_open(impl.acceptor_);
+       return listen_handle != INVALID_HANDLE_VALUE;
      }
 
      /// Open a new *socket* acceptor implementation.
@@ -239,22 +310,18 @@ BOOST_CGI_NAMESPACE_BEGIN
        if (!new_request->is_open() && !new_request->client().keep_connection())
        {
          // ...otherwise accept a new connection.
-         acceptor_service_.async_accept(impl.acceptor_,
-             new_request->client().connection()->next_layer(), 0,
-             strand_.wrap(
-               boost::bind(&self_type::handle_accept
-                , this, boost::ref(impl), new_request, handler, _1
-               )
+         detail::accept_named_pipe(listen_handle, *new_request->client().connection(), ec);
+         strand_.post(
+             boost::bind(&self_type::handle_accept
+              , this, boost::ref(impl), new_request, handler, _1
              )
-           );
+         );
        }
        else
        {
-         impl.service_->post(
-           strand_.wrap(
-             boost::bind(&self_type::handle_accept
-                 , this, boost::ref(impl), new_request, handler, boost::system::error_code()
-               )
+         strand_.post(
+           boost::bind(&self_type::handle_accept
+               , this, boost::ref(impl), new_request, handler, boost::system::error_code()
              )
            );
        }
@@ -279,12 +346,10 @@ BOOST_CGI_NAMESPACE_BEGIN
      void async_accept(implementation_type& impl
              , accept_handler_type handler)
      {
-       //impl.service_->post(
-           strand_.post(
-             boost::bind(&self_type::do_accept,
-                 this, boost::ref(impl), handler)
-             );
-         //);
+       strand_.post(
+         boost::bind(&self_type::do_accept,
+             this, boost::ref(impl), handler)
+         );
      }
      
      int accept(implementation_type& impl, accept_handler_type handler
@@ -317,8 +382,7 @@ BOOST_CGI_NAMESPACE_BEGIN
          if (!new_request->client().keep_connection())
          {
            // ...otherwise accept a new connection.
-           ec = acceptor_service_.accept(impl.acceptor_,
-                    new_request->client().connection()->next_layer(), endpoint, ec);
+           detail::accept_named_pipe(listen_handle, *new_request->client().connection(), ec);
          }
        }
        new_request->status(common::accepted);
@@ -356,9 +420,8 @@ BOOST_CGI_NAMESPACE_BEGIN
        if (request.client().keep_connection())
          return ec;
 
-       // ...otherwise accept a new connection.
-       ec = acceptor_service_.accept(impl.acceptor_,
-                request.client().connection()->next_layer(), endpoint, ec);
+       detail::accept_named_pipe(listen_handle, *request.client().connection(), ec);
+
        if (!ec)
          request.status(common::accepted);
        return ec;
@@ -370,7 +433,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 					  , typename implementation_type::request_type& request
                       , Handler handler)
      {
-       this->io_service().post(
+       strand_.post(
          detail::accept_handler<self_type, Handler>(*this, impl, request, handler)
        );
      }
@@ -397,20 +460,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      bool
      is_cgi(implementation_type& impl)
      {
-       boost::system::error_code ec;
-       socklen_t len (
-         static_cast<socklen_t>(local_endpoint(impl,ec).capacity()) );
-       int check (
-         getpeername(native(impl), local_endpoint(impl,ec).data(), &len) );
-         
-       /// The FastCGI check works differently on Windows and UNIX.
-#if defined(BOOST_WINDOWS)
-       return ( check == SOCKET_ERROR &&
-                WSAGetLastError() == WSAENOTCONN ) ? false : true;
-#else
-       return ( check == -1 && 
-                errno == ENOTCONN ) ? false : true;
-#endif
+       return is_cgi_;
      }
 
    public:
@@ -444,6 +494,8 @@ BOOST_CGI_NAMESPACE_BEGIN
      /// The underlying socket acceptor service.
      acceptor_service_type&          acceptor_service_;
      boost::asio::io_service::strand strand_;
+     HANDLE listen_handle;
+     bool is_cgi_;
    };
 
  } // namespace fcgi
@@ -451,4 +503,4 @@ BOOST_CGI_NAMESPACE_END
 
 #include "boost/cgi/detail/pop_options.hpp"
 
-#endif // CGI_FCGI_ACCEPTOR_SERVICE_IMPL_HPP_INCLUDED__
+#endif // CGI_FCGI_WIN32_ACCEPTOR_SERVICE_IMPL_HPP_INCLUDED_

@@ -7,7 +7,8 @@ project boost/cgi/tests/run
   : requirements
     <library>/boost/test//boost_unit_test_framework/
     <library>/boost/system/
-    <linkflags>-pthread
+    <library>/boost/serialization//boost_serialization/
+    #<os>:<linkflags>-pthread
     #<library>/boost/thread/
     #<library>/boost/regex/
   ;
@@ -29,14 +30,15 @@ test-suite run_test_suite
     #[ run name_test.cpp ]
     #[ run map_test.cpp ]
     #[ run parse_options.cpp ]
-    [ run data_map_proxy.cpp ]
+    #[ run data_map_proxy.cpp ]
+    [ run sessions.cpp ]
     #[ run has_key.cpp ]
   ;
 
-test-suite wget_test
-  :
+#test-suite wget_test
+#  :
     #[ run wget.cpp : "--log_level=message" ]
-    [ run hello_world.cpp /boost/filesystem/ ]
-  ;
+#    [ run hello_world.cpp /boost/filesystem/ ]
+#  ;
 
-explicit wget_test ;
+#explicit wget_test ;

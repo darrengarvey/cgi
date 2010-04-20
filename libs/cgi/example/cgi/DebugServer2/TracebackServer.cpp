@@ -1,7 +1,7 @@
 #include "TracebackServer.hpp"
 #include <boost/chrono/chrono.hpp>
 
-#define TBS_TEMPLATE__DEBUG_VIEW "../templates/debug_view.html"
+#define TBS_TEMPLATE__DEBUG_VIEW "../stencils/debug_view.html"
 
 namespace detail {
 

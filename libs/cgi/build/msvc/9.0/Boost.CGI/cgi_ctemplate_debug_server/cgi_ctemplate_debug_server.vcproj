@@ -87,7 +87,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\cgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\DebugServer2\debug_view.css&quot; &quot;c:\code\c++\boost.cgi\htdocs\css\debug_view.css&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\DebugServer2\debug_view.js&quot; &quot;c:\code\c++\boost.cgi\htdocs\js\debug_view.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\DebugServer2\debug_view.html&quot; &quot;c:\code\c++\boost.cgi\templates\debug_view.html&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\DebugServer2\default_view.html&quot; &quot;c:\code\c++\boost.cgi\templates\default_view.html&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;\code\c++\boost.cgi\cgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\DebugServer2\debug_view.css&quot; &quot;c:\code\c++\boost.cgi\htdocs\css\debug_view.css&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\DebugServer2\debug_view.js&quot; &quot;c:\code\c++\boost.cgi\htdocs\js\debug_view.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\DebugServer2\debug_view.html&quot; &quot;c:\code\c++\boost.cgi\stencils\debug_view.html&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\DebugServer2\default_view.html&quot; &quot;c:\code\c++\boost.cgi\stencils\default_view.html&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -163,7 +163,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\cgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\DebugServer2\debug_view.css&quot; &quot;c:\code\c++\boost.cgi\htdocs\css\debug_view.css&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\DebugServer2\debug_view.js&quot; &quot;c:\code\c++\boost.cgi\htdocs\js\debug_view.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\DebugServer2\debug_view.html&quot; &quot;c:\code\c++\boost.cgi\templates\debug_view.html&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\DebugServer2\default_view.html&quot; &quot;c:\code\c++\boost.cgi\templates\default_view.html&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;\code\c++\boost.cgi\cgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\DebugServer2\debug_view.css&quot; &quot;c:\code\c++\boost.cgi\htdocs\css\debug_view.css&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\DebugServer2\debug_view.js&quot; &quot;c:\code\c++\boost.cgi\htdocs\js\debug_view.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\DebugServer2\debug_view.html&quot; &quot;c:\code\c++\boost.cgi\stencils\debug_view.html&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\cgi\DebugServer2\default_view.html&quot; &quot;c:\code\c++\boost.cgi\stencils\default_view.html&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>

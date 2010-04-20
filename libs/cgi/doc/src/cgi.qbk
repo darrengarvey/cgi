@@ -7,7 +7,7 @@
 
 [library CGI
     [quickbook 1.5]
-    [version 0.02]
+    [version 0.6]
     [dirname the_document_dir]
     [copyright 2007-2009 Darren Garvey]
     [purpose Documentation for CGI / FastCGI Library]

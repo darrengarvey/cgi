@@ -89,7 +89,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\fcgi-bin\$(TargetName)&quot;&#x0D;&#x0A;mkdir &quot;$(ProjectDir)\templates&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\stencil\stencil.html&quot; &quot;$(ProjectDir)\templates\stencil.html&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\stencil\stencil.include.html&quot; &quot;$(ProjectDir)\templates\stencil.include.html&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;\code\c++\boost.cgi\fcgi-bin\$(TargetName)&quot;&#x0D;&#x0A;mkdir &quot;$(ProjectDir)\templates&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\stencil\stencil.html&quot; &quot;$(ProjectDir)\stencils\stencil.html&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\stencil\stencil.include.html&quot; &quot;$(ProjectDir)\stencils\stencil.include.html&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -166,7 +166,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\fcgi-bin\$(TargetName)&quot;&#x0D;&#x0A;mkdir &quot;$(ProjectDir)\templates&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\stencil\stencil.html&quot; &quot;$(ProjectDir)\templates\stencil.html&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\stencil\stencil.include.html&quot; &quot;$(ProjectDir)\templates\stencil.include.html&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;\code\c++\boost.cgi\fcgi-bin\$(TargetName)&quot;&#x0D;&#x0A;mkdir &quot;$(ProjectDir)\templates&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\stencil\stencil.html&quot; &quot;$(ProjectDir)\stencils\stencil.html&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\stencil\stencil.include.html&quot; &quot;$(ProjectDir)\stencils\stencil.include.html&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>

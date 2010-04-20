@@ -22,7 +22,7 @@ int handle_request(request& req)
   
   // Construct a response that uses Google cTemplate. Also sets the root
   // directory where the stencils are found.
-  stencil resp("templates/");
+  stencil resp("stencils/");
 
   //// Test 1.
 
@@ -116,7 +116,7 @@ int main()
 {
 try {
   service s;
-  acceptor a(s, 8018);
+  acceptor a(s);
   
   // Handle requests (one at a time) until the counter overflows.
   for(unsigned count(1);count;++count)

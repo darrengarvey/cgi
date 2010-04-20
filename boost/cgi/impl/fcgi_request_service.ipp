@@ -79,8 +79,9 @@ BOOST_CGI_NAMESPACE_BEGIN
   namespace fcgi {
  
     /// Close the request.
+    template<typename Protocol>
     BOOST_CGI_INLINE int
-    fcgi_request_service::close(
+    fcgi_request_service<Protocol>::close(
         implementation_type& impl
       , ::BOOST_CGI_NAMESPACE::common::http::status_code& hsc
       , int program_status)
@@ -91,8 +92,9 @@ BOOST_CGI_NAMESPACE_BEGIN
       return program_status;
     }
 
+	template<typename Protocol>
     BOOST_CGI_INLINE int
-    fcgi_request_service::close(
+    fcgi_request_service<Protocol>::close(
         implementation_type& impl
       , ::BOOST_CGI_NAMESPACE::common::http::status_code&
       , int program_status
@@ -116,8 +118,9 @@ BOOST_CGI_NAMESPACE_BEGIN
       return program_status;
     }
 
+	template<typename Protocol>
     BOOST_CGI_INLINE void
-    fcgi_request_service::clear(implementation_type& impl)
+    fcgi_request_service<Protocol>::clear(implementation_type& impl)
     {
       impl.post_buffer_.clear();
       impl.param_buffer_.clear();
@@ -142,8 +145,9 @@ BOOST_CGI_NAMESPACE_BEGIN
      *    packet for this request arrives from the server.
      *
      */
+    template<typename Protocol>
     BOOST_CGI_INLINE boost::system::error_code
-    fcgi_request_service::load(
+    fcgi_request_service<Protocol>::load(
         implementation_type& impl, common::parse_options opts
       , boost::system::error_code& ec)
     {
@@ -235,9 +239,10 @@ BOOST_CGI_NAMESPACE_BEGIN
       return ec;
     }
     
+    template<typename Protocol>
     template<typename Handler>
     BOOST_CGI_INLINE
-    void fcgi_request_service::do_load(
+    void fcgi_request_service<Protocol>::do_load(
         implementation_type& impl, common::parse_options opts,
         Handler handler, boost::system::error_code& ec
       )
@@ -249,9 +254,10 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     }
     
+    template<typename Protocol>
     template<typename Handler>
     BOOST_CGI_INLINE
-    void fcgi_request_service::handle_read_header(
+    void fcgi_request_service<Protocol>::handle_read_header(
         implementation_type& impl, 
         common::parse_options opts,
         Handler handler,
@@ -297,9 +303,10 @@ BOOST_CGI_NAMESPACE_BEGIN
       }
     }
         
+    template<typename Protocol>
     template<typename Handler>
     BOOST_CGI_INLINE
-    void fcgi_request_service::handle_begin_request_header(
+    void fcgi_request_service<Protocol>::handle_begin_request_header(
         implementation_type& impl,
         common::parse_options opts,
         Handler handler,
@@ -349,8 +356,9 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     // **FIXME**
+    template<typename Protocol>
     template<typename Handler> BOOST_CGI_INLINE
-    void fcgi_request_service::async_load(
+    void fcgi_request_service<Protocol>::async_load(
         implementation_type& impl, common::parse_options opts, Handler handler)
     {
       /*
@@ -367,15 +375,17 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     /// Check if the params have been read (ie. FCGI_PARAMS packets)
+    template<typename Protocol>
     BOOST_CGI_INLINE
-    bool fcgi_request_service::params_read(implementation_type& impl)
+    bool fcgi_request_service<Protocol>::params_read(implementation_type& impl)
     {
       return impl.client_.status() >= common::params_read;
     }
 
     /// Read and parse the cgi POST meta variables (greedily)
+    template<typename Protocol>
     BOOST_CGI_INLINE boost::system::error_code&
-    fcgi_request_service::parse_post_vars(
+    fcgi_request_service<Protocol>::parse_post_vars(
         implementation_type& impl
       , boost::system::error_code& ec)
     {
@@ -391,9 +401,10 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     /// Read and parse a single cgi POST meta variable (greedily)
+    template<typename Protocol>
     template<typename RequestImpl> BOOST_CGI_INLINE
     boost::system::error_code&
-    fcgi_request_service::parse_one_post_var(
+    fcgi_request_service<Protocol>::parse_one_post_var(
         implementation_type& impl, boost::system::error_code& ec)
     {
       //#     error "Not implemented"
@@ -402,9 +413,10 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     // **FIXME**
     /// Read some data from the client.
+    template<typename Protocol>
     template<typename MutableBufferSequence>
     BOOST_CGI_INLINE std::size_t
-    fcgi_request_service::read_some(
+    fcgi_request_service<Protocol>::read_some(
         implementation_type& impl, const MutableBufferSequence& buf
       , boost::system::error_code& ec)
     {
@@ -424,8 +436,9 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     /// Read in the FastCGI (env) params
     // **FIXME**
+    template<typename Protocol>
     BOOST_CGI_INLINE boost::system::error_code
-    fcgi_request_service::read_env_vars(
+    fcgi_request_service<Protocol>::read_env_vars(
         implementation_type& impl, boost::system::error_code& ec)
     {
       while(!ec && !(status(impl) & common::env_read))
@@ -468,8 +481,9 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     /// Read a single header, but do nothing with it.
+    template<typename Protocol>
     BOOST_CGI_INLINE boost::system::error_code
-    fcgi_request_service::read_header(
+    fcgi_request_service<Protocol>::read_header(
         implementation_type& impl
       , boost::system::error_code& ec)
     {
@@ -483,9 +497,10 @@ BOOST_CGI_NAMESPACE_BEGIN
       return ec;
     }
 
+	template<typename Protocol>
     template<typename Handler>
     BOOST_CGI_INLINE void
-    fcgi_request_service::async_read_header(
+    fcgi_request_service<Protocol>::async_read_header(
         implementation_type& impl
       , common::parse_options opts
       , Handler handler
@@ -511,23 +526,26 @@ BOOST_CGI_NAMESPACE_BEGIN
      * better place to live ***/
 
     // **FIXME**
+    template<typename Protocol>
     BOOST_CGI_INLINE void
-    fcgi_request_service::handle_admin_request(implementation_type& /* impl */)
+    fcgi_request_service<Protocol>::handle_admin_request(implementation_type& /* impl */)
     {
       //std::cerr<< std::endl << "**FIXME** " << __FILE__ << ":" << __LINE__ 
       //  << " handle_admin_request()" << std::endl;
     }
 
     // **FIXME**
+    template<typename Protocol>
     BOOST_CGI_INLINE void
-    fcgi_request_service::handle_other_request_header(implementation_type& /* impl */)
+    fcgi_request_service<Protocol>::handle_other_request_header(implementation_type& /* impl */)
     {
       //std::cerr<< std::endl << "**FIXME** " << __FILE__ << ":" << __LINE__ 
       //  << " handle_other_request_header()" << std::endl;
     }
 
+	template<typename Protocol>
     BOOST_CGI_INLINE boost::system::error_code
-    fcgi_request_service::process_abort_request(
+    fcgi_request_service<Protocol>::process_abort_request(
         implementation_type& impl, boost::uint16_t id
       , const unsigned char* buf, boost::uint32_t
       , boost::system::error_code& ec)
@@ -547,8 +565,9 @@ BOOST_CGI_NAMESPACE_BEGIN
       return ec;
     }
 
+	template<typename Protocol>
     BOOST_CGI_INLINE boost::system::error_code
-    fcgi_request_service::process_params(
+    fcgi_request_service<Protocol>::process_params(
         implementation_type& impl, boost::uint16_t id
       , const unsigned char* buf, boost::uint32_t len
       , boost::system::error_code& ec)
@@ -604,9 +623,9 @@ BOOST_CGI_NAMESPACE_BEGIN
       return ec;
     }
 
-
+	template<typename Protocol>
     BOOST_CGI_INLINE boost::system::error_code
-    fcgi_request_service::process_stdin(
+    fcgi_request_service<Protocol>::process_stdin(
         implementation_type& impl, boost::uint16_t id
       , const unsigned char* buf, boost::uint32_t len
       , boost::system::error_code& ec)
@@ -620,8 +639,9 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     /// Parse the current header
+    template<typename Protocol>
     BOOST_CGI_INLINE boost::tribool
-    fcgi_request_service::parse_header(implementation_type& impl)
+    fcgi_request_service<Protocol>::parse_header(implementation_type& impl)
     {
       BOOST_ASSERT(fcgi::spec::get_version(impl.header_buf_) == 1
                    && "This library is only compatible with FastCGI 1.0");
@@ -654,8 +674,9 @@ BOOST_CGI_NAMESPACE_BEGIN
       }
     }
 
+	template<typename Protocol>
     BOOST_CGI_INLINE boost::system::error_code
-    fcgi_request_service::parse_packet(
+    fcgi_request_service<Protocol>::parse_packet(
         implementation_type& impl, boost::system::error_code& ec)
     {
       if (this->read_header(impl, ec))
@@ -690,9 +711,10 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     /// Read the body of the current packet; do nothing with it.
+    template<typename Protocol>
     template<typename MutableBuffersType> BOOST_CGI_INLINE
     boost::system::error_code
-    fcgi_request_service::read_body(
+    fcgi_request_service<Protocol>::read_body(
         implementation_type& impl, const MutableBuffersType& buf
       , boost::system::error_code& ec)
     {
@@ -705,9 +727,10 @@ BOOST_CGI_NAMESPACE_BEGIN
       return ec;
     }
 
+	template<typename Protocol>
     template<typename MutableBuffersType> BOOST_CGI_INLINE
     boost::system::error_code
-    fcgi_request_service::parse_body(
+    fcgi_request_service<Protocol>::parse_body(
         implementation_type& impl, const MutableBuffersType& buf
       , boost::system::error_code& ec)
     {
@@ -734,10 +757,11 @@ BOOST_CGI_NAMESPACE_BEGIN
       return ec;
     }
 
+	template<typename Protocol>
     BOOST_CGI_INLINE boost::system::error_code
-    fcgi_request_service::begin_request_helper(
+    fcgi_request_service<Protocol>::begin_request_helper(
         implementation_type& impl
-      , implementation_type::header_buffer_type& header
+      , header_buffer_type& header
       , boost::system::error_code& ec)
     {
        impl.client_.request_id_ = fcgi::spec::get_request_id(header);
@@ -770,8 +794,9 @@ BOOST_CGI_NAMESPACE_END
 BOOST_CGI_NAMESPACE_BEGIN
  namespace fcgi {
 
+	template<typename Protocol>
     BOOST_CGI_INLINE boost::system::error_code
-    fcgi_request_service::process_begin_request(
+    fcgi_request_service<Protocol>::process_begin_request(
         implementation_type& impl, boost::uint16_t id
       , const unsigned char* buf, boost::uint32_t
       , boost::system::error_code& ec)

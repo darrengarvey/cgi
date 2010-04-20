@@ -32,16 +32,17 @@ BOOST_CGI_NAMESPACE_BEGIN
  namespace fcgi {
  
   /// The IoObjectService class for a FCGI basic_request<>s
+  template<typename Protocol>
   class fcgi_request_service
-    : public common::request_base<common::tags::fcgi>
-    , public detail::service_base<fcgi_request_service>
+    : public common::request_base<Protocol>
+    , public detail::service_base<fcgi_request_service<Protocol> >
   {
   public:
     /// The actual implementation date for an FCGI request.
     struct implementation_type
       : base_type::impl_base
     {
-      typedef client_type::header_buffer_type       header_buffer_type;
+      typedef typename client_type::header_buffer_type       header_buffer_type;
       typedef spec_detail::Header                   header_type;
 
       implementation_type()
@@ -70,14 +71,12 @@ BOOST_CGI_NAMESPACE_BEGIN
       }
      };
 
-    typedef fcgi_request_service                           self_type;
-    typedef fcgi_request_service                           full_type;
-    typedef self_type::implementation_type::protocol_type  protocol_type;
-    typedef self_type::implementation_type::string_type    string_type;
-    typedef self_type::implementation_type::request_type   request_type;
+    typedef fcgi_request_service<Protocol>                 self_type;
+    typedef fcgi_request_service<Protocol>                 full_type;
+    typedef typename traits::header_buffer_type            header_buffer_type;
 
     fcgi_request_service(::BOOST_CGI_NAMESPACE::common::io_service& ios)
-      : detail::service_base<fcgi_request_service>(ios)
+      : detail::service_base<fcgi_request_service<Protocol> >(ios)
       , strand_(ios)
     {
     }
@@ -135,7 +134,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       return common::responder;
     }
 
-    implementation_type::client_type&
+    client_type&
       client(implementation_type& impl)
     {
       return impl.client_;
@@ -255,15 +254,6 @@ BOOST_CGI_NAMESPACE_BEGIN
     boost::system::error_code
     read_env_vars(implementation_type& impl, boost::system::error_code& ec);
 
-    // Mammoth typedef corresponding to function signature of process_*
-    // functions.
-    //typedef boost::system::error_code
-    //  ( full_type::* proc_func_t)
-    //  (implementation_type& impl, boost::uint16_t, const unsigned char*
-    //  , boost::uint32_t, boost::system::error_code&);
-
-    //const proc_func_t proc_funcs[8];
-  
     boost::system::error_code
       parse_packet(implementation_type& impl, boost::system::error_code& ec);
       
@@ -280,7 +270,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     boost::system::error_code
       begin_request_helper(implementation_type& impl
-                          , implementation_type::header_buffer_type& header
+                          , header_buffer_type& header
                           , boost::system::error_code& ec);
                           
   private:

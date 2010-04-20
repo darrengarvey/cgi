@@ -22,7 +22,7 @@ try {
   // as well as cookies.
   cgi::request req;
   // Using a response is the simplest way to write data back to the client.
-  cgi::stencil resp("../templates/");
+  cgi::stencil resp("../stencils/");
   
   resp<< cgi::content_type("text/html");
   resp.set("filename", req.post["file"]);

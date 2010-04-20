@@ -179,8 +179,6 @@ BOOST_CGI_NAMESPACE_BEGIN
       
     ~basic_request()
     {
-      //if (is_open())
-      //  close(http::internal_server_error, 0);
 #ifdef BOOST_CGI_ENABLE_SESSIONS
       try {
           if (!session.id().empty())
@@ -193,6 +191,9 @@ BOOST_CGI_NAMESPACE_BEGIN
     
 #ifdef BOOST_CGI_ENABLE_SESSIONS
     /// Start a session, or load the session from a cookie.
+    /**
+     * This starts a session.
+	 */
     void start_session()
     {
       if (!session.loaded())
@@ -381,8 +382,6 @@ BOOST_CGI_NAMESPACE_BEGIN
       boost::system::error_code ec;
       this->service.close(this->implementation, http_status,
           program_status, ec);
-      // Clear the request data so the object can be reused.
-      //clear();
       detail::throw_error(ec);
       return program_status;
     }
@@ -410,8 +409,6 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     /// Clear the data for the request, for reusing this object.
-    // I'd imagine clearing and re-loading a request is quicker than 
-    // destroying/re-creating one. **Unverified claims** **FIXME**
     void clear()
     {
       this->service.clear(this->implementation);

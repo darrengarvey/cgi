@@ -90,7 +90,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\fcgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\amortization\amortization.css&quot; &quot;c:\code\c++\boost.cgi\htdocs\css\amortization.css&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\amortization\amortization.js&quot; &quot;c:\code\c++\boost.cgi\htdocs\js\amortization.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\amortization\amortization.html&quot; &quot;c:\code\c++\boost.cgi\templates\amortization.html&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\amortization\amortization.html&quot; &quot;$(ProjectDir)\templates\amortization.html&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;\code\c++\boost.cgi\fcgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\amortization\amortization.css&quot; &quot;\code\c++\boost.cgi\htdocs\css\amortization.css&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\amortization\amortization.js&quot; &quot;\code\c++\boost.cgi\htdocs\js\amortization.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\amortization\amortization.html&quot; &quot;\code\c++\boost.cgi\stencils\amortization.html&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\amortization\amortization.html&quot; &quot;$(ProjectDir)\stencils\amortization.html&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -166,7 +166,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;c:\code\c++\boost.cgi\fcgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\amortization\amortization.css&quot; &quot;c:\code\c++\boost.cgi\htdocs\css\amortization.css&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\amortization\amortization.js&quot; &quot;c:\code\c++\boost.cgi\htdocs\js\amortization.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\amortization\amortization.html&quot; &quot;c:\code\c++\boost.cgi\templates\amortization.html&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\amortization\amortization.html&quot; &quot;$(ProjectDir)\templates\amortization.html&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;\code\c++\boost.cgi\fcgi-bin\$(TargetName)&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\amortization\amortization.css&quot; &quot;\code\c++\boost.cgi\htdocs\css\amortization.css&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\amortization\amortization.js&quot; &quot;\code\c++\boost.cgi\htdocs\js\amortization.js&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\amortization\amortization.html&quot; &quot;\code\c++\boost.cgi\stencils\amortization.html&quot;&#x0D;&#x0A;copy &quot;$(SolutionDir)\..\..\..\..\example\fcgi\amortization\amortization.html&quot; &quot;$(ProjectDir)\stencils\amortization.html&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>

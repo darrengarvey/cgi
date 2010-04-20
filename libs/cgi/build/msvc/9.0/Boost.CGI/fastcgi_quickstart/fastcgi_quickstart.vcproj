@@ -86,6 +86,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;\code\c++\boost.cgi\fcgi-bin\$(TargetName)&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -160,6 +161,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;\code\c++\boost.cgi\fcgi-bin\$(TargetName)&quot;"
 			/>
 		</Configuration>
 	</Configurations>

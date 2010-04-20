@@ -53,6 +53,15 @@ enum fcgi_errors
 
   invalid_socket,
 
+  // On Windows, attempting to call DuplicateHandle on STDIN failed.
+  unable_to_duplicate_handle,
+
+  // On Windows, a call to SetStdHandle failed.
+  failed_to_redirect_stdin,
+
+  // On Windows, TCP connections aren't supported.
+  unsupported_handle_type,
+
   // The CONTENT_TYPE for form data wasn't recognised.
   invalid_form_type,
 
@@ -104,11 +113,17 @@ public:
     case already_closed:
       return "The client has already been closed.";
     case multiplexing_not_supported:
-      return "Multiplexing connections are not yet supported.";
+      return "Multiplexing connections are not yet fully supported.";
+    case unable_to_duplicate_handle:
+      return "A call to DuplicateHandle failed while trying to duplicate the FastCGI HANDLE.";
+    case failed_to_redirect_stdin:
+      return "A call to SetStdHandle failed while trying to redirect the FastCGI HANDLE.";
+    case unsupported_handle_type:
+      return "An unsupported connection type was used to communicate with the FastCGI application.";
     //case empty_packet_read:
     //  return "An empty FastCGI packet was read (eg. STDIN or GET_PARAM data has been read).";
     default:
-      return "(FastCGI) BOOM!!!";
+      return "An unknown FastCGI error occurred.";
     }
   }
 };

@@ -24,7 +24,7 @@ int handle_request(request& req)
   
   // Construct a response that uses Google cTemplate. Also sets the root
   // directory where the stencils are found.
-  stencil resp("templates/");
+  stencil resp("stencils/");
 
   //// Test 1.
 

@@ -14,6 +14,7 @@
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/uuid/uuid.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/import/write.hpp"
 #include "boost/cgi/common/header.hpp"

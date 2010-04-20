@@ -12,6 +12,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/none.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/config.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/common/parse_options.hpp"
 #include "boost/cgi/common/role_type.hpp"
@@ -21,11 +22,9 @@
 #include "boost/cgi/fwd/basic_connection_fwd.hpp"
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 #include "boost/cgi/fwd/basic_request_fwd.hpp"
-//#include "boost/cgi/fwd/data_map_proxy_fwd.hpp"
 #include "boost/cgi/fwd/form_parser_fwd.hpp"
 #ifdef BOOST_CGI_ENABLE_SESSIONS
 #  include "boost/cgi/fwd/sessions_fwd.hpp"
-#  include <boost/uuid/uuid_generators.hpp>
 #endif // BOOST_CGI_ENABLE_SESSIONS
 
 BOOST_CGI_NAMESPACE_BEGIN
@@ -36,6 +35,7 @@ BOOST_CGI_NAMESPACE_BEGIN
   namespace fcgi
   {
   class fcgi_service_impl;
+  template<typename Protocol>
   class fcgi_request_service;
   class fcgi_acceptor_service;
   }
@@ -52,6 +52,8 @@ BOOST_CGI_NAMESPACE_BEGIN
   class fcgi_service_impl;
 
   class fcgi_acceptor_service;
+  template<typename Protocol>
+  class fcgi_request_acceptor_service;
 
   class cgi_request_service;
   class fcgi_request_service;
@@ -78,17 +80,17 @@ BOOST_CGI_NAMESPACE_BEGIN
       typedef cgi_request_service                    request_service_impl;
       typedef cgi_request_service                    service_type;
       typedef common::basic_protocol_service<
-                  tags::cgi
+                  protocol_type
               >                                      protocol_service_type;
       typedef basic_request<
-                  tags::cgi
+                  protocol_type
               >                                      request_type; 
       typedef cgi_service_impl                       service_impl_type;
       typedef basic_connection<
                   tags::async_stdio
               >                                      connection_type;
       typedef basic_client<
-                  tags::cgi
+                  protocol_type
               >                                      client_type;
       typedef form_parser                            form_parser_type;
       typedef boost::none_t                          header_type;
@@ -98,7 +100,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       typedef boost::array<unsigned char, 8>         header_buffer_type;
       typedef boost::asio::const_buffers_1           const_buffers_type;
       typedef boost::asio::mutable_buffers_1         mutable_buffers_type;
-      typedef role_type                              role_type;
+      typedef common::role_type                      role_type;
       typedef boost::shared_ptr<request_type>        pointer;
 #ifdef BOOST_CGI_ENABLE_SESSIONS
       typedef basic_session<
@@ -121,20 +123,26 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       typedef protocol_traits<tags::fcgi>            type;
       typedef tags::fcgi                             protocol_type;
-      typedef fcgi::fcgi_request_service             request_service_impl;
-      typedef fcgi::fcgi_request_service             service_type;
+      typedef fcgi::fcgi_request_service<protocol_type>             request_service_impl;
+      typedef fcgi::fcgi_request_service<protocol_type>             service_type;
       typedef basic_protocol_service<
-                  tags::fcgi
+                  protocol_type
               >                                      protocol_service_type;
-      typedef basic_request<
-                  tags::fcgi
-              >                                      request_type; 
+      typedef basic_request<protocol_type>           request_type; 
       typedef boost::shared_ptr<request_type>        request_ptr;
       typedef fcgi::fcgi_service_impl                service_impl_type;
+      typedef fcgi_request_acceptor_service<protocol_type>  acceptor_service;
       typedef fcgi::fcgi_acceptor_service            acceptor_service_impl;
+#if defined(BOOST_WINDOWS)
+      typedef basic_connection<
+                  tags::anonymous_pipe
+              >                                      connection_type;
+      //typedef anonymous_pipe                         connection_type;
+#else
       typedef basic_connection<
                   tags::shareable_tcp_socket
               >                                      connection_type;
+#endif // defined(BOOST_WINDOWS)
       typedef boost::asio::ip::tcp                   native_protocol_type;
       typedef boost::asio::socket_acceptor_service<
                   native_protocol_type
@@ -144,7 +152,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       typedef acceptor_service_type::native_type     native_type;
       typedef unsigned short                         port_number_type;
       typedef boost::asio::ip::tcp::endpoint         endpoint_type;
-      typedef basic_client<tags::fcgi>               client_type;
+      typedef basic_client<protocol_type>            client_type;
       typedef form_parser                            form_parser_type;
       typedef fcgi::spec::header                     header_type;
       typedef fcgi::spec_detail::role_types          role_type;

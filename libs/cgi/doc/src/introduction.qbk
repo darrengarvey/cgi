@@ -17,9 +17,9 @@ int main()
   response resp;
 
   resp<< "Hello there, Universe. "
-      << "-- " << req[get]["name"];
+      << "-- " << req.get["name"];
 
-  return_(req, resp, 0); // write the response and 'return 0;' to the OS
+  return commit(req, resp); // write the response
 }
 ``
 
@@ -34,7 +34,7 @@ Hello there, Universe. -- Mr. Allison
 
 ``
 
-This CGI library is a reasonably high-level library for creating CGI, FastCGI or SCGI programs. Its scope is intentionally limited to the ''controller'' portion of the Model-View-Controller idiom. In other words, XML/HTML templates are not addressed, even if their use is highly recommended.
+This CGI library is a reasonably high-level library for creating CGI or FastCGI programs. Its scope is intentionally limited to the ''controller'' portion of the Model-View-Controller idiom. In other words, XML/HTML templates are not addressed, even if their use is highly recommended.
 
 [tip
   The __amort_example__ example uses Google cTemplate for dealing with HTML templates. Consider having a look at it, or at the upcoming ''Karma'' part of Boost.Spirit.
