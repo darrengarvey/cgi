@@ -213,16 +213,18 @@ class stencil
 public:
   typedef stencil                       self_type;
   typedef boost::cgi::common::response  base_type;
-  typedef ctemplate::Template           stencil_type;
   typedef ctemplate::TemplateDictionary impl_type;
   typedef stencils::section             section;
   typedef stencils::dictionary          dictionary;
   
   enum reload_option
   {
+    // Don't reload templates from disk.
     cached,
-    reload,
-    reload_all
+    // Reload templates from disk as and when required.
+    lazy_reload = ctemplate::TemplateCache::LAZY_RELOAD,
+    // Reload all templates in the cache now.
+    immediate_reload = ctemplate::TemplateCache::IMMEDIATE_RELOAD
   };
   
   enum strip
@@ -232,49 +234,33 @@ public:
     strip_whitespace = ctemplate::STRIP_WHITESPACE
   };
 
-  enum parse_state
-  {
-    unused = ctemplate::TS_UNUSED,
-    empty = ctemplate::TS_EMPTY,
-    error = ctemplate::TS_ERROR,
-    ready = ctemplate::TS_READY,
-    should_reload = ctemplate::TS_SHOULD_RELOAD
-  };
- 
   stencil(impl_type* parent_dict)
-    : tmpl(NULL)
-    , impl(parent_dict->MakeCopy("response"))
+    : impl(parent_dict->MakeCopy("response"))
     , expanded(false)
     , per_expand_data()
   {
   }
   
   stencil(string_type const& root_dir = "")
-    : tmpl(NULL)
-    , impl(new impl_type("response"))
+    : impl(new impl_type("response"))
     , expanded(false)
     , per_expand_data()
   {
     if (!root_dir.empty())
-      ctemplate::Template::SetTemplateRootDirectory(root_dir);
+      ctemplate::mutable_default_template_cache()
+        ->SetTemplateRootDirectory(root_dir);
   }
   
   /// Clear the response buffer.
   void reset(impl_type* use_dict = NULL)
   {
     impl.reset(use_dict ? use_dict : new impl_type("response"));
-    tmpl = NULL;
     base_type::reset();
   }
   
   /// Get the implementation type of the template.
   impl_type& native() { return *impl; }
   
-  parse_state state()
-  {
-    return tmpl ? (parse_state)tmpl->state() : unused;
-  }
-
   bool expand(
       string_type const& template_name,
       enum reload_option reload_if_changed = cached,
@@ -286,29 +272,25 @@ public:
     // Clear the response body (but not headers).
     clear(false);
 
-    if (reload_if_changed == reload_all)
-      ctemplate::Template::ReloadAllIfChanged();
-
-    // Get hold of the template to output.
-    tmpl = ctemplate::Template::GetTemplate(
-              template_name,
-              (ctemplate::Strip)strip_option
-           );
-
-    if (!tmpl || state() == error)
-      throw template_error(template_name);
-    else
-    if (reload_if_changed == reload)
-      tmpl->ReloadIfChanged();
-
     // Add the response content back into the template.
     set("content", content);
-    
-    // Expand the template and write it to the response.
+
+    if (reload_if_changed != cached)
+      ctemplate::mutable_default_template_cache()->ReloadAllIfChanged(
+        (ctemplate::TemplateCache::ReloadType)reload_if_changed);
+
     string_type body;
-    bool success = tmpl->ExpandWithData(&body, impl.get(), &per_expand_data);
+    bool success = ctemplate::ExpandWithData(
+        template_name,                   // The filename
+        (ctemplate::Strip)strip_option,
+        impl.get(),                      // The dictionary
+        &per_expand_data,
+        &body
+      );
+
     if (!success)
       return false;
+
     write(body);
 
     // All ok.
@@ -385,7 +367,6 @@ public:
     return *this;
   }
 
-  stencil_type* tmpl;
   boost::scoped_ptr<impl_type> impl;
   bool expanded;
   ctemplate::PerExpandData per_expand_data;

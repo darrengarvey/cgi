@@ -106,7 +106,7 @@ int handle_request(request& req)
   // Expand the response using the specified template.
   // cTemplate has a cache internally, which we can choose to
   // ignore.
-  resp.expand("stencil.html", stencil::reload);
+  resp.expand("stencil.html", stencil::lazy_reload);
 
   // Send the response and close the request.
   return commit(req, resp);
