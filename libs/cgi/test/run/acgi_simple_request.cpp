@@ -33,8 +33,7 @@ BOOST_AUTO_TEST_CASE( env_test )
   init_env();
 
   using namespace boost::acgi;
-  service s;
-  request req(s, parse_all);
+  request req(parse_all);
 
   TEST_ENV_DATA(req);
 }
@@ -42,8 +41,7 @@ BOOST_AUTO_TEST_CASE( env_test )
 BOOST_AUTO_TEST_CASE( get_data_test )
 {
   using namespace boost::acgi;
-  service s;
-  request req(s, parse_all);
+  request req(parse_all);
 
   TEST_GET_DATA(req);
 }
@@ -53,8 +51,7 @@ BOOST_AUTO_TEST_CASE( cookie_test )
   using namespace boost::acgi;
 
   {
-    service s;
-    request req(s, parse_all);
+    request req(parse_all);
     TEST_ONE_COOKIE(req);
   }
   
@@ -62,8 +59,7 @@ BOOST_AUTO_TEST_CASE( cookie_test )
     // Set two cookies
     setenv("HTTP_COOKIE", "foo=bar;another_one=stuff", 1);
 
-    service s;
-    request req(s, parse_all);
+    request req(parse_all);
     TEST_TWO_COOKIES(req);
   }
 
@@ -71,8 +67,7 @@ BOOST_AUTO_TEST_CASE( cookie_test )
     // Set a url-encoded cookie (with a '; ' separator).
     setenv("HTTP_COOKIE", "foo=bar; encoded=%22%C2%A3$%^$*^hh%%thd@:", 1);
 
-    service s;
-    request req(s, parse_all);
+    request req(parse_all);
     TEST_ENCODED_COOKIE(req);
   }
 }

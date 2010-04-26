@@ -36,6 +36,30 @@
 #endif // BOOST_CGI_ENABLE_SESSIONS
 
 BOOST_CGI_NAMESPACE_BEGIN
+
+ namespace detail {
+
+    template<typename ImplType, typename Service>
+    struct callback_functor
+    {
+      callback_functor(ImplType& impl, Service* service)
+        : impl_(impl)
+        , service_(service)
+      {
+      }
+
+      std::size_t operator()(boost::system::error_code& ec)
+      {
+        return service_->read_some(impl_, ec);
+      }
+
+    private:
+      ImplType& impl_;
+      Service* service_;
+    };
+
+  } // namespace detail
+
  namespace common {
 
   /// ABC that defines the common interface for basic_request<>s
@@ -149,25 +173,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       std::vector<common::form_part> form_parts_;
     };
     
-    template<typename ImplType, typename Service>
-    struct callback_functor
-    {
-      callback_functor(ImplType& impl, Service* service)
-        : impl_(impl)
-        , service_(service)
-      {
-      }
-
-      std::size_t operator()(boost::system::error_code& ec)
-      {
-        return service_->read_some(impl_, ec);
-      }
-
-    private:
-      ImplType& impl_;
-      Service* service_;
-    };
-    
+   
   public:
   
     /// Get the request ID of a FastCGI request, or 1.

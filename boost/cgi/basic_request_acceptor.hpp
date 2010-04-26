@@ -127,8 +127,8 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     /// Open the acceptor
-    template<typename Protocol>
-    void open(const Protocol& protocol)
+    template<typename InternetProtocol>
+    void open(const InternetProtocol& protocol)
     {
       boost::system::error_code ec;
       this->service.open(this->implementation, protocol, ec);
@@ -136,9 +136,9 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     /// Open the acceptor
-    template<typename Protocol>
+    template<typename InternetProtocol>
     boost::system::error_code
-      open(const Protocol& protocol, boost::system::error_code& ec)
+      open(const InternetProtocol& protocol, boost::system::error_code& ec)
     {
       return this->service.open(this->implementation, protocol, ec);
     }
@@ -195,17 +195,17 @@ BOOST_CGI_NAMESPACE_BEGIN
       return this->service.close(this->implementation, ec);
     }
 
-    template<typename Protocol>
-    void assign(Protocol protocol, const native_type& native_acceptor)
+    template<typename InternetProtocol>
+    void assign(InternetProtocol protocol, const native_type& native_acceptor)
     {
       boost::system::error_code ec;
       this->service.assign(this->implementation, protocol, native_acceptor, ec);
       detail::throw_error(ec);
     }
 
-    template<typename Protocol>
+    template<typename InternetProtocol>
     boost::system::error_code
-      assign(Protocol protocol, const native_type& native_acceptor
+      assign(InternetProtocol protocol, const native_type& native_acceptor
             , boost::system::error_code& ec)
     {
       return this->service.assign(this->implementation, protocol

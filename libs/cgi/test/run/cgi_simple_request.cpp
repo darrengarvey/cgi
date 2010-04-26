@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE( env_test )
   using namespace boost::cgi;
   request req;
 
-  TEST_ENV_DATA(req);
+  test_env_data(req);
 }
 
 BOOST_AUTO_TEST_CASE( get_data_test )
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE( get_data_test )
   using namespace boost::cgi;
   request req;
 
-  TEST_GET_DATA(req);
+  test_get_data(req);
 }
 
 BOOST_AUTO_TEST_CASE( cookie_test )
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE( cookie_test )
 
   {
     request req;
-    TEST_ONE_COOKIE(req);
+    test_one_cookie(req);
   }
   
   {
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE( cookie_test )
     setenv("HTTP_COOKIE", "foo=bar;another_one=stuff", 1);
 
     request req;
-    TEST_TWO_COOKIES(req);
+    test_two_cookies(req);
   }
 
   {
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE( cookie_test )
     setenv("HTTP_COOKIE", "foo=bar; encoded=%22%C2%A3$%^$*^hh%%thd@:", 1);
 
     request req;
-    TEST_ENCODED_COOKIE(req);
+    test_encoded_cookie(req);
   }
 }
 

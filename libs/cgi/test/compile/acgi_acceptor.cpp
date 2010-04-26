@@ -2,8 +2,8 @@
 
 int main()
 {
-  cgi::acgi::service s;
-  cgi::acgi::acceptor a(s);
+  boost::acgi::service s;
+  boost::acgi::acceptor a(s);
 
   return 0;
 }

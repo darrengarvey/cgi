@@ -2,8 +2,7 @@
 
 int main()
 {
-  cgi::acgi::service service;
-  cgi::acgi::request req(service);
+  boost::acgi::request req;
 
   return 0;
 }

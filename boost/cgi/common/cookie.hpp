@@ -115,11 +115,8 @@ BOOST_CGI_NAMESPACE_BEGIN
     bool empty() const { return value.empty(); }
     
     const char_type* c_str() const { return value.c_str(); }
-    operator const char_type* () const { return value.c_str(); }
     operator string_type const& () const { return value; }
     operator string_type () const { return value; }
-    template<typename T>
-    operator std::basic_string<T> () { return value; }
     
     bool operator==(string_type const& other) { return value == other; }
     

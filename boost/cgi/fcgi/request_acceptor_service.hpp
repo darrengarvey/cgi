@@ -110,9 +110,9 @@ BOOST_CGI_NAMESPACE_BEGIN
       return service_impl_.close(impl, ec);
     }
 
-    template<typename Protocol>
+    template<typename InternetProtocol>
     boost::system::error_code
-      open(implementation_type& impl, const Protocol& protocol
+      open(implementation_type& impl, const InternetProtocol& protocol
           , boost::system::error_code& ec)
     {
       return service_impl_.open(impl, protocol, ec);
@@ -171,9 +171,9 @@ BOOST_CGI_NAMESPACE_BEGIN
       return service_impl_.local_endpoint(impl, ec);
     }
 
-    template<typename Protocol>
+    template<typename InternetProtocol>
     boost::system::error_code
-      assign(implementation_type& impl, Protocol protocol
+      assign(implementation_type& impl, InternetProtocol protocol
             , const native_type& native_acceptor, boost::system::error_code& ec)
     {
       return service_impl_.assign(impl, protocol, native_acceptor, ec);

@@ -38,12 +38,25 @@ BOOST_CGI_NAMESPACE_BEGIN
     , public detail::service_base<fcgi_request_service<Protocol> >
   {
   public:
+    typedef fcgi_request_service<Protocol>           self_type;
+    typedef fcgi_request_service<Protocol>           full_type;
+    typedef common::request_base<Protocol>           base_type;
+    typedef typename base_type::traits               traits;
+    typedef typename base_type::client_type          client_type;
+    typedef typename base_type::string_type          string_type;
+    typedef typename base_type::mutable_buffers_type mutable_buffers_type;
+    typedef typename traits::header_buffer_type      header_buffer_type;
+
     /// The actual implementation date for an FCGI request.
     struct implementation_type
       : base_type::impl_base
     {
-      typedef typename client_type::header_buffer_type       header_buffer_type;
-      typedef spec_detail::Header                   header_type;
+      typedef typename base_type::traits                 traits;
+      typedef typename base_type::client_type            client_type;
+      typedef typename base_type::buffer_type            buffer_type;
+      typedef typename base_type::mutable_buffers_type   mutable_buffers_type;
+      typedef typename client_type::header_buffer_type   header_buffer_type;
+      typedef spec_detail::Header                        header_type;
 
       implementation_type()
         : id_(0)
@@ -70,10 +83,6 @@ BOOST_CGI_NAMESPACE_BEGIN
         return boost::asio::buffer(&param_buffer_[bufsz], size);
       }
      };
-
-    typedef fcgi_request_service<Protocol>                 self_type;
-    typedef fcgi_request_service<Protocol>                 full_type;
-    typedef typename traits::header_buffer_type            header_buffer_type;
 
     fcgi_request_service(::BOOST_CGI_NAMESPACE::common::io_service& ios)
       : detail::service_base<fcgi_request_service<Protocol> >(ios)

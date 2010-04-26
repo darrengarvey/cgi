@@ -4,7 +4,7 @@
 
 int main()
 {
-  using namespace cgi::common;
+  using namespace boost::cgi::common;
 
   BOOST_STATIC_ASSERT(is_async<tags::cgi>::value == false);
   BOOST_STATIC_ASSERT(is_async<tags::async_cgi>::value == true);

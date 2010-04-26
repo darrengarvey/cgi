@@ -395,7 +395,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       
       return base_type::parse_post_vars(
           impl,
-          callback_functor<implementation_type, self_type>(impl, this),
+          detail::callback_functor<implementation_type, self_type>(impl, this),
           ec
         );
     }
@@ -465,8 +465,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
           if (remaining)
           {
-            implementation_type::mutable_buffers_type buf
-              = impl.prepare_misc(remaining);
+            mutable_buffers_type buf = impl.prepare_misc(remaining);
 
             if (this->read_body(impl, buf, ec))
               return ec;
@@ -488,7 +487,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       , boost::system::error_code& ec)
     {
       // clear the header first (might be unneccesary).
-      impl.header_buf_ = implementation_type::header_buffer_type();
+      impl.header_buf_ = header_buffer_type();
 
       if (8 != read(*impl.client_.connection(), buffer(impl.header_buf_)
                    , boost::asio::transfer_all(), ec) || ec)
@@ -698,8 +697,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         std::size_t remaining(fcgi::spec::get_length(impl.header_buf_));
         if (remaining)
         {
-          implementation_type::mutable_buffers_type buf
-            = impl.prepare(remaining);
+          mutable_buffers_type buf = impl.prepare(remaining);
 
           if (this->read_body(impl, buf, ec))
             return ec;

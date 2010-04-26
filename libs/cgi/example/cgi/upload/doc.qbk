@@ -1,0 +1,11 @@
+
+[section Upload]
+
+[import main.cpp]
+
+[cgi_upload]
+
+See the [@../../example/cgi/upload/main.cpp full source listing].
+
+[endsect][/ upload]
+

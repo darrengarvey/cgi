@@ -41,7 +41,7 @@ struct request_handler
     resp<< content_type("text/plain")
         << "Hello there, universe.";
  
-    return_(resp, req, 0);
+    return commit(req, resp, 0);
   }
 };
 

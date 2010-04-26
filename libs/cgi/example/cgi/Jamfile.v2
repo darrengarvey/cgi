@@ -9,6 +9,8 @@ build-project hello_world ;
 build-project echo ;
 build-project cookies ;
 build-project file_browser ;
+#build-project stencil ;
+build-project upload ;
 
 # If the user explicitly passes "install" on the command line, build the
 # CGI examples and copy them to $(cgi-bin)
@@ -18,6 +20,8 @@ install install
     echo
     cookies
     file_browser
+#    stencil
+    upload
   :
     <location>$(cgi-bin)
   ;

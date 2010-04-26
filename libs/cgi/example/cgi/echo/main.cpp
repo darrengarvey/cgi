@@ -108,7 +108,7 @@ int main()
       resp<< "Saved uploaded file to: " << part.path << "<br />";
   }
   resp<< "<input type=submit value=submit />"
-         "<br />";
+         "<br />"
          "</form><p />";
 
   format_map(resp, req, req.env, "Environment Variables");

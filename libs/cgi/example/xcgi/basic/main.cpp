@@ -32,7 +32,7 @@ int handle_request(Request& req, Response& resp)
   resp<< content_type("text/plain")
       << "Hello there, universe.";
 
-  return_(resp, req, 0);
+  return commit(req, resp, 0);
 }
 
 /// Handle a vanilla CGI request
