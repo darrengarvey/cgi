@@ -19,17 +19,6 @@
 #include <fstream>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <boost/random/mersenne_twister.hpp>
-
-/// Characters that should be removed from any file uploads.
-/**
- * The filename of any file uploads is a stripped version of
- * the provided file's name. As such, we need to clean the uploaded
- * file's name.
- */
-#ifndef BOOST_CGI_UNSAFE_FILENAME_CHARS
-#   define BOOST_CGI_UNSAFE_FILENAME_CHARS ":~.|"
-#endif // BOOST_CGI_UNSAFE_FILENAME_CHARS
 
 BOOST_CGI_NAMESPACE_BEGIN
 
@@ -95,7 +84,6 @@ BOOST_CGI_NAMESPACE_BEGIN
             name.swap(result);
             break;
          case '&': // we now have the name/value pair, so save it
-            // **FIXME** have to have .c_str() ?
             context_->data_map[name.c_str()] = result;
             result.clear();
             name.clear();
@@ -189,7 +177,6 @@ BOOST_CGI_NAMESPACE_BEGIN
           // Load the data to a local file.
           string_type content (
               buffer.substr(meta.length()+4, next_pos-meta.length()-4));
-          //boost::mt19937 rng(time(NULL));
           string_type randomatter (
             boost::lexical_cast<string_type>(time(NULL)));
           string_type user_ip (context_->random_string);
@@ -202,7 +189,6 @@ BOOST_CGI_NAMESPACE_BEGIN
               internal_filename.c_str()
             , std::ios::out | std::ios::binary);
           file<< content;
-          //file.flush();
           context_->uploads_map[part.name.c_str()] = part;
         }
       }

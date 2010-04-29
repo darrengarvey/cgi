@@ -30,8 +30,12 @@ int handle_request(cgi::request& req, cgi::response& resp)
 /*<
 In our request handler, we will assume that the request has been fully-parsed
 and we can access all of the request data. The request data is available using
-`std::map<>`-like public members of a `cgi::request`.[footnote
-The data is stored internally in a single `fusion::vector<>`]
+public members of a `cgi::request`. These member variables are instances of
+the [classref boost::cgi::common::data_map_proxy data_map_proxy], which has a
+`std::map<>`-like interface along with some additional helper functions to
+facilitate common CGI tasks, such as lexical conversion to different types.
+[footnote The data is stored internally in a single `fusion::vector<>` which
+is not currently publicly accessible.]
 
 A CGI request has several types of variables available. These are listed in
 the table below, assuming that `req` is an instance of `cgi::request`:
@@ -51,7 +55,8 @@ the table below, assuming that `req` is an instance of `cgi::request`:
   ]
   [
     [POST] [`req.post`] [The HTTP POST data that is sent in an HTTP request's
-    body. File uploads are not stored in this map.]
+    body. For file uploads, the file's name is the value stored in the map. You
+    should use `req.uploads` for more information on file uploads.]
   ]
   [
     [Cookies] [`req.cookies`] [Cookies are sent in the HTTP_COOKIE environment
@@ -60,9 +65,11 @@ the table below, assuming that `req` is an instance of `cgi::request`:
   ]
   [
     [File Uploads] [`req.uploads`] [File uploads, sent in an HTTP POST where
-    the body is MIME-encoded as multipart/form-data. Uploaded files are read
-    onto the server's file system. The value of an upload variable is the path
-    of the file.]
+    the body is MIME-encoded as multipart/form-data. Uploaded files are written
+    onto the server's file system and meta-data related to the file is stored in
+    a [classref boost::cgi::common::form_part form_part]. The value of an upload
+    variable is the `form_part` for the upload and all `form_part`s are implicitly
+    convertible to a string, which corresponds to the original filename.]
   ]
   [
     [Form] [`req.form`] [The form variables are either the GET variables or

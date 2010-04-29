@@ -35,20 +35,17 @@ BOOST_CGI_NAMESPACE_BEGIN
      
      ~form_part()
      {
-     /*
+#ifndef BOOST_CGI_KEEP_FILE_UPLOADS
        try {
            // Delete any file saved in uploading this.
            namespace fs = boost::filesystem;
            if (!path.empty() && fs::exists(path)) {
-#ifndef NDEBUG
-             std::cerr<< "Removing file: " << path << std::endl;
-#endif // NDEBUG
              fs::remove(path);
            }
        } catch(...) {
            // pass
        }
-       */
+#endif // BOOST_CGI_KEEP_FILE_UPLOADS
      }
 
      meta_data_map_type meta_data_;

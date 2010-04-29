@@ -25,7 +25,5 @@ The example(s) will be installed into the relevant directory.
 
 [include fcgi/doc.qbk]
 
-[include xcgi/doc.qbk]
-
 [endsect][/ examples]
 

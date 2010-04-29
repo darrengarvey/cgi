@@ -13,14 +13,4 @@
 
 [include upload/doc.qbk]
 
-[section Servers]
-
-[include server1/doc.qbk]
-
-[include server2/doc.qbk]
-
-[include server3/doc.qbk]
-
-[endsect]
-
-[endsect]
+[endsect]   

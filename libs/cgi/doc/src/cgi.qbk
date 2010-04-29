@@ -86,9 +86,9 @@ This manual does [*not] document a library that is a part of __Boost__. The majo
 These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sourceforge], or at [@http://svn.boost.org/svn/boost/browser/sandbox/SOC/2007/cgi svn.boost.org]. For free!
 ]
 
-[/include preface.qbk]
+[include preface.qbk]
 
-[/include:intro introduction.qbk]
+[include:intro introduction.qbk]
 
 [/include quickstart.qbk]
 
@@ -110,7 +110,7 @@ These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sour
 
 [/xinclude ../cgi_dox.xml]
 
-[/include:examples examples.qbk]
+[include:examples examples.qbk]
 
 [/include:reference reference.qbk]
 
@@ -127,3 +127,4 @@ These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sour
 [/xinclude quickref.xml]
 
 [/include reference.qbk]
+

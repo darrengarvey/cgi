@@ -40,15 +40,6 @@
 #  include "boost/cgi/utility/sessions.hpp"
 #endif // BOOST_CGI_ENABLE_SESSIONS
 
-#ifndef BOOST_CGI_POST_MAX
-    /// Restrict POST data to less than 7MB per request.
-#   define BOOST_CGI_POST_MAX 6663322
-#endif // BOOST_CGI_POST_MAX
-
-#ifndef BOOST_CGI_DEFAULT_CHARSET
-#   define BOOST_CGI_DEFAULT_CHARSET "UTF-8"
-#endif 
-
 BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 

@@ -5,11 +5,11 @@
 
 [include echo/doc.qbk]
 
-[include command_line/doc.qbk]
+[include sessions/doc.qbk]
 
-[include cookie_game/doc.qbk]
+[include cookies/doc.qbk]
 
-[include cookie_game2/doc.qbk]
+[include cookies2/doc.qbk]
 
 [include file_browser/doc.qbk]
 

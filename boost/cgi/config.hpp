@@ -13,9 +13,40 @@ namespace boost {
  namespace cgi {}
 } // namespace boost
 
+/// Make the library keep file uploads on disk.
+/**
+ * File uploads are save to the hard disk in an upload directory. By default,
+ * they are deleted at the end of the request.
+ */
+//#define BOOST_CGI_KEEP_FILE_UPLOADS
+
 #ifndef NDEBUG
 # include <iostream>
 #endif // NDEBUG
+
+/// Characters that should be removed from any file uploads.
+/**
+ * The filename of any file uploads is a stripped version of
+ * the provided file's name. As such, we need to clean the uploaded
+ * file's name.
+ */
+#ifndef BOOST_CGI_UNSAFE_FILENAME_CHARS
+#   define BOOST_CGI_UNSAFE_FILENAME_CHARS ":~.|/\\"
+#endif // BOOST_CGI_UNSAFE_FILENAME_CHARS
+
+/// The maximum amount of POST data that can be uploaded.
+/**
+ * Set this to -1 for no limit.
+ */
+#ifndef BOOST_CGI_POST_MAX
+    /// Restrict POST data to less than 7MB per request.
+#   define BOOST_CGI_POST_MAX 6663322
+#endif // BOOST_CGI_POST_MAX
+
+/// The default charset to add to responses.
+#ifndef BOOST_CGI_DEFAULT_CHARSET
+#   define BOOST_CGI_DEFAULT_CHARSET "UTF-8"
+#endif
 
 /// The namespace of the library.
 /**

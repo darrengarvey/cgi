@@ -40,7 +40,7 @@
  * directory containing executable files.
  */
 #if !defined(BOOST_CGI_UPLOAD_DIRECTORY)
-#   define BOOST_CGI_UPLOAD_DIRECTORY "../upload/"
+#   define BOOST_CGI_UPLOAD_DIRECTORY "../uploads/"
 #endif // BOOST_CGI_UPLOAD_DIRECTORY
 
 BOOST_CGI_NAMESPACE_BEGIN

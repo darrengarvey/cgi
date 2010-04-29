@@ -6,7 +6,8 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 //
 //////////////////////////////////////////////////////////////////
-//[cgi_cookie_game2
+//
+//[cgi_cookies
 //
 // Cookie Test With cTemplate
 // --------------------------

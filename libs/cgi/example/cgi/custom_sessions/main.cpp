@@ -1,4 +1,6 @@
 
+//[custom_sessions
+
 #include <boost/cgi/cgi.hpp>
 #include <iostream>
 
@@ -41,3 +43,5 @@ int main(int, char**)
 
   cout<< "Content-type: text/html\r\n\r\nAn error occurred.";
 }
+
+//]
