@@ -1,0 +1,10 @@
+
+[section Custom Sessions]
+
+[import main.cpp]
+
+[custom_sessions]
+
+See the [@../../example/cgi/custom_sessions/main.cpp full source listing].
+
+[endsect][/ custom_sessions]

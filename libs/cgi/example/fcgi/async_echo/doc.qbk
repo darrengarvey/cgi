@@ -1,0 +1,11 @@
+
+[section Asynchronous Echo]
+
+[import main.cpp]
+
+[fcgi_async_echo]
+
+See the [@../../example/fcgi/async_echo/main.cpp full source listing].
+
+[endsect][/ async_echo]
+

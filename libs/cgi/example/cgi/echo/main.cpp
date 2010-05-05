@@ -95,9 +95,22 @@ int main()
              "<input type=text name=name value='"
       <<         req.post["name"] << "' />"
              "<br />"
+             "<input type=checkbox name=checks value='one'"
+             << (req.post.matches("checks", "one") ? " checked='checked'" : "") << " />One"
+             "<br />"
+             "<input type=checkbox name=checks value='two'"
+             << (req.post.matches("checks", "two") ? " checked='checked'" : "") << " />Two"
+             "<br />"
+             "<input type=checkbox name=checks value='six'"
+             << (req.post.matches("checks", "six") ? " checked='checked'" : "") << " />Six"
+             "<br />"
+             "<input type=checkbox name=checks value='ten'"
+             << (req.post.matches("checks", "ten") ? " checked='checked'" : "") << " />Ten"
+             "<br />"
              "<input type=text name=hello value='"
       <<         req.post["hello"] << "' />"
              "<br />"
+             "<input type=file name=user_file /><br />"
              "<input type=file name=user_file />"
              "<input type=hidden name=cmd value=multipart_test />"
              "<br />";
@@ -108,7 +121,7 @@ int main()
       resp<< "Saved uploaded file to: " << part.path << "<br />";
   }
   resp<< "<input type=submit value=submit />"
-         "<br />"
+         "<br />";
          "</form><p />";
 
   format_map(resp, req, req.env, "Environment Variables");

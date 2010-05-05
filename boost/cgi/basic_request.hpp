@@ -18,10 +18,9 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/functional/hash.hpp>
 #include <boost/system/error_code.hpp>
 ///////////////////////////////////////////////////////////
-#include "boost/cgi/common/data_map_proxy.hpp"
+#include "boost/cgi/common/request_data.hpp"
 #include "boost/cgi/common/form_part.hpp"
 #include "boost/cgi/common/map.hpp"
 #include "boost/cgi/common/parse_options.hpp"
@@ -42,15 +41,6 @@
 
 BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
-
-  /// Get a hashed interpretation of the request.
-  /**
-   * You cannot consider this completely unique to each
-   * request, but it should be quite useful anyway.
-   * You can use this for logging or tracking, for example.
-   */
-  template<typename P>
-  std::size_t hash_value(basic_request<P> const& req);
 
   /// The basic_request class, primary entry point to the library
   /**
@@ -91,12 +81,18 @@ BOOST_CGI_NAMESPACE_BEGIN
     session_type session;
 #endif // BOOST_CGI_ENABLE_SESSIONS
     
-    common::data_map_proxy<env_map>    env;
-    common::data_map_proxy<post_map>   post;
-    common::data_map_proxy<get_map>    get;
-    common::data_map_proxy<form_map>   form;
-    common::data_map_proxy<cookie_map> cookies;
-    common::data_map_proxy<upload_map> uploads;
+	/// The environment data, exposed as a request_data<env_map>.
+    env_data    env;
+	/// The GET (ie. query string) data, exposed as a request_data<get_map>.
+    post_data   post;
+	/// The POST data, exposed as a request_data<post_map>.
+    get_data    get;
+	/// The form data, which is either the GET or POST data.
+    form_data   form;
+	/// The cookie data, exposed as a request_data<cookie_map>.
+    cookie_data cookies;
+	/// The file uploads, exposed as a request_data<upload_map>.
+    upload_data uploads;
 
     basic_request(
         int opts
@@ -299,10 +295,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         if (parse_opts & parse_form_only)
         {
           common::name rm(request_method().c_str());
-          form.set(
-            (rm == "GET" || rm == "HEAD") ? get :
-                rm == "POST" ? post : env
-          );
+          form.set(rm == "POST" ? post.impl() : get.impl());
         }
 #ifdef BOOST_CGI_ENABLE_SESSIONS
         if (parse_opts & parse_session_only)
@@ -624,20 +617,9 @@ BOOST_CGI_NAMESPACE_BEGIN
      * different
      * eg. `authorizer`, or `filter`.
      */
-    role_type& role() const
+    role_type role() const
     {
       return this->service.role(this->implementation);
-    }
-
-    /// Get a hashed interpretation of the request.
-    /**
-     * You cannot consider this completely unique to each
-     * request, but it should be quite useful anyway.
-     * You can use this for logging or tracking, for example.
-     */
-    std::size_t hash()
-    {
-      return boost::hash<self_type>()(*this);
     }
 
     /// Get / Set the status of a request.
@@ -656,26 +638,6 @@ BOOST_CGI_NAMESPACE_BEGIN
       this->service.status(this->implementation, status);
     }
    };
-
-   /// Support for Boost.Hash
-   /**
-    * `basic_request<>` supports Boost.Hash. A request will have the same hash
-    * value if all of the following are the same:
-    *
-    * * PATH_INFO
-    * * QUERY_STRING
-    * * REQUEST_METHOD
-    * * REQUEST_URI
-    */
-   template<typename P>
-   std::size_t hash_value(basic_request<P> const& req)
-   {
-     boost::hash<typename basic_request<P>::string_type> hasher;
-     return hasher(req.env["PATH_INFO"] + ":"
-                 + req.env["QUERY_STRING"] + ":"
-                 + req.env["REQUEST_METHOD"] + ":"
-                 + req.env["REQUEST_URI"]);
-   }
 
  } // namespace common
 BOOST_CGI_NAMESPACE_END

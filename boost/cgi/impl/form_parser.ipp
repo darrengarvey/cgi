@@ -84,7 +84,7 @@ BOOST_CGI_NAMESPACE_BEGIN
             name.swap(result);
             break;
          case '&': // we now have the name/value pair, so save it
-            context_->data_map[name.c_str()] = result;
+            context_->data_map.insert(std::make_pair(name.c_str(), result));
             result.clear();
             name.clear();
             break;
@@ -95,7 +95,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 #if defined(BOOST_CGI_KEEP_EMPTY_VARS)
       // save the last param (it won't have a trailing &)
       if( !name.empty() ) {
-          context_->data_map[name.c_str()] = result;
+          context_->data_map.insert(std::make_pair(name.c_str(), result));
       }
 #endif // BOOST_CGI_KEEP_EMPTY_VARS
      return ec;
@@ -189,11 +189,11 @@ BOOST_CGI_NAMESPACE_BEGIN
               internal_filename.c_str()
             , std::ios::out | std::ios::binary);
           file<< content;
-          context_->uploads_map[part.name.c_str()] = part;
+          context_->uploads_map.insert(std::make_pair(part.name.c_str(), part));
         }
       }
       // Load the data to the request's post map.
-      context_->data_map[part.name.c_str()] = part.value;
+      context_->data_map.insert(std::make_pair(part.name.c_str(), part.value));
       
       buffer.erase(0, next_pos+marker.length()+2);
       if (buffer.length() >= 2

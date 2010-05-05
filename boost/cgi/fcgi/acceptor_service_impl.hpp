@@ -1,6 +1,6 @@
-//           -- fcgi/acceptor_service_impl.hpp --
+//          -- fcgi/acceptor_service_impl.hpp --
 //
-//            Copyright (c) Darren Garvey 2007.
+//          Copyright (c) Darren Garvey 2007-2010.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
@@ -62,20 +62,6 @@ BOOST_CGI_NAMESPACE_BEGIN
   namespace fcgi {
 
   /// The service_impl class for FCGI basic_request_acceptor<>s
-   /**
-    * Note: this is near enough to being generic. It will hopefully translate
-    *       directly to the fcgi_acceptor_service_impl. In other words you
-    *       would then have one acceptor_service_impl<>, so you'd use
-    *       acceptor_service_impl<scgi> acceptor_service_impl_; // and
-    *       acceptor_service_impl<fcgi> acceptor_service_impl_; // etc...
-    *
-    * Note: If the protocol is an asynchronous protocol, which means it
-    * requires access to a boost::asio::io_service instance, then this
-    * class becomes a model of the Service concept (**LINK**) and must
-    * only use the constructor which takes a ProtocolService (**LINK**).
-    * If the protocol isn't async then the class can be used without a
-    * ProtocolService.
-    */
    template<typename Protocol = common::tags::fcgi>
    class acceptor_service_impl
      : public detail::service_base<

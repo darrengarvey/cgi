@@ -167,7 +167,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     /// CGI is always a responser.
     common::role_type
-    role(implementation_type& impl) const
+    role(implementation_type const& impl) const
     {
       return common::responder;
     }

@@ -139,7 +139,6 @@ int handle_request(fcgi::request& req)
          "<head>"
          "<body>"
            "Request ID = " << req.id() << "<br />"
-           "Request Hash = " << req.hash() << "<br />"
            "Process ID = " << process_id() << "<br />"
            "<form method=post enctype=\"multipart/form-data\">"
              "<input type=text name=name value='"

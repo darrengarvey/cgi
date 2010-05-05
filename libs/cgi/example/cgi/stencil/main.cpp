@@ -73,15 +73,66 @@ int handle_request(request& req)
   
   //// Test 5.
 
+  dictionary test5 = resp.add("test5");
+  test5.add("input")
+    .set("type", "text")
+    .set("name", "text")
+    .set("value", req.form["text"])
+    .show("label", "Text");
+
+  test5.add("input")
+    .set("type", "checkbox")
+    .set("name", "check")
+    .set("value", "one")
+    .show("label", "One")
+    .show(req.post.matches("check", "one") ? "checked" : "");
+  test5.add("input")
+    .set("type", "checkbox")
+    .set("name", "check")
+    .set("value", "two")
+    .show("label", "Two")
+    .show(req.post.matches("check", "two") ? "checked" : "");
+  test5.add("input")
+    .set("type", "checkbox")
+    .set("name", "check")
+    .set("value", "six")
+    .show("label", "Six")
+    .show(req.post.matches("check", "six") ? "checked" : "");
+  test5.add("input")
+    .set("type", "checkbox")
+    .set("name", "check")
+    .set("value", "ten")
+    .show("label", "Ten")
+    .show(req.post.matches("check", "ten") ? "checked" : "");
+
+  test5.add("input")
+    .set("type", "radio")
+    .set("name", "radio")
+    .set("value", "yes")
+    .show("label", "Yes")
+    .show(req.post.matches("radio", "yes") ? "checked" : "");
+  test5.add("input")
+    .set("type", "radio")
+    .set("name", "radio")
+    .set("value", "no")
+    .show("label", "No")
+    .show(req.post.matches("radio", "no") ? "checked  " : "");
+
+  test5.add("input")
+    .set("type", "submit")
+    .set("value", "Submit");
+
+  //// Test 6.
+
   resp.add(stencil::section("embedded")).set("test", "passed");
   
-  stencil::dictionary dict = resp.add("embedded");
+  dictionary dict = resp.add("embedded");
   dict.add("subsection") // returns a new sub-dictionary.
       .set("test", "passed again")
       .set("other", "(another field)");
   dict.set("test", "passed yet again", stencil::section("subsection"));
 
-  //// Test 6.
+  //// Test 7.
 
   // Include another stencil into this one at marker {{>include}}.
   resp.include(

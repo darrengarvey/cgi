@@ -127,6 +127,17 @@ public:
     return *this;
   }
 
+  /// Show a section.
+  self_type& show(section const& sec, string_type const& value)
+  {
+    impl->SetValueAndShowSection(
+        sec.name,
+        boost::lexical_cast<string_type>(value),
+        sec.name
+      );
+    return *this;
+  }
+  
   /// Include a file into the stencil.
   /**
    * @return dictionary  The returned sub-dictionary is used to set fields in
@@ -343,6 +354,17 @@ public:
   {
     impl->SetValueAndShowSection(
         name,
+        boost::lexical_cast<string_type>(value),
+        sec.name
+      );
+    return *this;
+  }
+  
+  /// Show a section.
+  self_type& show(section const& sec, string_type const& value)
+  {
+    impl->SetValueAndShowSection(
+        sec.name,
         boost::lexical_cast<string_type>(value),
         sec.name
       );

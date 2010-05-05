@@ -129,7 +129,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       impl.stdin_parsed_ = false;
       impl.http_status_ = common::http::no_content;
       impl.request_status_ = common::null;
-      impl.request_role_ = spec_detail::ANY;
+      impl.request_role_ = spec_detail::NONE;
       impl.all_done_ = false;
       impl.client_.status_ = common::none_;
       impl.client_.request_id_ = -1;

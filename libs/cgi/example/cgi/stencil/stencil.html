@@ -14,7 +14,6 @@
 <html>
 <head>
     <title>CGI Stencils (using Google cTemplate)</title>
-    <link rel="stylesheet" type="text/css" href="/css/style.css" />
 </head>
 <body>
 
@@ -75,8 +74,22 @@
     {{/section_with_variable}}
 </fieldset>
 
+{{#test5}}
 <fieldset>
-    <legend>Test 5 - Embedded sections</legend>
+    <legend>Test 5 - Inputs</legend>
+    <form method="post">
+    {{#input}}
+        <input type="{{type}}" 
+        name="{{name}}" value="{{value}}"{{#checked}} checked="checked"{{/checked}} />
+        {{#label}} : {{label}}{{/label}}
+        {{#input_separator}}<br />{{/input_separator}}
+    {{/input}}
+    </form>
+</fieldset>
+{{/test5}}
+
+<fieldset>
+    <legend>Test 6 - Embedded sections</legend>
     {{#embedded}}
     <ul>
         {{#subsection}}
@@ -87,7 +100,7 @@
 </fieldset>
 
 <fieldset>
-    <legend>Test 6 - Include Files</legend>
+    <legend>Test 7 - Include Files</legend>
     {{>include}}
 </fieldset>
 

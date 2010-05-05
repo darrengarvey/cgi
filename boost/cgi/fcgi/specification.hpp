@@ -63,10 +63,11 @@ BOOST_CGI_NAMESPACE_BEGIN
     const boost::uint16_t MAX_MSG_LEN = 65535;
 
     // Values for role component of BeginRequestBody
-    enum role_types { RESPONDER  = 1
-                , AUTHORIZER = 2
-                , FILTER     = 3
-                , ANY
+    enum role_types {
+        NONE = 0
+      , RESPONDER  = 1
+      , AUTHORIZER = 2
+      , FILTER     = 3
     };
 
     // Values for protocolStatus component of EndRequestBody
@@ -575,7 +576,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         case FILTER:
           return "FILTER";
         default:
-          return "ANY";
+          return "NONE";
         }
       }
     };

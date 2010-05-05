@@ -60,7 +60,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
       implementation_type()
         : id_(0)
-        , request_role_(spec_detail::ANY)
+        , request_role_(spec_detail::NONE)
       {
       }
 
@@ -138,9 +138,9 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Returns true if the request environment params have been read.
     bool params_read(implementation_type& impl);
 
-    common::role_type role(implementation_type& impl) const
+    common::role_type role(implementation_type const& impl) const
     {
-      return common::responder;
+      return static_cast<common::role_type>(impl.request_role_);
     }
 
     client_type&

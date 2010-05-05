@@ -90,23 +90,11 @@ These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sour
 
 [include:intro introduction.qbk]
 
-[/include quickstart.qbk]
-
 [include tutorial.qbk]
 
 [include overview.qbk]
 
 [include utilities.qbk]
-
-[/include user_guide.qbk]
-
-[/include:tutorial user_guide/tutorial.qbk]
-
-[/include:protocols user_guide/protocols.qbk]
-
-[/include:examples user_guide/examples.qbk]
-
-[/include:ug user_guide.qbk]
 
 [/xinclude ../cgi_dox.xml]
 
@@ -127,4 +115,3 @@ These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sour
 [/xinclude quickref.xml]
 
 [/include reference.qbk]
-

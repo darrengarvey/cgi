@@ -310,10 +310,12 @@ BOOST_CGI_NAMESPACE_BEGIN
        if (!new_request->is_open() && !new_request->client().keep_connection())
        {
          // ...otherwise accept a new connection.
+         boost::system::error_code ec;
          detail::accept_named_pipe(listen_handle, *new_request->client().connection(), ec);
-         strand_.post(
+         if (!ec)
+           strand_.post(
              boost::bind(&self_type::handle_accept
-              , this, boost::ref(impl), new_request, handler, _1
+               , this, boost::ref(impl), new_request, handler, ec
              )
          );
        }
@@ -480,13 +482,15 @@ BOOST_CGI_NAMESPACE_BEGIN
          request.clear();
        }
 
+       boost::system::error_code ec;
        // If we can reuse this request's connection, return.
        if (request.client().keep_connection())
-         return handler(boost::system::error_code());
+         return handler(ec);
 
-       // ...otherwise accept a new connection (asynchronously).
-       acceptor_service_.async_accept(impl.acceptor_,
-         request.client().connection()->next_layer(), 0, handler);
+       // ...otherwise accept a new connection.
+
+       detail::accept_named_pipe(listen_handle, *request.client().connection(), ec);
+       strand_.post(handler);
        return 0;
      }
 

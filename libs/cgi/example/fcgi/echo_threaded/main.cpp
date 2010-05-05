@@ -83,7 +83,7 @@ std::size_t process_id()
 
 /// This function accepts and handles a single request.
 template<typename Acceptor, typename Request>
-int handle_request(Acceptor& a, Request& req, boost::system::error_code ec)
+int handle_request(Acceptor& a, Request& req)
 {  
   //
   // Load in the request data so we can access it easily.
@@ -154,14 +154,9 @@ int handle_request(Acceptor& a, Request& req, boost::system::error_code ec)
   int ret = commit(req, resp, 0);
 
   //a.async_accept(req, boost::bind(&handle_request, boost::ref(a), boost::ref(req), _1));
-  a.async_accept(req,
-      boost::bind(
-        &handle_request<
-            boost::fcgi::acceptor
-          , boost::fcgi::request
-          >
+  a.async_accept(boost::bind(
+      &handle_request<boost::fcgi::acceptor, boost::fcgi::request>
         , boost::ref(a)
-        , boost::ref(req)
         , _1));
   
   return ret;
@@ -185,37 +180,26 @@ try {
 
   // Make a `service` (more about this in other examples).
   service s;
-  
-  using boost::asio::ip::tcp;
 
   // Make an `acceptor` for accepting requests through.
-  acceptor a(s, 8019);    // The acceptor is for accepting requests.
+  acceptor a(s);
 
   //
   // After the initial setup, we can enter a loop to handle several requests
   // at a time until there's an error of some sort.
   //
-  typedef std::vector<boost::shared_ptr<request> > request_queue;
-  request_queue requests;
-  
   // Handle 50 requests at a time.
-  for (int i(0); i < 50; ++i)
+  for (int i(0); i < 2; ++i)
   {
-    requests.push_back(request::create(s));
     //
     // Now we asychronously accept a request. This will return immediately.
     //
     // The second argument is the handler that is called when a request is
     // accepted.
     //
-    a.async_accept(*requests[i],
-        boost::bind(
-          &handle_request<
-              boost::fcgi::acceptor
-            , boost::fcgi::request
-            >
+    a.async_accept(boost::bind(
+        &handle_request<boost::fcgi::acceptor, boost::fcgi::request>
           , boost::ref(a)
-          , boost::ref(*requests[i])
           , _1));
   }
   

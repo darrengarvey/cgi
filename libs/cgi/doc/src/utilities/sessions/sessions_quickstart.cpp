@@ -160,8 +160,13 @@ int main(int, char**)
 {
   try
   {
-    mycgi::request req; // Our custom request type.
-    cgi::stencil resp; // A basic wrapper over cTemplate.
+    // Construct our custom request type, auto-parsing the request.
+    mycgi::request req;
+    // A basic wrapper over cTemplate. This constructor takes the directory
+    // where all "stencils" (eg. HTML templates) are kept. Your web server
+    // should be given read access to this directory.
+    cgi::stencil resp("../stencils/");
+    // The dummy user manager defined earlier in this example.
     user_manager user_mgr;
     
     resp.set("last_accessed",
@@ -169,6 +174,7 @@ int main(int, char**)
 
     if (req.form.count("login"))
     {
+      // Allow users to log in to the application.
       if (user_mgr.login(req.form, req.session.info)) {
         // Mark the request so when you call `commit`, the session is saved.
         req.start_session();
@@ -185,20 +191,23 @@ int main(int, char**)
     else
     if (req.form.count("logout"))
     {
+      // Allow users to log out.
       /*<
          We call `stop_session` to close the session. This call deletes the
          session data stored on the server, but leaves the session object
          stored in memory as is. The session cookie itself is only removed
          when you call `commit`, later.
-      req.stop_session();
+
          Redirect the user. This causes a "Location" header to be added to
          the response.
       >*/
+      req.stop_session();
       resp<< cgi::redirect(req, req.script_name());
     }
     else
     if (!req.session.info.name.empty())
     {
+      // Retrieve the session information for the user.
       resp.set("user_name", req.session.info.name);
       resp.set("user_email", req.session.info.email);
       resp.set("user_location", req.session.info.location);
@@ -222,7 +231,7 @@ int main(int, char**)
        info, take a look at the ctemplate documentation:
        @ http://code.google.com/p/google-ctemplate/
     >*/
-    resp.expand("../stencils/login.html");
+    resp.expand("login.html");
     resp<< cgi::content_type("text/html");
     
     req.session.last_accessed = boost::posix_time::microsec_clock::universal_time();
