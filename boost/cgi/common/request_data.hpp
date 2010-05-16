@@ -57,35 +57,65 @@ BOOST_CGI_NAMESPACE_BEGIN
     typedef typename map_type::const_reverse_iterator const_reverse_iterator;
     typedef typename map_type::allocator_type         allocator_type;
 
+    /// Get a pair of iterators that refer to the values for the key.
+    /**
+     * This is equivalent to std::multimap<>::equal_range(). It returns
+     * a pair of iterators that refer to the first and just-past-the-last
+     * values that match the passed in `key`.
+     */
     std::pair<iterator, iterator> equal_range( const key_type& key ) {
-      return impl()equal_range(key);
+      return this->impl()equal_range(key);
     }
 
-    bool matches(key_type const& key, mapped_type const& val)
+    /// Boolean check to see if the value exists for the key.
+    /**
+     * This looks to the values for a given `key` and checks to see if
+     * the passed `value` matches one of the values exactly.
+     *
+     * This is useful when a form contains a checkbox input and you want
+     * to see if the user checked a specific item.
+     */
+    bool matches(key_type const& key, mapped_type const& value)
     {
-      std::pair<iterator, iterator> ret = impl().equal_range(key);
+      std::pair<iterator, iterator> ret = this->impl().equal_range(key);
       for (iterator iter = ret.first, end = ret.second; iter != end; ++iter)
-        if (iter->second == val)
+        if (iter->second == value)
           return true;
       return false;
     }
 
+    /// Get hold of the first value for a `key` in a multimap.
+    /**
+     * Provides consistent access to request data when you only care
+     * about single valued fields. In many cases, form data contains
+     * single-valued inputs so you can get hold of this using operator[].
+     * As the data for form data is actually held in a multimap<>, the
+     * operator[] isn't available, so it is implemented here.
+     */
     mapped_type& operator[](const char* varname) {
-      BOOST_CGI_MAP_ASSERT(impl_);
-      if (impl_->find(varname) == impl_->end()) {
+      BOOST_CGI_MAP_ASSERT(this->impl_);
+      if (this->impl_->find(varname) == this->impl_->end()) {
         using std::make_pair;
-        impl_->insert(make_pair(varname, ""));
+        this->impl_->insert(make_pair(varname, ""));
       }
-      return impl_->find(varname)->second;
+      return this->impl_->find(varname)->second;
     }
 
+    /// Get hold of the first value for a `key` in a multimap.
+    /**
+     * Provides consistent access to request data when you only care
+     * about single valued fields. In many cases, form data contains
+     * single-valued inputs so you can get hold of this using operator[].
+     * As the data for form data is actually held in a multimap<>, the
+     * operator[] isn't available, so it is implemented here.
+     */
     mapped_type& operator[](key_type const& varname) {
-      BOOST_CGI_MAP_ASSERT(impl_); 
-      if (impl_->find(varname) == impl_->end()) {
+      BOOST_CGI_MAP_ASSERT(this->impl_); 
+      if (this->impl_->find(varname) == this->impl_->end()) {
         using std::make_pair;
-        impl_->insert(make_pair(varname, ""));
+        this->impl_->insert(make_pair(varname, ""));
       }
-      return impl_->find(varname)->second;
+      return this->impl_->find(varname)->second;
     }
   };
 
