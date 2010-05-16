@@ -64,7 +64,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      * values that match the passed in `key`.
      */
     std::pair<iterator, iterator> equal_range( const key_type& key ) {
-      return this->impl()equal_range(key);
+      return this->impl().equal_range(key);
     }
 
     /// Boolean check to see if the value exists for the key.
