@@ -1,0 +1,12 @@
+
+
+[section:utilities Utilities]
+
+['[*TODO]: Document using Utilties]
+
+[include utilities/stencils.qbk]
+
+[include utilities/sessions.qbk]
+
+[endsect] [/ utilities]
+

@@ -78,7 +78,7 @@ The first thing to do is write a handler function which takes a request and a
 response and does all request-specific work. Later, we will look at writing
 the code that calls this function.
 >*/
-int handle_request(fcgi::request& req, fcgi::response& resp)
+int handle_request(fcgi::request& req)
 {
 /*<
 A FastCGI request is not loaded or parsed by default. 
@@ -105,22 +105,25 @@ in the table below, assuming that `req` is an instance of `fcgi::request`:
   ]
   [
     [GET] [`req.get`] [The variables passed in the query string of an HTTP GET
-    request.]
+    request. The `get_data` map is multivalued and mimics a `std::multimap<>`.]
   ]
   [
     [POST] [`req.post`] [The HTTP POST data that is sent in an HTTP request's
-    body. File uploads are not stored in this map.]
+    body. For file uploads, only the filename is stored in this map. As with
+    `get`, the `post_data` map is multivalued and mimics a `std::multimap<>`.]
   ]
   [
     [Cookies] [`req.cookies`] [Cookies are sent in the HTTP_COOKIE environment
-    variable. These can store limited amounts session information on the client's
-    machine, such as database session ids or tracking information.]
+    variable. These can store limited amounts session information on the
+    client's machine, such as database session ids or tracking information. As
+    with `get`, the `cookie_data` map is multivalued and mimics a
+    `std::multimap<>`.]
   ]
   [
     [File Uploads] [`req.uploads`] [File uploads, sent in an HTTP POST where
     the body is MIME-encoded as multipart/form-data. Uploaded files are read
     onto the server's file system. The value of an upload variable is the path
-    of the file.]
+    of the file. The `upload_data` map is also multivalued.]
   ]
   [
     [Form] [`req.form`] [The form variables are either the GET variables or
@@ -128,6 +131,33 @@ in the table below, assuming that `req` is an instance of `fcgi::request`:
   ]
 ]
 >*/
+
+  fcgi::response resp;/*<
+The `response` class provides a streaming interface for writing replies. You
+can write to the request object directly, but for now we're going to use the
+`response`, which works well for most situations.
+
+As you can see, the `response` is decoupled from the rest of the library. The
+advantages of using it over any other custom container are separate handling
+of the response body and headers, and a [funcref
+boost::cgi::common::response::send send()] function which wraps the whole
+response and writes it out to the client who instigated the request.
+
+Writing to a `response` is buffered. If an error occurs, you can `clear()` the
+response and send an error message instead. Buffered writing may not always
+suit your use-case (eg. returning large files), but when memory is not at a
+real premium, buffering the response is highly preferable.
+
+Not only does buffering help with network latency issues, but being able to
+cancel the response and send another at any time is almost essential when
+an error can crop up at any time. A `cgi::response` is not tied to a
+request, so the same response can be reused across multiple requests.[footnote
+Not with plain CGI though, of course.]
+
+When sending a response that is large relative to the amount of memory
+available to the system, you may need to write unbuffered.
+>*/
+
   if (req.form.count("expression"))
   {
     resp<< "<fieldset><legend>Result</legend><pre>";
@@ -195,24 +225,6 @@ bits.
   fcgi::acceptor acceptor(service); /*<
 An `Acceptor` handles accepting requests and little else.
 >*/
-  fcgi::response response; /*<
-The `response` class provides a streaming interface for writing replies. You
-can write to the request object directly, but for now we're going to just
-use the `response`, which works well for most situations.
-
-Writing to a `response` is buffered. If an error occurs, you can simply
-`clear()` the response and send an error message instead. Buffered writing
-may not always suit your use-case (eg. returning large files), but when memory
-is not at a real premium, buffering the response is highly preferable.
-
-Not only does buffering avoid network latency issues, but being able to cancel
-the response and send another is much cleaner than sending half a response,
-followed by "...Ooops". A `cgi::response` is not tied to a request, so the
-same response can be reused across multiple requests.
-
-When sending a response that is large relative to the amount of memory
-available to the program, you may want to write unbuffered.
->*/
   int status;
   
 /*<
@@ -228,20 +240,12 @@ boost::function<int (boost::fcgi::request&)>
 ie. A function that takes a reference to a `request` and returns an `int`.
 The returned `int` should be non-zero if the request was handled with
 an error.
-
-Since our handler has been defined to take references to a `request` and a
-`response`, we can use [@http://boost.org/libs/bind Boost.Bind] to wrap our
-function to give it the signature we need. See the documentation of Boost.Bind
-and [@http://boost.org/libs/function Boost.Function] for more information .
 >*/
-    status = acceptor.accept(boost::bind(&handle_request, _1, boost::ref(response)));
-    if (status) {
+    status = acceptor.accept(&handle_request);
+    if (status)
         std::cerr
-            << "Request handled with error. Exit code: " << status << std::endl
-            << "Response body follows: " << std::endl
-            << response.str() << std::endl;
-    }
-    response.clear();
+            << "Request handled with error. Exit code: "
+            << status << std::endl;
   } while (!status);
   return status;
 }

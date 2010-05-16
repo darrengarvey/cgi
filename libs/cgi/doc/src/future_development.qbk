@@ -1,5 +1,5 @@
 [/
- / Copyright (c) 2007 Darren Garvey
+ / Copyright (c) 2007-2010 Darren Garvey
  /
  / Distributed under the Boost Software License, Version 1.0. (See accompanying
  / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,17 +9,19 @@
 
 [h4 Iostream functionality.]
 
-Streamed IO, likely to be similar to Boost.Asio's `basic_socket_stream<>` is required.
+Streamed IO, likely to be similar to Boost.Asio's `basic_socket_stream<>` would be nice, although .
 
 [h4 SCGI support.]
 
 I haven't managed to get apache/lighttpd configured properly for SCGI, so this isn't functional yet.
 
+[h4 FastCGI client support.]
+
+FastCGI is supported in server-side applications. Support for client-side applications would be useful.
+
 [h4 FastCGI support.]
 
-FastCGI support is essential to any modern CGI library. There is currently ['no] known FastCGI library for C or C++ that aims to implement the complete [@http://www.fastcgi.com/devkit/doc/fcgi-spec.html FastCGI 1.0] specification. Providing support for multiplexing FastCGI daemons is one of this library's major goals.
-
-There are a couple of issues that have yet to be worked out, but FastCGI is working in a basic way now.
+I would like to add to the FastCGI functionality on Windows, where currently only anonymous pipes are supported. It is possible to customise the library to use external FastCGI apps, but this is not documented.
 
 [h4 Access to error output streams]
 
@@ -36,16 +38,12 @@ Even though the server is not obliged to do anything with this output, it is gen
 
 Access to the above streams will be implemented as a __Service__, which can be switched on or off at runtime. Output can be sent either to stdout, stderr, or both simultaneously. If this isn't enough, a user can add their own custom service layer, which can manipulate the data as it is read/written in any way they wish (such as logging to a database, url-encoding/filtering data, or playing an April Fool's prank on your website visitors).
 
-[h4 Session handling.]
-
-Access to persistent session data is a very useful stop-gap to using a complete RDBMS to store/retrieve data. In some cases, such as when an object is supposed to stay in active memory, a RDBMS will not be efficient, so session management fits in nicely. A templated `basic_session<>` will be provided so various session-storage methods can be used. Boost.Interprocess is an ideal default, while Boost.UUID can be used to generate unique session identifiers.
-
 [h4 Concept Documentation]
 
 Even though this library introduces very few new concepts, they are not currently documented. Links to Boost.Asio's concept documentation is also required (essentially as part of a reworking of the doxygen reference section).
 
-[/h4 Removing aCGI/CGI Divide]
+[h4 Unicode Support]
 
-[/h4 Unicode Support]
+The library currently makes no documented provisions for Internationalisation support. The string type used in the library is templated but this is as far as support goes. A Boost.Unicode library would help a lot with adding this support. Comments on this topic by domain experts are most welcome.
 
 [endsect]

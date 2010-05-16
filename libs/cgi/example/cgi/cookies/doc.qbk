@@ -1,0 +1,19 @@
+
+[section Cookies]
+
+[import main.cpp]
+
+This file uses [@http://code.google.com/p/google-ctemplate/ Google cTemplate] to show the benefits of using an HTML template engine[footnote cTemplate isn't just an HTML templating engine. This library is in no way affiliated with cTemplate, etc, etc. :)].
+
+Using cTemplate to separate /displaying/ the response with figuring out /what to respond with/ allows for flexible applications. The 'templates' (aka. 'stencils') can be text files or strings built into your application so you can provide multiple formats of the same data by simply providing multiple template files.
+
+Of course, if you are familiar with any other languages or any web programming at all then none of this will be new to you: This is Model-View-Controller programming.
+
+[headers]
+
+[main]
+
+See the [@../../example/cgi/cookies/main.cpp full source listing].
+
+[endsect][/ cookies]
+

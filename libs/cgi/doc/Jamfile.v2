@@ -131,7 +131,10 @@ boostbook standalone
     # Max depth in each TOC:
     <xsl:param>toc.max.depth=2
     # How far down we go with TOC's
-    <xsl:param>generate.section.toc.level=1
+    <xsl:param>generate.section.toc.level=3
+    #<xsl:param>%div.title.content="'false'"
+    <xsl:param>$nav.border="'None'"
+    <xsl:param>djg.nonav="'ok'"
     #<xsl:param>generate.toc="chapter nop section nop"
 
     #<xsl:param>root.filename="svg_plot"
@@ -139,7 +142,7 @@ boostbook standalone
     <xsl:param>boost.image.src="../doc/src/images"
     <xsl:param>project.image.src="../doc/src/images"
 
-    # <xsl:param>project.root=http://beta.boost.org/development
+    <xsl:param>project.root=http://omnisplat.com
     # <xsl:param>annotation.support=1
     # <xsl:param>quickbook.source.style.show="'true'"
 

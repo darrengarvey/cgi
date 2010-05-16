@@ -1,0 +1,20 @@
+[/
+ / Copyright (c) 2007-2009 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section:sessions Sessions Quickstart]
+
+['[*TODO]: Sessions Quickstart]
+
+[h3 10 minute intro]
+
+The following example is generated from the linked [@../src/utilities/sessions/sessions_quickstart.cpp source file].
+
+[import sessions_quickstart.cpp]
+
+[sessions_quickstart]
+
+[endsect]

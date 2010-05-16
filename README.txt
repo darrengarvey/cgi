@@ -1,13 +1,23 @@
 Comments/critique are welcome and can be directed to one of:
 
   cgi-devel @ cgi dot sourceforge dot net
-  lists dot drrngrvy @ gmail dot com
+  darren dt garvey @ gmail dt com
 
 ------------------------------------------------------------
+
+== DISCLAIMER ==
+
+Note: This library is *not* a Boost library. It uses Boost coding conventions and will be proposed for review in due course.
+
+Please do not confuse the code style with any mark of approval coming from the members of Boost. Said approval is still to be obtained.
+
+== / DISCLAIMER ==
 
 Websites for more information on this library are:
  http://cgi.sf.net
  http://omnisplat.com
+ 
+Documentation is being updated so the documentation up on these sites is quite out of date. The examples in this package are by far the best teaching aid for the moment.
 
 Check the library works ok by first running the tests + compiling the examples.
 
@@ -17,7 +27,7 @@ These are all in the
 
 directory (see Jamfile.v2 for build instructions).
 
-Note that some of the examples (ie. the "stencil" examples) require cTemplate, so they will fail to compile unless you have that installed.
+Note that some of the examples (ie. the "stencil" examples) require Google's cTemplate, so they will fail to compile unless you have that installed.
 
 The tests aren't exhaustive - this library is still under development.
 
@@ -27,6 +37,10 @@ Ubuntu 8.04 desktop 32bit
 Ubuntu 9.10 desktop 32bit
 Ubuntu 8.04 server 64bit
 MSVC 2008 Windows XP
+MSVC 2008 Windows 7
 
-FastCGI stuff only works on linux at the moment. FastCGI is supported on Windows as an external server, tested against Apache 2.2 with mod_fastcgi (obsolete) and mod_fcgid. mod_fcgid has been merged with upstream Apache and should become part of a future release.
+FastCGI stuff works on linux and Windows under Apache 2.2 and mod_fcgid. Currently external fastcgi servers (eg. on mod_fastcgi) are only supported on linux.
 
+Bleeding edge code is at https://svn.boost.org/trac/boost/browser/sandbox/SOC/2007/cgi/trunk
+
+Check out the latest code with: svn co https://svn.boost.org/svn/boost/sandbox/SOC/2007/cgi/trunk

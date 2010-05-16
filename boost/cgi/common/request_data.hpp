@@ -22,6 +22,18 @@ BOOST_CGI_NAMESPACE_BEGIN
     : public data_map_proxy<T>
   {
   public:
+    typedef T                                         map_type;
+    typedef data_map_proxy<map_type>                  self_type;
+    typedef typename map_type::key_type               key_type;
+    typedef typename map_type::value_type             value_type;
+    typedef typename map_type::mapped_type            mapped_type;
+    typedef typename map_type::size_type              size_type;
+    typedef typename map_type::iterator               iterator;
+    typedef typename map_type::const_iterator         const_iterator;
+    typedef typename map_type::reverse_iterator       reverse_iterator;
+    typedef typename map_type::const_reverse_iterator const_reverse_iterator;
+    typedef typename map_type::allocator_type         allocator_type;
+
     using data_map_proxy<T>::operator[];
   };
 
@@ -33,7 +45,17 @@ BOOST_CGI_NAMESPACE_BEGIN
     : public data_map_proxy<T>
   {
   public:
-    typedef typename T::iterator               iterator;
+    typedef T                                         map_type;
+    typedef data_map_proxy<map_type>                  self_type;
+    typedef typename map_type::key_type               key_type;
+    typedef typename map_type::value_type             value_type;
+    typedef typename map_type::mapped_type            mapped_type;
+    typedef typename map_type::size_type              size_type;
+    typedef typename map_type::iterator               iterator;
+    typedef typename map_type::const_iterator         const_iterator;
+    typedef typename map_type::reverse_iterator       reverse_iterator;
+    typedef typename map_type::const_reverse_iterator const_reverse_iterator;
+    typedef typename map_type::allocator_type         allocator_type;
 
     std::pair<iterator, iterator> equal_range( const key_type& key ) {
       return impl()equal_range(key);

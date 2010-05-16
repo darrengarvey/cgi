@@ -1,0 +1,37 @@
+
+[section MVC Cookie Game]
+
+This example shows the user their cookies and allows them to set and delete them. It uses Google.cTemplate to move HTML out of the program and into HTML template files, which would be easily editable by anyone familiar with HTML.
+
+If you're not familiar with the term, [@http://wikipedia.org/wiki/Model-View-Controller read up on MVC]. The additional time you'll spend learning an HTML templating library, such as Google.cTemplate, will be saved many times over when compiling your CGI app starts taking more than a few seconds!
+
+[note
+    You need to download and install [@http://code.google.com/p/google-ctemplate Google's cTemplate library] and you may have to modify Jamfile.v2 to point to your compiled ctemplate library (see the `lib ctemplate ...` lines).
+]
+
+You can try a demo of the MVC Cookie Game example [@http://omnisplat.com/cgi/cgi_cookie_game2 here].
+
+[import main.cpp]
+
+[section Headers]
+
+[headers]
+
+[endsect][/ headers]
+
+[section Code]
+
+[main]
+
+[endsect][/ code]
+
+[table Files used for this example:
+  [[File] [Contents]]
+  [[[@../../example/cgi/cookie_game2/main.cpp main.cpp]] [The C++ source.]]
+  [[[@../../example/cgi/cookie_game2/style.css style.css]] [CSS styling for the response.]]
+  [[[@../../example/cgi/cookie_game2/main.js main.js]] [Javascript functions (for changing between GET and POST requests.]]
+  [[[@../../example/cgi/cookie_game2/index.html index.html]] [The HTML template itself.]]
+]
+
+[endsect][/ echo]
+

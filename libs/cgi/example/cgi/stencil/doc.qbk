@@ -3,7 +3,9 @@
 
 [import main.cpp]
 
-[cgi_stencil]
+[cgi_stencil_headers]
+
+[cgi_stencil_main]
 
 See the [@../../example/cgi/stencil/main.cpp full source listing].
 

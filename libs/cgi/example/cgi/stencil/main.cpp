@@ -7,22 +7,22 @@
 //
 ////////////////////////////////////////////////////////////////
 //
-// [cgi_stencil
-//
-
+//[cgi_stencil_headers
 #include <iostream>
 #include <boost/cgi/cgi.hpp>
 #include <boost/cgi/utility/stencil.hpp>
+//]
 
-using namespace boost::cgi;
+//[cgi_stencil_main
+namespace cgi = boost::cgi;
 
-int handle_request(request& req)
+int handle_request(cgi::request& req)
 {
-  req.load(parse_all);
+  req.load(cgi::parse_all);
   
   // Construct a response that uses Google cTemplate. Also sets the root
   // directory where the stencils are found.
-  stencil resp("../stencils/");
+  cgi::stencil resp("../stencils/");
 
   //// Test 1.
 
@@ -30,7 +30,7 @@ int handle_request(request& req)
   // the response text.
   // The content of the response - which is everything streamed to it - is
   // added to a {{content}} field in the stencil.
-  resp<< content_type("text/html")
+  resp<< cgi::content_type("text/html")
       << "Hello there, universe!";
       
   //// Test 2.
@@ -53,7 +53,7 @@ int handle_request(request& req)
   // Show a section, conditionally.
   
   // Use the "show" GET variable, or default to the string "show" if not set.
-  request::string_type show = req.get.pick("show", "show");
+  cgi::request::string_type show = req.get.pick("show", "show");
   resp.set("show", show == "show" ? "hide" : "show");
   if (show == "show")
     resp.show("some_section"); // Shows {{#some_section}}...{{/some_section}}.
@@ -64,7 +64,7 @@ int handle_request(request& req)
   if (num < 0) num = 0;
   resp.set("show_less", num ? num - 1 : 0);
   resp.set("show_more", num + 1);
-  stencil::section sec("section_with_variable");
+  cgi::section sec("section_with_variable");
   for (int i(0); i < num; ++i)
   {
     // We can show a section and set one field in it in one go.
@@ -73,7 +73,7 @@ int handle_request(request& req)
   
   //// Test 5.
 
-  dictionary test5 = resp.add("test5");
+  cgi::dictionary test5 = resp.add("test5");
   test5.add("input")
     .set("type", "text")
     .set("name", "text")
@@ -124,19 +124,19 @@ int handle_request(request& req)
 
   //// Test 6.
 
-  resp.add(stencil::section("embedded")).set("test", "passed");
+  resp.add(cgi::section("embedded")).set("test", "passed");
   
-  dictionary dict = resp.add("embedded");
+  cgi::dictionary dict = resp.add("embedded");
   dict.add("subsection") // returns a new sub-dictionary.
       .set("test", "passed again")
       .set("other", "(another field)");
-  dict.set("test", "passed yet again", stencil::section("subsection"));
+  dict.set("test", "passed yet again", cgi::section("subsection"));
 
   //// Test 7.
 
   // Include another stencil into this one at marker {{>include}}.
   resp.include(
-      stencil::section(
+      cgi::section(
           "include",
           "cgi_stencil.include.html"
         )
@@ -145,7 +145,8 @@ int handle_request(request& req)
   // Short-cut for stencil includes.
   resp.include("include", "cgi_stencil.include.html");
   
-  resp<< cookie("name", "value");
+  // Set a session cookie, which expires when the user closes their browser.
+  resp<< cgi::cookie("name", "value");
 
   /// End Tests.
   
@@ -155,14 +156,14 @@ int handle_request(request& req)
   resp.expand("cgi_stencil.html");
 
   // Send the response and close the request.
-  return commit(req, resp);
+  return cgi::commit(req, resp);
 }
   
 int main()
 {
 try {
   
-  request req;
+  cgi::request req;
   if (handle_request(req))
     std::cerr<< "Error returned from handling request." << std::endl;
   else

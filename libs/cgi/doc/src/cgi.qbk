@@ -5,12 +5,12 @@
  / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
  /]
 
-[library CGI
+[library FastCGI / CGI
     [quickbook 1.5]
-    [version 0.6]
+    [version 0.7]
     [dirname the_document_dir]
-    [copyright 2007-2009 Darren Garvey]
-    [purpose Documentation for CGI / FastCGI Library]
+    [copyright 2007-2010 Darren Garvey]
+    [purpose Documentation for CGI / FastCGI C++ Library]
     [authors [Garvey, Darren]]
     [license
         Distributed under the Boost Software License, Version 1.0.
@@ -30,7 +30,6 @@
 [def __fcgi__    [@http://en.wikipedia.org/wiki/FastCGI FastCGI]]
 
 [def __FastCGI__ [link boost.cgi.reference.protocols.fcgi FastCGI]]
-[def __SCGI__    [link boost.cgi.reference.protocols.scgi SCGI]]
 
 [def __boost__   [@http://boost.org/ Boost]]
 [def __asio__    [@http://asio.sourceforge.net Boost.Asio]]
@@ -54,6 +53,10 @@
 [def __HEAD__ `HEAD`]
 [def __PUT__  `PUT` ]
 
+[def __Boost__ [@http://boost.org Boost]]
+
+[def __ProtocolService__ `ProtocolService`]
+[def __Request__ `Request`]
 
 [def __Service__ [@http://asio.sourceforge.net/boost_asio_0_3_9/libs/asio/doc/html/boost_asio/reference/Service.html Service]]
 
@@ -81,12 +84,14 @@
 ]
 
 [important
-This manual does [*not] document a library that is a part of __Boost__. The major part of it has been developed this summer as part of the Google Summer of Code, '[@http://code.google.com/soc/2007 GSoC07]'. Everything from here on in is alpha-grade, some bits more than others; [link boost.cgi.preface.comments_and_support comments and bug reports] are welcome.
+This manual does [*not] document a library that is a part of __Boost__. The library was started just before the summer of 2007 and worked on during the [@http://code.google.com/soc/2007 Google Summer of Code 2007].
 
-These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sourceforge], or at [@http://svn.boost.org/svn/boost/browser/sandbox/SOC/2007/cgi svn.boost.org]. For free!
+There has been a lot of changes recently (as of May 2010) and the interface has reached a relatively stable state. Comments and bug reports are most welcome and should be directed to cgi-devel at lists.sf.net.
+
+The project is hosted at [@http://sourceforge.net/projects/cgi/ sourceforge] and the bleeding edge code is in the [@http://svn.boost.org/svn/boost/browser/sandbox/SOC/2007/cgi/trunk Boost SVN sandbox].
 ]
 
-[include preface.qbk]
+[/include preface.qbk]
 
 [include:intro introduction.qbk]
 
@@ -96,19 +101,17 @@ These documents are either hosted at [@http://sourceforge.net/projects/cgi/ sour
 
 [include utilities.qbk]
 
-[/xinclude ../cgi_dox.xml]
-
 [include:examples examples.qbk]
 
 [/include:reference reference.qbk]
 
-[/include:future future_development.qbk]
+[include:future future_development.qbk]
 
 [/include:server_support user_guide/server_support.qbk]
 
 [/include troubleshooting.qbk]
 
-[/include acknowledgements.qbk]
+[include acknowledgements.qbk]
 
 [/xinclude index.xml]
 

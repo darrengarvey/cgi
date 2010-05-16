@@ -1,0 +1,64 @@
+#             Copyright (c) 2007 Darren Garvey
+#
+# Distributed under the Boost Software License, Version 1.0.
+#     (See accompanying file LICENSE_1_0.txt or copy 
+#        at http://www.boost.org/LICENSE_1_0.txt)
+
+project boost/cgi/example/acgi/cookie_game2 ;
+
+import os ;
+
+lib ctemplate ;
+#lib ctemplate : : <name>ctemplate <search>C:/Packages/ctemplate/lib ;
+
+exe acgi_cookie_game2
+  :
+    main.cpp
+  :
+    <library>ctemplate
+  :
+    <linkflags>-lctemplate
+  ;
+
+# Our install rule (builds binaries and copies them to <location>)
+install install-exe
+  :
+    acgi_cookie_game2
+  :
+    <location>$(cgi-bin)
+  ;
+
+install install-css
+  :
+    style.css
+  :
+    <location>$(htdocs)/css/
+  ;
+
+install install-js
+  :
+    main.js
+  :
+    <location>$(htdocs)/js/
+  ;
+
+install install-extra
+  :
+    index.html
+  :
+    <location>$(htdocs)/../templates/
+  ;
+
+explicit install-exe ;
+explicit install-extra ;
+
+install install
+  :
+    install-exe
+    install-css
+    install-js
+    install-extra
+  ;
+
+# Only install example if you use `bjam install' or equivalent
+explicit install ;

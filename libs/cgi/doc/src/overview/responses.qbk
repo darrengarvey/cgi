@@ -5,52 +5,12 @@
 
 While you may sometimes want to respond to a request by writing directly back to the client, more often that not it is preferable to buffer your response. You can never tell how successful a request is going to be from the start, or whether an exception is going to be throw. Being able to rewrite your response at any time is a requirement for real-world applications.
 
-The library provides the [classref boost::cgi::response response] class to make buffering your response simpler. Here is an example of using it:
+The library provides the [classref boost::cgi::response response] class to make buffering your response simpler.
 
 [tip
-  If you're keen to use HTML templates, consider looking at the [classref boost::cgi::stencil stencil] class, which uses cTemplate to allow you to write
-maintainable [@http://wikipedia.org/wiki/Model%2Dview%2Dcontroller Model-View-Controller] apps. This class is just a wrapper over cTemplate and is [*currently experimental].
+  If you're keen to use HTML templates, consider looking at the [classref boost::cgi::stencil stencil] class, which uses Google's cTemplate library to allow you to write
+maintainable [@http://wikipedia.org/wiki/Model%2Dview%2Dcontroller Model-View-Controller] apps. This class is just a lightweight wrapper over cTemplate and is [*currently experimental].
 ]
-
-[section:example Short Example]
-
-[/import __doxamples__/response_1.cpp]
-
-First, include the correct header.
-
-[includes]
-
-Then define your `response` object.
-
-[enter_main]
-
-Now we can write to `resp` like we would with any other output stream. Below you can see how you can stream [classref cgi::header] objects to the response, which are completely independent of the response body. After all, if we're going to buffer our reply, we may as well take advantage of it. As you can see, we can explicitly mark that no more headers can be added by streaming a default-constructed `header` object. This is useful if you have flushed the response (more on this later) and the header block has already been sent to the client.
-
-[stream_headers]
-
-If for any reason we need to get rid of the headers we have two options. One is `response::clear_headers()`, which simply deletes the current headers. This will assert if the headers have already been terminated. The alternative is `response::reset_headers()`, which indescriminately clears the headers and resets the 'terminated' toggle (__FIXME__ This could probably do with being a bit uglier, or at least providing a warning).
-
-[clear_headers]
-
-The file <boost/cgi/header.hpp> defines some helper classes so you can stream known types of header with the assurance that typos won't slip into a compiled program. A complete list of these can be found [link __FIXME__ here].
-
-[helper_types]
-
-You may also set headers directly. In the second call, we are using __boost_lexical_cast__ to cast the response content length into a string so it can be set in the header. If you're not familiar with `lexical_cast<>`, you should take a look at it.
-
-[set_headers_directly]
-
-Finally, we need to send the response somewhere. This can be done to any model of the __SyncReadStream__ concept. This could be anything from a IP/TCP socket, to a remote database, whatever you like. As noted, a request from this library is a special case, so you can just pass it directly, even though it doesn't deal with reading or writing itself.
-
-[sending]
-
-And that's most of what you need to know to get using the `response`. Check out the [classref cgi::response] for the rest.
-
-[endsect] [/ example]
-
-[section:api `cgi::response` Interface]
-
-[endsect] [/ api]
 
 [endsect] [/ responses]
 

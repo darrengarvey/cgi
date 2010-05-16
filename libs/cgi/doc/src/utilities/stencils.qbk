@@ -1,0 +1,9 @@
+
+[section:stencils Stencils (HTML, XML, JSON, etc.)]
+
+['[*TODO]: Document using `common::stencil`]
+
+[note Requires cTemplate, from Google]
+
+
+[endsect] [/ stencils]

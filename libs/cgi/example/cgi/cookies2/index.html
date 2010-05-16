@@ -1,0 +1,53 @@
+
+
+<html>
+<head>
+    <title>aCGI Cookie Game Example (using Google cTemplate)</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    <script type="text/javascript" src="/js/main.js"></script>
+</head>
+<body>
+
+{{#HAS_NAME_IN_COOKIE_true}}
+    <h1>Hello again {{USER_NAME}}</h1>
+    <p><a href="?reset=true"><input type="submit" value="Reset" /></a></p>
+{{/HAS_NAME_IN_COOKIE_true}}
+{{#HAS_NAME_IN_COOKIE_false}}
+    <h1>Hello there.</h1>
+{{/HAS_NAME_IN_COOKIE_false}}
+
+<p>Here is list of the cookies you currently have for this site:</p>
+
+{{#DATA_MAP}}
+    {{#ERROR}}
+        EMPTY
+    {{/ERROR}}
+    <ul class="nvpair">
+    {{#ROW}}
+        <li class="name">{{NAME}}</li>
+        <li class="value">{{VALUE}}
+          <a href="?name={{NAME}}&del=checked">Remove</a>
+        </li>
+    {{/ROW}}
+        <div class="clear"></div>
+    </ul>
+{{/DATA_MAP}}
+
+<p>
+  You can add cookies using the form below.
+  If you add a cookie value for 'name', it will show up above.
+</p>
+
+    <form method="get" action="{{SCRIPT_NAME}}" id="getform">
+        <label for="name" class="name">Name:</label>
+        <input id="name" name="name" class="value" type="text" value=" {{COOKIE_NAME}}"></input>
+        <label for="value" class="name">Value:</label>
+        <input id="value" name="value" class="value" type="text" value=" {{COOKIE_VALUE}}"></input>
+        <label for="del" class="name">Delete this cookie?</label>
+        <input id="del" name="del" class="value" type="checkbox"></input>
+        <div class="clear"></div>
+        <input type="submit"></input>
+    </form>
+    <input type="submit" onclick="switch_method('getform'); switch_value(this); return false;" value="Switch to POST"></input>
+</body>
+</html>

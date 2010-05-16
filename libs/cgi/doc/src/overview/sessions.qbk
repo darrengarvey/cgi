@@ -1,0 +1,25 @@
+
+[section:sessions Sessions]
+
+[note
+Sessions are disabled by default and are only enabled when you define `BOOST_CGI_ENABLE_SESSIONS`. Supporting sessions adds a dependency on Boost.Serialization and also on the Boost.Uuid library (which was newly added in Boost 1.42).
+]
+
+In a typical CGI program, you will want to keep track of the user's current state as they navigate through the application / website. The CGI protocol itself doesn't keep track of state, but using cookies it is possible to save information on the client's machine. The information will identify them to your application each time they make a request.
+
+Cookies aren't the best vehicle for session information for a few reasons:
+
+# They are limited in size. The maximum size of a cookie is 4kB and each domain can have 20 cookies[footnote [@http://www.15seconds.com/faq/Cookies/388.htm http://www.15seconds.com/faq/Cookies/388.htm]]. Realistically the actual limit may be higher, but relying on other limits may give unportable results.
+# They aren't inherently secure. Cookies are sent between the client and the server almost every time they communicate and they are commonly stored in a plain text file on the client's machine. Clearly, saving personal data in a cookie isn't a very good idea.
+
+What cookies are especially well-suited for is saving less-secure session information. Think styling information, user preferences, session ids...
+
+[h4 Session IDs]
+
+It is advisable to keep secure user information on the server. The standard way to link the user's active session to their data is using a session id. This is simply a unique string that is generated for the user (eg. automatically or when they log in) and thereafter identifies them to the server / application. The lifetime of the cookie can be set to a specified time in the future or will expire when they close their browser (the default behaviour) or manually remove the cookie. Most applications will also give users some way of logging out.
+
+[h4 Session State]
+
+By default, sessions are stored on the filesystem, with one file per session. This may be an issue for high-traffic sites. If you find you need / want a different serialization strategy, you can easily integrate your own session handling with the library.
+
+[endsect] [/ sessions]

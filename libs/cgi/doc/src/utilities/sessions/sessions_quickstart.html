@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>Basic Login Example</title>
+    <style type="text/css">
+        body {
+            width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        #body {
+            padding: 10px;
+            width: 400px;
+        }
+{{#LOGIN_FORM}}
+        #login-form {
+            background: #C8F0B7;
+            border:2px solid #98D087;
+            padding:10px;
+        }
+        #login-form label {
+            float: left;
+            text-align: right;
+            padding: 0px 10px;
+            width: 150px;
+            display: block;
+        }
+        #login-form input {
+            margin: 0 10px;
+        }
+{{/LOGIN_FORM}}
+{{#HAS_ERROR}}
+        div.error {
+            border: 2px solid #dd4444;
+            background: #ffaaaa;
+            padding: 5px 10px;
+            text-align: center;
+            -moz-border-radius: 10px;
+        }
+{{/HAS_ERROR}}
+    </style>
+</head>
+<body>
+
+<div id="body">
+
+{{#HAS_ERROR}}
+    <div class="error">{{error}}</div>
+{{/HAS_ERROR}}
+
+Last Accessed: {{last_accessed}} UTC
+
+{{#AUTHENTICATED_PAGE}}
+    {{! This is a comment. Note that the ":h" below is a modifier that HTML-encodes the email address.}}
+    <p>Hello, <a href="mailto:{{user_email:h}}">{{user_name:h}}</a> from {{user_location}}!</p>
+    <p><a href="?logout">Log Out</a></p>
+{{/AUTHENTICATED_PAGE}}
+
+{{#DEFAULT_PAGE}}
+    <p>Hello, world.</p>
+{{/DEFAULT_PAGE}}
+
+{{#LOGIN_FORM}}
+    <p>Log in below.</p>
+
+    <form id="login-form" method="post">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="{{user_name}}">
+        </div>
+        <div>
+            <label for="pass">Password:</label>
+            <input type="password" id="pass" name="pass" value="">
+        </div>
+        <input type="hidden" name="login" value="1">
+        <input type="submit" name="submit" value="Submit">
+    </form>
+{{/LOGIN_FORM}}
+</div>
+
+</body>
+</html>
