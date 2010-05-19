@@ -139,7 +139,7 @@ boostbook standalone
 
     #<xsl:param>root.filename="svg_plot"
     #<xsl:param>root.filename=cgi
-    <xsl:param>boost.image.src="../doc/src/images"
+    <xsl:param>boost.image.src="../images/logo.png"
     <xsl:param>project.image.src="../doc/src/images"
 
     <xsl:param>project.root=http://omnisplat.com

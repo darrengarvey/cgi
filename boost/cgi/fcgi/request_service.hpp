@@ -208,20 +208,6 @@ BOOST_CGI_NAMESPACE_BEGIN
   /***************************************************************************/
   public: // Reading stuff goes under here
 
-    /// Read some data from the client into the internal buffer.
-    std::size_t
-    read_some(implementation_type& impl, boost::system::error_code& ec)
-    {
-      return read_some(impl, impl.prepare(64), ec);
-    }
-
-    // **FIXME**
-    /// Read some data from the client into the supplied buffer.
-    template<typename MutableBufferSequence>
-    std::size_t
-      read_some(implementation_type& impl, const MutableBufferSequence& buf
-               , boost::system::error_code& ec);
-      
     /// Read a single header, buf do nothing with it.
     boost::system::error_code
       read_header(implementation_type& impl, boost::system::error_code& ec);

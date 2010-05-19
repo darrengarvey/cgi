@@ -411,29 +411,6 @@ BOOST_CGI_NAMESPACE_BEGIN
       return ec;
     }
 
-    // **FIXME**
-    /// Read some data from the client.
-    template<typename Protocol>
-    template<typename MutableBufferSequence>
-    BOOST_CGI_INLINE std::size_t
-    fcgi_request_service<Protocol>::read_some(
-        implementation_type& impl, const MutableBufferSequence& buf
-      , boost::system::error_code& ec)
-    {
-      if (impl.client_.status_ == common::closed_)
-      {
-        ec = common::error::client_closed;
-        return 0;
-      }
-
-      //if (read_header(ec))
-        return 0;
-
-      //boost::tribool state = parse_header(impl);
-      //std::size_t bytes_read;//( connection_->read_some(buf, ec) );
-      //return bytes_read;
-    }
-
     /// Read in the FastCGI (env) params
     // **FIXME**
     template<typename Protocol>
@@ -764,10 +741,6 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
        impl.client_.request_id_ = fcgi::spec::get_request_id(header);
 
-       BOOST_STATIC_ASSERT((
-        fcgi::spec::begin_request::body::size::value
-        == fcgi::spec::header_length::value));
-       
        // A begin request body is as long as a header, so we can optimise:
        if (read_header(impl, ec))
          return ec;

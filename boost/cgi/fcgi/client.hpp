@@ -97,7 +97,20 @@ BOOST_CGI_NAMESPACE_BEGIN
     return ec;
   }
 
-  
+  /// Prepare a buffer by wrapping it into a FastCGI packet.
+  /**
+   * FastCGI dictates that data is sent in packets which identify
+   * which request the data relates to, along with the size of
+   * the packet.
+   *
+   * This function takes a buffer of data and creates another
+   * buffer which includes the packet header information. As the
+   * buffers themselves only contain pointers to the data the
+   * overhead is negligible as the data is not copied.
+   *
+   * The lifetime of the header is guaranteed as it is kept in
+   * the client object itself.
+   */
   template<>
   template<typename ConstBufferSequence>
   void
@@ -179,6 +192,11 @@ BOOST_CGI_NAMESPACE_BEGIN
 
 
   /// Write some data to the client.
+  /**
+   * Currently this actually writes an entire packet - which may be up
+   * to 65,535 bytes in size - as the connection may potentially be
+   * multiplexed and shared between requests.
+   */
   template<>
   template<typename ConstBufferSequence>
   std::size_t 
@@ -202,6 +220,11 @@ BOOST_CGI_NAMESPACE_BEGIN
 
 
   /// Write some data to the client.
+  /**
+   * Currently this actually writes an entire packet - which may be up
+   * to 65,535 bytes in size - as the connection may potentially be
+   * multiplexed and shared between requests.
+   */
   template<>
   template<typename ConstBufferSequence, typename Handler>
   void

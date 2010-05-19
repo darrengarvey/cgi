@@ -177,8 +177,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       connection_->async_read_some(buf, handler);
     }
-    
-    
+
     ////// Querying the client.
 
     /// Get a shared_ptr of the connection associated with the client.
@@ -227,7 +226,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
   public: // **FIXME**
     // we should never read more than content-length bytes.
-    std::size_t                           bytes_left_;
+    std::size_t bytes_left_;
     
     boost::uint16_t request_id_;
     client_status status_;
@@ -236,10 +235,13 @@ BOOST_CGI_NAMESPACE_BEGIN
     boost::uint64_t total_sent_packets_;
 
     /// Buffer used to check the header of each packet.
-    //header_buffer_type out_header_;
     fcgi::spec::header header_;
 
     /// Output buffer.
+    /**
+     * This doesn't take ownership of the underlying memory, so the
+     * data must remain valid until it has been completely written.
+     */
     std::vector<boost::asio::const_buffer> outbuf_;
 
     bool keep_connection_;
