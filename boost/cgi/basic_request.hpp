@@ -81,17 +81,17 @@ BOOST_CGI_NAMESPACE_BEGIN
     session_type session;
 #endif // BOOST_CGI_ENABLE_SESSIONS
     
-	/// The environment data, exposed as a request_data<env_map>.
+    /// The environment data, exposed as a `request_data<env_map>`.
     env_data    env;
-	/// The GET (ie. query string) data, exposed as a request_data<get_map>.
+    /// The GET (ie. query string) data, exposed as a `request_data<get_map>`.
     post_data   post;
-	/// The POST data, exposed as a request_data<post_map>.
+    /// The POST data, exposed as a `request_data<post_map>`.
     get_data    get;
-	/// The form data, which is either the GET or POST data.
+    /// The form data, which is either the GET or POST data.
     form_data   form;
-	/// The cookie data, exposed as a request_data<cookie_map>.
+    /// The cookie data, exposed as a `request_data<cookie_map>`.
     cookie_data cookies;
-	/// The file uploads, exposed as a request_data<upload_map>.
+    /// The file uploads, exposed as a `request_data<upload_map>`.
     upload_data uploads;
 
     basic_request(
@@ -381,7 +381,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Reject the request with a '500 Internal Server Error' error.
     int reject()
     {
-      this->service.set_status(this->implementation, aborted);
+      this->service.status(this->implementation, aborted);
       return this->service.close(this->implementation
                                 , http::internal_server_error);
     }
@@ -389,7 +389,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Abort a request.
     void abort()
     {
-      this->service.set_status(this->implementation, aborted);
+      this->service.status(this->implementation, aborted);
     }
 
     /// Clear the data for the request, for reusing this object.

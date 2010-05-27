@@ -257,6 +257,16 @@ BOOST_CGI_NAMESPACE_BEGIN
       impl.status(status);
     }
 
+    /// Close the request.
+    template<typename ImplType>
+    int close(ImplType& impl
+      , http::status_code& hsc = http::ok
+      , int program_status = 0)
+    {
+      status(closed);
+      return program_status;
+    }
+
     /// Return if the request is still open.
     template<typename ImplType>
     bool is_open(ImplType& impl)
@@ -333,7 +343,10 @@ BOOST_CGI_NAMESPACE_BEGIN
       return ec;
     }
 
-    /// Read and parse the HTTP_COOKIE meta variable
+    /// Read and parse the HTTP_COOKIE meta variable.
+    /**
+     * Note: Do not URL decode the cookie values.
+     */
     template<typename ImplType>
     boost::system::error_code
     parse_cookie_vars(ImplType& impl, boost::system::error_code& ec)
@@ -347,7 +360,7 @@ BOOST_CGI_NAMESPACE_BEGIN
           detail::extract_params(vars, cookie_vars(impl.vars_)
                                 , boost::char_separator<char>
                                     ("", "=;", boost::keep_empty_tokens)
-                                , ec);
+                                , ec, false);
         status(impl, (common::request_status)(status(impl) | common::cookies_read));
       }
       return ec;

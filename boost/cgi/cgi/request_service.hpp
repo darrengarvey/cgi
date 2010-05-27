@@ -110,8 +110,21 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     int request_id(implementation_type& impl) { return 1; }
 
-    // **FIXME** should return error_code
-    int close(implementation_type& impl, common::http::status_code& http_s
+    /// Close the request.
+    int close(implementation_type& impl,
+        common::http::status_code http_s = http::ok
+      , int program_status = 0)
+    {
+      int s(0);
+      boost::system::error_code ec;
+      s = close(impl, http_s, program_status, ec);
+      detail::throw_error(ec);
+      return s;
+    }
+
+    /// Close the request.
+    int close(implementation_type& impl,
+        common::http::status_code http_s
       , int program_status, boost::system::error_code& ec)
     {
       status(impl, common::closed);

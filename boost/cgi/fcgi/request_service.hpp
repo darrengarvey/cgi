@@ -106,12 +106,14 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     /// Close the request.
-    int close(implementation_type& impl, ::BOOST_CGI_NAMESPACE::common::http::status_code& hsc
-              , int program_status);
+    int close(implementation_type& impl,
+        http::status_code hsc = http::ok
+      , int program_status = 0);
 
     /// Close the request.
-    int close(implementation_type& impl, ::BOOST_CGI_NAMESPACE::common::http::status_code& hsc
-             , int program_status, boost::system::error_code& ec);
+    int close(implementation_type& impl,
+        http::status_code hsc
+      , int program_status, boost::system::error_code& ec);
 
     /// Clear all request data (object is then safe to reuse).
     void clear(implementation_type& impl);

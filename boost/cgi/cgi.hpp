@@ -13,6 +13,7 @@
 
 // Include all cgi-related headers only.
 #include "boost/cgi/cgi/request.hpp"
+#include "boost/cgi/cgi/client.hpp"
 #include "boost/cgi/cgi/service.hpp"
 
 // Include headers common to all protocols

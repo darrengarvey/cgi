@@ -2,6 +2,7 @@
 #ifndef BOOST_CGI_COMMON_PATH_INFO_HPP_INCLUDED_
 #define BOOST_CGI_COMMON_PATH_INFO_HPP_INCLUDED_
 
+#include <vector>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
