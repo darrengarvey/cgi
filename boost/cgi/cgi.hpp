@@ -12,6 +12,7 @@
 #include "boost/cgi/config.hpp"
 
 // Include all cgi-related headers only.
+#include "boost/cgi/cgi/traits.hpp"
 #include "boost/cgi/cgi/request.hpp"
 #include "boost/cgi/cgi/client.hpp"
 #include "boost/cgi/cgi/service.hpp"

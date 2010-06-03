@@ -56,7 +56,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     typedef common::protocol_traits<tags::fcgi>       traits;
     /** FastCGI specific stuff **/
     typedef traits::request_type                      request_type;
-    typedef traits::request_ptr                       request_ptr;
+    typedef boost::shared_ptr<request_type>           request_ptr;
     typedef std::map<boost::uint16_t, request_type*>  request_map_type;
     typedef std::vector<request_type*>                request_vector_type;
     /** End FastCGI stuff      **/

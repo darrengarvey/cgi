@@ -69,10 +69,10 @@ BOOST_CGI_NAMESPACE_BEGIN
     typedef protocol_traits<protocol_type>             traits;
     typedef typename traits::protocol_service_type     protocol_service_type;
     typedef typename traits::service_type              service_type;
-    typedef typename traits::pointer                   pointer;
     typedef typename service_type::implementation_type implementation_type;
     typedef typename traits::char_type                 char_type;
     typedef typename traits::string_type               string_type;
+    typedef typename traits::request_type              request_type;
     typedef typename traits::client_type               client_type;
     typedef typename traits::buffer_type               buffer_type;
 #ifdef BOOST_CGI_ENABLE_SESSIONS
@@ -80,6 +80,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     session_type session;
 #endif // BOOST_CGI_ENABLE_SESSIONS
+    typedef boost::shared_ptr<request_type>            pointer;
     
     /// The environment data, exposed as a `request_data<env_map>`.
     env_data    env;

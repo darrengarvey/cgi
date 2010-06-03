@@ -37,7 +37,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     */
    template<typename MapT>
    void save_environment(MapT& env_map, char** env =
-       // Windows calls the environment environ_
+       // Windows calls the environment _environ
 #      if BOOST_WINDOWS
          _environ
 #      else

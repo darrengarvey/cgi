@@ -29,6 +29,21 @@ BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
   /// The response class: a helper for responding to requests.
+  /**
+   * This class has no knowledge of requests or protocols. It is a lightweight
+   * wrapper over a std::ostream that separates response headers from the
+   * response body.
+   *
+   * One response can be reused for several requests (though not
+   * simultaneously) and multiple responses can be combined.
+   *
+   * Note that std::endl is not supported for this class. std::endl usually
+   * flushes an std::ostream, which is not possible with this class as it
+   * is request-agnostic.
+   *
+   * When a response has been constructed, you can send it to any
+   * SyncWriteStream by calling send() or flush().
+   */
   template<typename CharT>
   class basic_response
   {
@@ -56,15 +71,16 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Return the response to the 'just constructed' state.
     void reset();
 
-    // provide this too?
+    /// Write characters to the response body.
     std::size_t write(const char_type* str, std::size_t len);
 
+    /// Write a string to the response body.
     std::size_t write(string_type const& str);
 
     template<typename ConstBufferSequence>
     std::size_t write(const ConstBufferSequence& buf);
 
-    /// Synchronously flush the data to the supplied SyncWriteStream
+    /// Synchronously flush the data to the supplied SyncWriteStream.
     /**
      * This call uses throwing semantics. ie. an exception will be thrown on
      * any failure.
@@ -76,7 +92,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Put a character into the stream.
     self_type& put (char_type c);
 
-    /// Synchronously flush the data via the supplied request
+    /// Synchronously flush the data via the supplied SyncWriteStream.
     /**
      * This call uses error_code semantics. ie. ec is set if an error occurs.
      * If there is no error, the buffer is cleared.
@@ -108,7 +124,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename SyncWriteStream>
     void resend(SyncWriteStream& sws);
 
-    /// Asynchronously send the data through the supplied request
+    /// Asynchronously send the data through the supplied AsyncWriteStream.
     /**
      * Note: This is quite crude at the moment and not as asynchronous as
      *       it could/should be. The data in the stream isn't cleared after
@@ -148,6 +164,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       return *this;
     }
 
+    /// Add a cookie to the response.
     basic_response<char_type>&
       set(const basic_cookie<char_type>& ck)
     {
@@ -155,6 +172,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       return *this;
     }
 
+    /// Set a header give a string of the form "name=value".
     basic_response<char_type>&
       set_header(const string_type& value);
 
@@ -165,21 +183,25 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Get the contents of the response as a string.
     /**
      * This copies the contents of the response into a string.
-     * Headers aren't included in the dump unless `include_header` is true.
+     * Headers aren't included unless `include_header` is true.
      */
     string_type str(bool include_header = false) const;
 
+    /// Get the value of a header in this response with the name `name`.
     string_type header_value(string_type const& name);
 
+    /// Clear all of the response headers.
     void clear_headers();
 
     void reset_headers();
     
     /// Get the charset.
     string_type& charset() const { return charset_; }
+
     /// Set the charset.
     void charset(string_type const& cs) { charset_ = cs; }
 
+    /// Check if more response headers may be added.
     bool headers_terminated() const;
 
     // Is this really necessary?
@@ -188,9 +210,10 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Get the ostream containing the response body.
     ostream_type& ostream();
 
-    /// Get the headers
+    /// Get the response headers.
     std::vector<string_type>& headers();
 
+    /// Stream any type to the response.
     template<typename T>
     self_type& operator<<(T t)
     {
@@ -198,28 +221,39 @@ BOOST_CGI_NAMESPACE_BEGIN
       return *this;
     }
 
+    /// Change the charset of the response.
     self_type& operator<< (charset_header<char_type> const& hdr)
     {
       charset(hdr.content);
       return *this;
     }
  
-     self_type& operator<< (basic_header<char_type> const& hdr)
+    /// Add a header to the response.
+    self_type& operator<< (basic_header<char_type> const& hdr)
     {
       return set(hdr);
     }
  
+    /// Add a cookie to the response.
     self_type& operator<< (basic_cookie<char_type> const& ck)
     {
       return set(ck);
     }
  
+    /// Set the HTTP status of the response.
     self_type& operator<< (http::status_code stat)
     {
       status(stat);
       return *this;
     }
 
+    /// Copy another response into this response.
+    /**
+     * The body of the other response is appended to the body of this
+     * response. The headers of the other response are added to this
+     * response, except for the "Content-type" header. The content-type
+     * of this response is assumed to be authoritative.
+     */
     self_type& operator<< (self_type& other)
     {
       if (!headers_terminated())
@@ -262,7 +296,6 @@ BOOST_CGI_NAMESPACE_BEGIN
 
    /// Typedefs for typical usage.
    typedef basic_response<char>    response;
-   typedef basic_response<wchar_t> wresponse; // **TODO** (untested)
 
  } // namespace common
 BOOST_CGI_NAMESPACE_END

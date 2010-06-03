@@ -68,7 +68,6 @@ BOOST_CGI_NAMESPACE_BEGIN
     typedef typename traits::mutable_buffers_type mutable_buffers_type;
     typedef typename traits::header_buffer_type   header_buffer_type;
     typedef typename connection_type::pointer     connection_ptr;
-    typedef typename traits::role_type            role_type;
 
     basic_client()
     {
@@ -245,7 +244,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     std::vector<boost::asio::const_buffer> outbuf_;
 
     bool keep_connection_;
-    role_type role_;
+    common::role_type role_;
   };
 
  } // namespace common

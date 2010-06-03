@@ -102,8 +102,8 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       /**
        * Apache on Windows with mod_fcgid requires that all of the
-       * pending data for the connection is read before the response
-       * is sent.
+       * pending data for the connection is read before the request
+       * is closed.
        */
       while(!ec 
         && impl.client_.status() < common::stdin_read
@@ -226,7 +226,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 	      return ec;
       }
       if (opts & common::parse_cookies_only)
-        parse_cookie_vars(impl, ec);
+        parse_cookie_vars(impl, "HTTP_COOKIE", ec);
         
       if (ec == error::eof) {
         ec = boost::system::error_code();
@@ -747,7 +747,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         
        spec::begin_request packet(impl.header_buf_);
        impl.request_role_ = packet.role();
-       impl.client_.role_ = packet.role();
+       impl.client_.role_ = static_cast<common::role_type>(packet.role());
        impl.client_.keep_connection_
          = packet.flags() & spec::keep_connection;
 

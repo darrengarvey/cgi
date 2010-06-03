@@ -27,6 +27,7 @@
 #include "boost/cgi/common/request_status.hpp"
 #include "boost/cgi/detail/extract_params.hpp"
 #include "boost/cgi/detail/save_environment.hpp"
+#include "boost/cgi/http/status_code.hpp"
 #include "boost/cgi/config.hpp"
 #ifdef BOOST_CGI_ENABLE_SESSIONS
 #  include "boost/cgi/utility/sessions.hpp"
@@ -328,8 +329,6 @@ BOOST_CGI_NAMESPACE_BEGIN
     boost::system::error_code
     parse_get_vars(ImplType& impl, boost::system::error_code& ec)
     {
-      // Make sure the request is in a pre-loaded state
-      //BOOST_ASSERT (impl.status() <= unloaded);
       if (!(status(impl) & common::get_read))
       {
         std::string const& vars (env_vars(impl.vars_)["QUERY_STRING"]);
@@ -346,16 +345,18 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Read and parse the HTTP_COOKIE meta variable.
     /**
      * Note: Do not URL decode the cookie values.
+     *
+     * @param cookie_key The name of the header that the cookie should appear
+     *        as. eg. this is HTTP_COOKIE for CGI-like protocols and Cookie
+     *        for HTTP.
      */
     template<typename ImplType>
     boost::system::error_code
-    parse_cookie_vars(ImplType& impl, boost::system::error_code& ec)
+    parse_cookie_vars(ImplType& impl, const char* cookie_key, boost::system::error_code& ec)
     {
-      // Make sure the request is in a pre-loaded state
-      //BOOST_ASSERT (impl.status() <= unloaded);
       if (!(status(impl) & common::cookies_read))
       {
-        std::string const& vars (env_vars(impl.vars_)["HTTP_COOKIE"]);
+        std::string const& vars (env_vars(impl.vars_)[cookie_key]);
         if (!vars.empty())
           detail::extract_params(vars, cookie_vars(impl.vars_)
                                 , boost::char_separator<char>

@@ -130,11 +130,10 @@ BOOST_CGI_NAMESPACE_BEGIN
      typedef typename traits::native_protocol_type  native_protocol_type;
      typedef typename traits::native_type           native_type;
      typedef typename traits::request_type          request_type;
-     typedef typename traits::pointer               request_ptr;
      typedef typename traits::acceptor_service_type acceptor_service_type;
      typedef typename traits::acceptor_impl_type    acceptor_impl_type;
-     typedef typename traits::port_number_type      port_number_type;
      typedef typename traits::endpoint_type         endpoint_type;
+     typedef boost::shared_ptr<request_type>        request_ptr;
      typedef std::pair<
        typename std::set<request_ptr>::iterator, bool> request_iter;
      typedef boost::function<int (request_type&)>   accept_handler_type;
@@ -147,7 +146,6 @@ BOOST_CGI_NAMESPACE_BEGIN
        typedef typename traits::native_protocol_type  native_protocol_type;
        typedef typename traits::request_type          request_type;
        typedef typename traits::acceptor_service_type acceptor_service_type;
-       typedef typename traits::port_number_type      port_number_type;
        typedef typename traits::endpoint_type         endpoint_type;
 
        acceptor_impl_type                            acceptor_;
@@ -155,7 +153,7 @@ BOOST_CGI_NAMESPACE_BEGIN
        std::queue<boost::shared_ptr<request_type> >  waiting_requests_;
        std::set<request_ptr>                         running_requests_;
        protocol_service_type*                        service_;
-       port_number_type                              port_num_;
+       unsigned short                                port_num_;
        endpoint_type                                 endpoint_;
        
      };
@@ -419,10 +417,8 @@ BOOST_CGI_NAMESPACE_BEGIN
        }
 
        // If we can reuse this request's connection, return.
-       if (request.client().keep_connection())
-         return ec;
-
-       detail::accept_named_pipe(listen_handle, *request.client().connection(), ec);
+       if (!request.client().keep_connection())
+         detail::accept_named_pipe(listen_handle, *request.client().connection(), ec);
 
        if (!ec)
          request.status(common::accepted);

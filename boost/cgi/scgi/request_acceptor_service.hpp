@@ -1,13 +1,13 @@
-//          -- fcgi/acceptor_service_impl.hpp --
+//          -- scgi/scgi_request_acceptor_service.hpp --
 //
-//          Copyright (c) Darren Garvey 2007-2010.
+//           Copyright (c) Darren Garvey 2010.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
 //
 ////////////////////////////////////////////////////////////////
-#ifndef CGI_FCGI_ACCEPTOR_SERVICE_IMPL_HPP_INCLUDED__
-#define CGI_FCGI_ACCEPTOR_SERVICE_IMPL_HPP_INCLUDED__
+#ifndef CGI_SCGI_REQUEST_ACCEPTOR_SERVICE_HPP_INCLUDED__
+#define CGI_SCGI_REQUEST_ACCEPTOR_SERVICE_HPP_INCLUDED__
 
 #include "boost/cgi/detail/push_options.hpp"
 
@@ -22,8 +22,8 @@
 #include <boost/system/error_code.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/common/protocol_traits.hpp"
-#include "boost/cgi/fcgi/error.hpp"
-#include "boost/cgi/fcgi/request.hpp"
+#include "boost/cgi/scgi/request.hpp"
+#include "boost/cgi/scgi/error.hpp"
 #include "boost/cgi/import/io_service.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
 #include "boost/cgi/detail/service_base.hpp"
@@ -31,46 +31,18 @@
 
 BOOST_CGI_NAMESPACE_BEGIN
 
-   namespace detail {
-
-     /// Helper functions for async_accept operation.
-     template<typename T, typename Handler>
-     struct accept_handler
-     {
-       accept_handler(T& t, typename T::implementation_type& impl
-                     , typename T::implementation_type::request_type& req
-                     , Handler& hnd)
-         : type(t)
-         , implementation(impl)
-         , request(req)
-         , handler(hnd)
-       {}
-
-       void operator()()
-       {
-         type.check_for_waiting_request(implementation, request, handler);
-       }
-
-       T& type;
-       typename T::implementation_type& implementation;
-       typename T::implementation_type::request_type& request;
-       Handler handler;
-     };
-
-   } // namespace detail
-
-  namespace fcgi {
+  //namespace scgi {
 
   /// The service_impl class for FCGI basic_request_acceptor<>s
-   template<typename Protocol = common::tags::fcgi>
-   class acceptor_service_impl
+   template<typename Protocol = common::tags::scgi>
+   class scgi_request_acceptor_service
      : public detail::service_base<
-         ::BOOST_CGI_NAMESPACE::fcgi::acceptor_service_impl<Protocol>
+         ::BOOST_CGI_NAMESPACE::scgi_request_acceptor_service<Protocol>
        >
    {
    public:
    
-     typedef acceptor_service_impl<Protocol>        self_type;
+     typedef scgi_request_acceptor_service<Protocol> self_type;
      typedef Protocol                               protocol_type;
      typedef common::protocol_traits<Protocol>      traits;
      typedef typename traits::protocol_service_type protocol_service_type;
@@ -96,17 +68,14 @@ BOOST_CGI_NAMESPACE_BEGIN
        typedef typename traits::endpoint_type         endpoint_type;
 
        acceptor_impl_type                            acceptor_;
-       boost::mutex                                  mutex_;
-       std::queue<boost::shared_ptr<request_type> >  waiting_requests_;
-       std::set<request_ptr>                         running_requests_;
-       protocol_service_type*                        service_;
+       protocol_service_type*                        protocol_service_;
        unsigned short                                port_num_;
        endpoint_type                                 endpoint_;
        
      };
 
-     explicit acceptor_service_impl(::BOOST_CGI_NAMESPACE::common::io_service& ios)
-       : detail::service_base< ::BOOST_CGI_NAMESPACE::fcgi::acceptor_service_impl<Protocol> >(ios)
+     explicit scgi_request_acceptor_service(::BOOST_CGI_NAMESPACE::common::io_service& ios)
+       : detail::service_base< ::BOOST_CGI_NAMESPACE::scgi_request_acceptor_service<Protocol> >(ios)
        , acceptor_service_(boost::asio::use_service<acceptor_service_type>(ios))
        , strand_(ios)
      {
@@ -115,19 +84,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      protocol_service_type&
        service(implementation_type const& impl) const
      {
-       return *impl.service_;
-     }
-
-     /// Default-initialize the acceptor.
-     boost::system::error_code
-       default_init(implementation_type& impl, boost::system::error_code& ec)
-     {
-       // I've never got the default initialisation working on Windows...
-#if ! defined(BOOST_WINDOWS)
-       return acceptor_service_.assign(impl.acceptor_, boost::asio::ip::tcp::v4()
-                                      , 0, ec);
-#endif
-       return ec;
+       return *impl.protocol_service_;
      }
 
      void set_protocol_service(implementation_type& impl
@@ -139,8 +96,8 @@ BOOST_CGI_NAMESPACE_BEGIN
      protocol_service_type&
        get_protocol_service(implementation_type& impl)
      {
-       BOOST_ASSERT(impl.service_ != NULL);
-       return *impl.service_;
+       BOOST_ASSERT(impl.protocol_service_ != NULL);
+       return *impl.protocol_service_;
      }
 
      void construct(implementation_type& impl)
@@ -157,6 +114,13 @@ BOOST_CGI_NAMESPACE_BEGIN
      void shutdown_service()
      {
        acceptor_service_.shutdown_service();
+     }
+
+     boost::system::error_code
+     default_init(implementation_type& impl, boost::system::error_code& ec)
+     {
+       ec = boost::system::error_code(829, boost::system::system_category);
+       return ec;
      }
 
      /// Check if the given implementation is open.
@@ -204,25 +168,10 @@ BOOST_CGI_NAMESPACE_BEGIN
      {
        request_ptr new_request;
        
-       if (impl.waiting_requests_.empty())
-       {
-         // Accepting on new request.
-         new_request = request_type::create(*impl.service_);
-       }
-       else
-       {
-         // Accepting on existing request.
-         new_request = impl.waiting_requests_.front();
-         impl.waiting_requests_.pop();
-       }
+       new_request = request_type::create(*impl.protocol_service_);
        
-       impl.running_requests_.insert(new_request);
-       
-       // The waiting request may be open if it is a multiplexed request.
-       // If we can reuse this request's connection, return.
-       if (!new_request->is_open() && !new_request->client().keep_connection())
+       if (!new_request->is_open())
        {
-         // ...otherwise accept a new connection.
          acceptor_service_.async_accept(impl.acceptor_,
              new_request->client().connection()->next_layer(), 0,
              strand_.wrap(
@@ -234,7 +183,7 @@ BOOST_CGI_NAMESPACE_BEGIN
        }
        else
        {
-         impl.service_->post(
+         impl.protocol_service_->post(
            strand_.wrap(
              boost::bind(&self_type::handle_accept
                  , this, boost::ref(impl), new_request, handler, boost::system::error_code()
@@ -251,69 +200,43 @@ BOOST_CGI_NAMESPACE_BEGIN
      {
        new_request->status(common::accepted);
        int status = handler(*new_request);
-       impl.running_requests_.erase(impl.running_requests_.find(new_request));
        if (new_request->is_open()) {
          new_request->close(http::ok, status);
        }
        new_request->clear();
-       impl.waiting_requests_.push(new_request);
      }
 
      /// Accepts a request and runs the passed handler.
      void async_accept(implementation_type& impl
              , accept_handler_type handler)
      {
-       //impl.service_->post(
-           strand_.post(
-             boost::bind(&self_type::do_accept,
-                 this, boost::ref(impl), handler)
-             );
-         //);
+       strand_.post(
+         boost::bind(&self_type::do_accept,
+             this, boost::ref(impl), handler)
+         );
      }
      
      int accept(implementation_type& impl, accept_handler_type handler
              , endpoint_type* endpoint, boost::system::error_code& ec)
      {
-       typedef typename std::set<request_ptr>::iterator iter_t;
-       typedef std::pair<iter_t, bool> pair_t;
-       
        request_ptr new_request;
-       pair_t insert_result;
        
-       if (impl.waiting_requests_.empty())
-       {
-         // Accepting on new request.
-         new_request = request_type::create(*impl.service_);
-       }
-       else
-       {
-         // Accepting on existing request.
-         new_request = impl.waiting_requests_.front();
-         impl.waiting_requests_.pop();
-       }
-       
-       insert_result = impl.running_requests_.insert(new_request);
+       // Accepting on new request.
+       new_request = request_type::create(*impl.protocol_service_);
        
        // The waiting request may be open if it is a multiplexed request.
        if (!new_request->is_open())
        {
-         // If we can reuse this request's connection, return.
-         if (!new_request->client().keep_connection())
-         {
-           // ...otherwise accept a new connection.
-           ec = acceptor_service_.accept(impl.acceptor_,
-                    new_request->client().connection()->next_layer(), endpoint, ec);
-         }
+         ec = acceptor_service_.accept(impl.acceptor_,
+                  new_request->client().connection()->next_layer(), endpoint, ec);
        }
        new_request->status(common::accepted);
        int status = handler(*new_request);
        
-       impl.running_requests_.erase(insert_result.first);
        if (new_request->is_open()) {
-         new_request->close(http::ok, status);
+         new_request->close(common::http::ok, status);
        }
        new_request->clear();
-       impl.waiting_requests_.push(new_request);
        
        return status;
      }
@@ -336,10 +259,6 @@ BOOST_CGI_NAMESPACE_BEGIN
          request.clear();
        }
 
-       // If we can reuse this request's connection, return.
-       if (request.client().keep_connection())
-         return ec;
-
        // ...otherwise accept a new connection.
        ec = acceptor_service_.accept(impl.acceptor_,
                 request.client().connection()->next_layer(), endpoint, ec);
@@ -354,9 +273,8 @@ BOOST_CGI_NAMESPACE_BEGIN
 					  , typename implementation_type::request_type& request
                       , Handler handler)
      {
-       this->io_service().post(
-         detail::accept_handler<self_type, Handler>(*this, impl, request, handler)
-       );
+       acceptor_service_.async_accept(impl.acceptor_,
+          request.client().connection()->next_layer(), handler);
      }
 
      /// Close the acceptor (not implemented yet).
@@ -381,47 +299,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      bool
      is_cgi(implementation_type& impl)
      {
-       boost::system::error_code ec;
-       socklen_t len (
-         static_cast<socklen_t>(local_endpoint(impl,ec).capacity()) );
-       int check (
-         getpeername(native(impl), local_endpoint(impl,ec).data(), &len) );
-         
-       /// The FastCGI check works differently on Windows and UNIX.
-#if defined(BOOST_WINDOWS)
-       return ( check == SOCKET_ERROR &&
-                WSAGetLastError() == WSAENOTCONN ) ? false : true;
-#else
-       return ( check == -1 && 
-                errno == ENOTCONN ) ? false : true;
-#endif
-     }
-
-   public:
-     template<typename CommonGatewayRequest, typename Handler>
-     int check_for_waiting_request(implementation_type& impl
-                                   , CommonGatewayRequest& request
-                                   , Handler handler)
-     {
-       // We can't call accept on an open request (close it first).
-       if (request.is_open())
-         return handler(error::accepting_on_an_open_request);
-
-       // If the client is open, make sure the request is clean.
-       // ie. don't leak data from one request to another!
-       if (request.client().is_open())
-       {
-         request.clear();
-       }
-
-       // If we can reuse this request's connection, return.
-       if (request.client().keep_connection())
-         return handler(boost::system::error_code());
-
-       // ...otherwise accept a new connection (asynchronously).
-       acceptor_service_.async_accept(impl.acceptor_,
-         request.client().connection()->next_layer(), 0, handler);
-       return 0;
+       return false;
      }
 
    public:
@@ -430,9 +308,9 @@ BOOST_CGI_NAMESPACE_BEGIN
      boost::asio::io_service::strand strand_;
    };
 
- } // namespace fcgi
+ //} // namespace scgi
 BOOST_CGI_NAMESPACE_END
 
 #include "boost/cgi/detail/pop_options.hpp"
 
-#endif // CGI_FCGI_ACCEPTOR_SERVICE_IMPL_HPP_INCLUDED__
+#endif // CGI_SCGI_REQUEST_ACCEPTOR_SERVICE_HPP_INCLUDED__

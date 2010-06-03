@@ -17,7 +17,7 @@
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/basic_client.hpp"
 #include "boost/cgi/common/map.hpp"
-#include "boost/cgi/common/tags.hpp"
+#include "boost/cgi/fcgi/traits.hpp"
 #include "boost/cgi/connections/shareable_tcp_socket.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
 #include "boost/cgi/fcgi/specification.hpp"
@@ -171,10 +171,12 @@ BOOST_CGI_NAMESPACE_BEGIN
     std::size_t total_buffer_size = static_cast<std::size_t>(header_.content_length());
     
 #if !defined(BOOST_CGI_NO_LOGGING) && !defined(NDEBUG)
+    std::ofstream log("../logs/fcgi_client.log", std::ios::out | std::ios::app);
     if (ec)
       std::cerr<< "Error " << ec << ": " << ec.message() << '\n';
     else    
-      std::cerr
+      //std::cerr
+      log
         << "Transferred " << total_buffer_size
         << " (+" << (bytes_transferred - total_buffer_size)
         << " protocol) bytes (running total: "

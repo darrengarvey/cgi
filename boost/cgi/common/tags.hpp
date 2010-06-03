@@ -27,6 +27,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     struct cgi {};
     struct fcgi {};
     struct scgi {};
+    struct http {};
 
     // IoServiceProvider PoolingPolicy types
     struct single_service {};

@@ -9,7 +9,7 @@
 #ifndef CGI_FCGI_REQUEST_HPP_INCLUDED__
 #define CGI_FCGI_REQUEST_HPP_INCLUDED__
 
-#include "boost/cgi/common/tags.hpp"
+#include "boost/cgi/fcgi/traits.hpp"
 #include "boost/cgi/fcgi/service.hpp"
 #include "boost/cgi/fcgi/request_service.hpp"
 #include "boost/cgi/fwd/basic_request_fwd.hpp"

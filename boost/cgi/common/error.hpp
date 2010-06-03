@@ -105,6 +105,8 @@ public:
     case max_post_exceeded:
       return "The content length of the file upload is larger than maximum"
              " allowed by the BOOST_CGI_POST_MAX macro.";
+    case already_closed:
+      return "Trying to close a request that has already been closed.";
     default:
       return "(CGI) BOOM!!!";
     }

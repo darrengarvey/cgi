@@ -9,7 +9,7 @@
 #ifndef CGI_CGI_SERVICE_HPP_INCLUDED__
 #define CGI_CGI_SERVICE_HPP_INCLUDED__
 
-#include "boost/cgi/common/tags.hpp"
+#include "boost/cgi/cgi/traits.hpp"
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 
 BOOST_CGI_NAMESPACE_BEGIN

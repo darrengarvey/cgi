@@ -56,6 +56,7 @@ namespace boost {
 
   namespace cgi { using ::BOOST_CGI_NAMESPACE::common::commit; }
   namespace fcgi { using ::BOOST_CGI_NAMESPACE::common::commit; }
+  namespace scgi { using ::BOOST_CGI_NAMESPACE::common::commit; }
 
 } // namespace boost
 

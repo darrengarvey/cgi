@@ -40,7 +40,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     typedef typename protocol_traits<Protocol>::type traits;
     typedef typename traits::string_type             string_type;
     typedef typename traits::request_type            request_type;
-    typedef typename request_type::pointer           request_ptr;
+    typedef boost::shared_ptr<request_type>          request_ptr;
     typedef std::set<request_ptr>                    set_type;
     typedef std::queue<request_ptr>                  queue_type;
 

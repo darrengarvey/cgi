@@ -9,6 +9,7 @@
 #ifndef CGI_FCGI_ACCEPTOR_HPP_INCLUDED__
 #define CGI_FCGI_ACCEPTOR_HPP_INCLUDED__
 
+#include "boost/cgi/fcgi/traits.hpp"
 #include "boost/cgi/basic_request_acceptor.hpp"
 #include "boost/cgi/fcgi/request_acceptor_service.hpp"
 

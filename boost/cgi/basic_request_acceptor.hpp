@@ -36,7 +36,6 @@ BOOST_CGI_NAMESPACE_BEGIN
     typedef Protocol                               protocol_type;
     typedef protocol_traits<protocol_type>         traits;
     typedef typename traits::acceptor_service      service_type;
-    typedef typename traits::port_number_type      port_number_type;
     typedef typename traits::endpoint_type         endpoint_type;
     typedef typename traits::native_type           native_type;
     typedef typename traits::protocol_service_type protocol_service_type;
@@ -47,7 +46,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename IoServiceProvider>
     explicit basic_request_acceptor(
           common::basic_protocol_service<protocol_type, IoServiceProvider>& ps,
-          port_number_type port_num = 0)
+          unsigned short port_num = 0)
       : boost::asio::basic_io_object<service_type>(ps.get_io_service())
     {
       this->service.set_protocol_service(this->implementation, ps);

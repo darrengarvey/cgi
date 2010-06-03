@@ -169,7 +169,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
       if (parse_opts & common::parse_cookie_only)
       {
-        if (parse_cookie_vars(impl, ec)) // returns an error_code
+        if (parse_cookie_vars(impl, "HTTP_COOKIE", ec)) // returns an error_code
           return ec;
       }
 
