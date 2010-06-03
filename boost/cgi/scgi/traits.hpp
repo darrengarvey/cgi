@@ -85,7 +85,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       // Internal types (advanced)
       typedef scgi::scgi_request_service<
                   protocol_type
-              >                                      request_service_impl;
+              >                                      request_service_type;
       typedef scgi_request_acceptor_service<
                   protocol_type
               >                                      acceptor_service;

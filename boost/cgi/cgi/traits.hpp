@@ -44,8 +44,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       typedef protocol_traits<tags::cgi>             type;
       typedef tags::cgi                              protocol_type;
-      typedef cgi_request_service                    request_service_impl;
-      typedef cgi_request_service                    service_type;
+      typedef cgi_request_service                    request_service_type;
       typedef common::basic_protocol_service<
                   protocol_type
               >                                      protocol_service_type;

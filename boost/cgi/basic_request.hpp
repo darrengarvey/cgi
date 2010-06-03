@@ -60,7 +60,7 @@ BOOST_CGI_NAMESPACE_BEGIN
   template<typename Protocol>
   class basic_request
     : public detail::basic_io_object<
-        typename protocol_traits<Protocol>::service_type
+        typename protocol_traits<Protocol>::request_service_type
     >
   {
   public:
@@ -68,7 +68,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     typedef Protocol                                   protocol_type;
     typedef protocol_traits<protocol_type>             traits;
     typedef typename traits::protocol_service_type     protocol_service_type;
-    typedef typename traits::service_type              service_type;
+    typedef typename traits::request_service_type      service_type;
     typedef typename service_type::implementation_type implementation_type;
     typedef typename traits::char_type                 char_type;
     typedef typename traits::string_type               string_type;

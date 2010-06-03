@@ -31,7 +31,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     : public detail::service_base<request_service<Protocol> >
   {
     // The platform-specific implementation (only one for now)
-    typedef typename protocol_traits<Protocol>::request_service_impl
+    typedef typename protocol_traits<Protocol>::request_service_type
       service_impl_type;
 
   public:

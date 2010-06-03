@@ -100,10 +100,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       typedef boost::asio::mutable_buffers_1         mutable_buffers_type;
       typedef fcgi::fcgi_request_service<
                   protocol_type
-              >                                      request_service_impl;
-      typedef fcgi::fcgi_request_service<
-                  protocol_type
-              >                                      service_type;
+              >                                      request_service_type;
       typedef fcgi::fcgi_service_impl                service_impl_type;
       typedef fcgi_request_acceptor_service<
                   protocol_type
