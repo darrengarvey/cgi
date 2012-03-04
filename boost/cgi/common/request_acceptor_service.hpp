@@ -31,10 +31,6 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
     }
 
-    void shutdown_service()
-    {
-    }
-
     void construct(implementation_type& impl)
     {
       service_impl_.construct(impl);

@@ -75,11 +75,6 @@ BOOST_CGI_NAMESPACE_BEGIN
       service_impl_.destroy(impl);
     }
 
-    void shutdown_service()
-    {
-      service_impl_.shutdown_service();
-    }
-
     protocol_service_type&
       protocol_service(implementation_type const& impl) const
     {

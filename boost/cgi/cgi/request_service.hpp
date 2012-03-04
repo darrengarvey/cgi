@@ -102,10 +102,6 @@ BOOST_CGI_NAMESPACE_BEGIN
       );
     }
 
-    void shutdown_service()
-    {
-    }
-
     void clear(implementation_type& impl) { }
 
     int request_id(implementation_type& impl) { return 1; }

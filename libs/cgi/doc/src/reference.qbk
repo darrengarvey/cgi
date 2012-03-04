@@ -11202,11 +11202,6 @@ The generic service class for basic_request<>s.
     []
   ]
   
-  [
-    [[link cgi.reference.common__request_service.shutdown_service [*shutdown_service]]]
-    []
-  ]
-  
 ]
 
 Note: If the protocol is an asynchronous protocol, which means it requires access to a boost::asio::io\_service instance, then this class becomes a model of the Service concept (**LINK**) and must only use the constructor which takes a ProtocolService (**LINK**). If the protocol isn't async then the class can be used without a ProtocolService. 
@@ -11502,18 +11497,6 @@ Holds the request queue and the connection queue. It is also a wrapper around as
       const std::string & name,
       const std::string & value,
       boost::system::error_code & ec);
-
-
-
-[endsect]
-
-
-
-[section:shutdown_service common::request_service::shutdown_service]
-
-[indexterm2 shutdown_service..common::request_service] 
-
-  void shutdown_service();
 
 
 
@@ -12580,11 +12563,6 @@ Holds the request queue and the connection queue. It is also a wrapper around as
     []
   ]
   
-  [
-    [[link cgi.reference.request_acceptor_service.shutdown_service [*shutdown_service]]]
-    []
-  ]
-  
 ]
 
 
@@ -12683,18 +12661,6 @@ Check if there is a waiting request in the queue. If not, accept a connection, a
 
   request_acceptor_service(
       basic_protocol_service< protocol_type > & s);
-
-
-
-[endsect]
-
-
-
-[section:shutdown_service request_acceptor_service::shutdown_service]
-
-[indexterm2 shutdown_service..request_acceptor_service] 
-
-  void shutdown_service();
 
 
 

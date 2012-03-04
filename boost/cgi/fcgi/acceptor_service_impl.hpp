@@ -154,11 +154,6 @@ BOOST_CGI_NAMESPACE_BEGIN
        acceptor_service_.destroy(impl.acceptor_);
      }
 
-     void shutdown_service()
-     {
-       acceptor_service_.shutdown_service();
-     }
-
      /// Check if the given implementation is open.
      bool is_open(implementation_type& impl)
      {

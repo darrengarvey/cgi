@@ -111,11 +111,6 @@ BOOST_CGI_NAMESPACE_BEGIN
        acceptor_service_.destroy(impl.acceptor_);
      }
 
-     void shutdown_service()
-     {
-       acceptor_service_.shutdown_service();
-     }
-
      boost::system::error_code
      default_init(implementation_type& impl, boost::system::error_code& ec)
      {
