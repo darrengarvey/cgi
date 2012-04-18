@@ -458,7 +458,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       boost::cgi::common::name type(iter->substr(0, 12).c_str());
       if (type == "Content-type")
-        iter->insert(iter->length()-2, "; charset: " + charset_);    
+        iter->insert(iter->length()-2, "; charset=" + charset_);    
 
       //{ Construct a ConstBufferSequence out of the headers we have.
       headers.push_back(common::buffer(*iter));
