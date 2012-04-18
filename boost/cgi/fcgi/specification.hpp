@@ -11,6 +11,7 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/asio/buffer.hpp>
+#include <boost/array.hpp>
 #include "boost/cgi/config.hpp"
 
 // NOTE: CamelCase style mimicks the FastCGI specification
