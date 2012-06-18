@@ -18,6 +18,7 @@
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/static_assert.hpp>
+#include <boost/version.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/system/error_code.hpp>
 ///////////////////////////////////////////////////////////
@@ -110,6 +111,13 @@ BOOST_CGI_NAMESPACE_BEGIN
        // close/reject all the waiting requests
        acceptor_service_.destroy(impl.acceptor_);
      }
+
+#if BOOST_VERSION <= 104800
+     void shutdown_service()
+     {
+       acceptor_service_.shutdown_service();
+     }
+#endif
 
      boost::system::error_code
      default_init(implementation_type& impl, boost::system::error_code& ec)

@@ -22,6 +22,7 @@
 #endif // defined(BOOST_WINDOWS)
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 #include "boost/cgi/import/io_service.hpp"
+#include <boost/version.hpp>
 
 BOOST_CGI_NAMESPACE_BEGIN
 
@@ -74,6 +75,13 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       service_impl_.destroy(impl);
     }
+
+#if BOOST_VERSION <= 104800
+    void shutdown_service()
+    {
+      service_impl_.shutdown_service();
+    }
+#endif
 
     protocol_service_type&
       protocol_service(implementation_type const& impl) const

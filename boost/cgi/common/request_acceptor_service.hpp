@@ -13,6 +13,7 @@
 #include "boost/cgi/detail/service_base.hpp"
 #include "boost/cgi/detail/protocol_traits.hpp"
 #include "boost/cgi/config.hpp"
+#include <boost/version.hpp>
 
 BOOST_CGI_NAMESPACE_BEGIN
 
@@ -30,6 +31,12 @@ BOOST_CGI_NAMESPACE_BEGIN
       : detail::service_base<request_acceptor_service<Protocol>(s.io_service())
     {
     }
+
+#if BOOST_VERSION <= 104800
+    void shutdown_service()
+    {
+    }
+#endif
 
     void construct(implementation_type& impl)
     {
