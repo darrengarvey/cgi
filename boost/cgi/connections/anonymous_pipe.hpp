@@ -11,6 +11,8 @@
 
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/system/error_code.hpp>
+#include <boost/version.hpp>
 #include "boost/cgi/error.hpp"
 #include "boost/cgi/common/tags.hpp"
 #include "boost/cgi/basic_connection.hpp"
@@ -107,7 +109,12 @@ BOOST_CGI_NAMESPACE_BEGIN
         ret = bytesRead;
       else
         ec = boost::system::error_code(
-                ::GetLastError(), boost::system::system_category);
+                ::GetLastError(), 
+#if BOOST_VERSION > 104800
+                boost::system::system_category);
+#else
+                boost::system::system_category());
+#endif
 
       return ret;
     }
@@ -139,7 +146,12 @@ BOOST_CGI_NAMESPACE_BEGIN
         ret = bytesWritten;
       else
         ec = boost::system::error_code(
-                ::GetLastError(), boost::system::system_category);
+                ::GetLastError(),
+#if BOOST_VERSION > 104800
+                boost::system::system_category);
+#else
+                boost::system::system_category());
+#endif
 
       return ret;
     }
