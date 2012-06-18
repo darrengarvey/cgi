@@ -9,6 +9,7 @@
 #ifndef CGI_FCGI_SPECIFICATION_HPP_INCLUDED__
 #define CGI_FCGI_SPECIFICATION_HPP_INCLUDED__
 
+#include <boost/array.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/asio/buffer.hpp>
 #include "boost/cgi/config.hpp"
