@@ -13,14 +13,10 @@
 
 // You may want to remove these.
 #if defined (BOOST_WINDOWS)
-#   if !defined(_CRT_SECURE_NO_WARNINGS)
-#       define _CRT_SECURE_NO_DEPRECATE 1
-#       define _SCL_SECURE_NO_WARNINGS 1
-#       define _CRT_SECURE_NO_WARNINGS
-#   endif
-#   if !defined(NOMINMAX)
-#       define NOMINMAX
-#   endif
+#   define _CRT_SECURE_NO_DEPRECATE 1
+#   define _SCL_SECURE_NO_WARNINGS 1
+#   define _CRT_SECURE_NO_WARNINGS 1
+#   define NOMINMAX
 #   pragma warning( disable : 4503 ) // warning: decorated  name length exceeded
 #endif // defined (BOOST_WINDOWS)
 
