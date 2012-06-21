@@ -23,6 +23,7 @@
 #include <boost/regex.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/version.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/algorithm/string/find.hpp>
 ///////////////////////////////////////////////////////////
@@ -101,6 +102,12 @@ BOOST_CGI_NAMESPACE_BEGIN
         connection_type::create(this->get_io_service())
       );
     }
+
+#if BOOST_VERSION <= 104800
+    void shutdown_service()
+    {
+    }
+#endif
 
     void clear(implementation_type& impl) { }
 

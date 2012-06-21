@@ -14,6 +14,7 @@
 #include "boost/cgi/detail/service_base.hpp"
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
 #include "boost/cgi/import/io_service.hpp"
+#include <boost/version.hpp>
 
 BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
@@ -62,6 +63,13 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       service_impl_.destroy(impl);
     }
+
+#if BOOST_VERSION <= 104800
+    void shutdown_service()
+    {
+      service_impl_.shutdown_service();
+    }
+#endif
 
     impl_type null() const
     {

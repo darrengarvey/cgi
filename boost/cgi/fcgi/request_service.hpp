@@ -9,6 +9,7 @@
 #ifndef CGI_FCGI_REQUEST_SERVICE_HPP_INCLUDED__
 #define CGI_FCGI_REQUEST_SERVICE_HPP_INCLUDED__
 
+#include <boost/version.hpp>
 #include <boost/fusion/support.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/fusion/include/vector.hpp>
@@ -100,6 +101,12 @@ BOOST_CGI_NAMESPACE_BEGIN
         implementation_type::connection_type::create(this->get_io_service())
       );
     }
+
+#if BOOST_VERSION <= 104800
+    void shutdown_service()
+    {
+    }
+#endif
 
     /// Close the request.
     int close(implementation_type& impl,
