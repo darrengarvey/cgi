@@ -203,7 +203,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         
       if (request_method == "GET")
       {
-        if (parse_get_vars(impl, ec))
+        if (common::request_base<Protocol>::parse_get_vars(impl, ec))
           return ec;
       }
       else
@@ -226,7 +226,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 	      return ec;
       }
       if (opts & common::parse_cookies_only)
-        parse_cookie_vars(impl, "HTTP_COOKIE", ec);
+          common::request_base<Protocol>::parse_cookie_vars(impl, "HTTP_COOKIE", ec);
         
       if (ec == error::eof) {
         ec = boost::system::error_code();
@@ -325,7 +325,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         
       if (request_method == "GET")
       {
-        if (parse_get_vars(impl, ec))
+          if (common::request_base<Protocol>::parse_get_vars(impl, ec))
           return ec;
       }
       else
@@ -348,7 +348,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 	      return ec;
       }
       if (opts & common::parse_cookies_only)
-        parse_cookie_vars(impl, ec);
+          common::request_base<Protocol>::parse_cookie_vars(impl, ec);
         
       if (ec == error::eof) {
         ec = boost::system::error_code();
@@ -418,7 +418,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     fcgi_request_service<Protocol>::read_env_vars(
         implementation_type& impl, boost::system::error_code& ec)
     {
-      while(!ec && !(status(impl) & common::env_read))
+      while(!ec && !(common::request_base<Protocol>::status(impl) & common::env_read))
       {
         if (this->read_header(impl, ec))
           return ec;
@@ -428,7 +428,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         if (state)
         { // the header has been handled and all is ok; continue.
           impl.client_.status(common::params_read);
-          status(impl, (common::request_status)(status(impl) | common::env_read));
+          common::request_base<Protocol>::status(impl, (common::request_status)(common::request_base<Protocol>::status(impl) | common::env_read));
         }
         else
         if (!state)
