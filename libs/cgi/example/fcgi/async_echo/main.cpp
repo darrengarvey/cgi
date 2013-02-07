@@ -113,7 +113,6 @@ int handle_request(acceptor& a, request& req)
          "<head>"
          "<body>"
            "Request ID = " << req.id() << "<br />"
-           "Request Hash = " << req.hash() << "<br />"
            "Process ID = " << process_id() << "<br />"
            "<form method=post enctype=\"multipart/form-data\">"
              "<input type=text name=name value='"
@@ -170,7 +169,7 @@ try {
   service s;
   
   // Make an `acceptor` for accepting requests through.
-  acceptor a;
+  acceptor a(s);
 
   //
   // After the initial setup, we can enter a loop to handle one request at a

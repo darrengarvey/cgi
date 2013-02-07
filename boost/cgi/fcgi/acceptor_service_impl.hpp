@@ -155,12 +155,12 @@ BOOST_CGI_NAMESPACE_BEGIN
        acceptor_service_.destroy(impl.acceptor_);
      }
 
-#if BOOST_VERSION <= 104800
      void shutdown_service()
      {
+#if BOOST_VERSION < 104800
        acceptor_service_.shutdown_service();
-     }
 #endif
+     }
 
      /// Check if the given implementation is open.
      bool is_open(implementation_type& impl)
@@ -366,7 +366,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      boost::system::error_code
        close(implementation_type& impl, boost::system::error_code& ec)
      {
-       return boost::system::error_code(348, boost::system::system_category);
+       return boost::system::error_code(348, boost::system::system_category());
      }
 
      typename implementation_type::endpoint_type
