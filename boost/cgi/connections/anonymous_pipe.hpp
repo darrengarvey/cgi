@@ -110,7 +110,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       else
         ec = boost::system::error_code(
                 ::GetLastError(), 
-#if BOOST_VERSION > 104800
+#if BOOST_VERSION < 104400
                 boost::system::system_category);
 #else
                 boost::system::system_category());
@@ -147,7 +147,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       else
         ec = boost::system::error_code(
                 ::GetLastError(),
-#if BOOST_VERSION > 104800
+#if BOOST_VERSION < 104400
                 boost::system::system_category);
 #else
                 boost::system::system_category());
