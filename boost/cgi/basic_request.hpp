@@ -290,10 +290,10 @@ BOOST_CGI_NAMESPACE_BEGIN
           post.set(post_vars(this->implementation.vars_));
           uploads.set(upload_vars(this->implementation.vars_));
         }
-        if (parse_opts & parse_cookies) {
+        if ((parse_opts & parse_cookies) == parse_cookies) {
           cookies.set(cookie_vars(this->implementation.vars_));
         }
-        if (parse_opts & parse_form_only)
+        if ((parse_opts & parse_form_only) == parse_form_only)
         {
           common::name rm(request_method().c_str());
           form.set(rm == "POST" ? post.impl() : get.impl());
