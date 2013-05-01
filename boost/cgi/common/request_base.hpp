@@ -261,7 +261,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Close the request.
     template<typename ImplType>
     int close(ImplType& impl
-      , http::status_code& hsc = http::ok
+      , const http::status_code& hsc = http::ok
       , int program_status = 0)
     {
       status(closed);

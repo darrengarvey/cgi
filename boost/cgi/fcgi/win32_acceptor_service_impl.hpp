@@ -67,7 +67,11 @@ BOOST_CGI_NAMESPACE_BEGIN
         ::ZeroMemory(&overlapped, sizeof(overlapped)); 
         overlapped.hEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL); 
         if (!overlapped.hEvent) 
+#if BOOST_VERSION < 104400
             ec = boost::system::error_code(::GetLastError(), boost::system::system_category); 
+#else
+            ec = boost::system::error_code(::GetLastError(), boost::system::system_category()); 
+#endif
         if (! ::ConnectNamedPipe(listen_handle, &overlapped)) 
         { 
           switch(::GetLastError())
@@ -76,7 +80,11 @@ BOOST_CGI_NAMESPACE_BEGIN
             if (::WaitForSingleObject(overlapped.hEvent, INFINITE) == WAIT_FAILED) 
             { 
               ::CloseHandle(overlapped.hEvent); 
+#if BOOST_VERSION < 104400
               ec = boost::system::error_code(::GetLastError(), boost::system::system_category); 
+#else
+              ec = boost::system::error_code(::GetLastError(), boost::system::system_category()); 
+#endif
             } 
             break;
           case ERROR_PIPE_CONNECTED:
@@ -84,7 +92,11 @@ BOOST_CGI_NAMESPACE_BEGIN
             break;
           default:
             ::CloseHandle(overlapped.hEvent); 
+#if BOOST_VERSION < 104400
             ec = boost::system::error_code(::GetLastError(), boost::system::system_category); 
+#else
+            ec = boost::system::error_code(::GetLastError(), boost::system::system_category()); 
+#endif
           }
         }
         ::CloseHandle(overlapped.hEvent);
@@ -240,10 +252,9 @@ BOOST_CGI_NAMESPACE_BEGIN
        acceptor_service_.destroy(impl.acceptor_);
      }
 
-#if BOOST_VERSION <= 104800
+#if BOOST_VERSION >= 104700
      void shutdown_service()
      {
-       acceptor_service_.shutdown_service();
      }
 #endif
 
@@ -443,7 +454,11 @@ BOOST_CGI_NAMESPACE_BEGIN
      boost::system::error_code
        close(implementation_type& impl, boost::system::error_code& ec)
      {
+#if BOOST_VERSION < 104400
        return boost::system::error_code(348, boost::system::system_category);
+#else
+       return boost::system::error_code(348, boost::system::system_category());
+#endif
      }
 
      typename implementation_type::endpoint_type

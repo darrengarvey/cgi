@@ -38,8 +38,10 @@ BOOST_CGI_NAMESPACE_BEGIN
       if (ctx.content_type.find(
          "multipart/form-data") != string_type::npos)
         parse_multipart_form(ec);
-      else
-        return ec = common::error::invalid_form_type;
+
+      // NOTE: The following code prevented POST method execution for other valid mime types. (http://www.iana.org/assignments/media-types)
+      //else
+      //  return ec = common::error::invalid_form_type;
 
       return ec;
     }

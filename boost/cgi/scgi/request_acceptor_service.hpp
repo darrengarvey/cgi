@@ -112,7 +112,7 @@ BOOST_CGI_NAMESPACE_BEGIN
        acceptor_service_.destroy(impl.acceptor_);
      }
 
-#if BOOST_VERSION <= 104800
+#if BOOST_VERSION >= 104700
      void shutdown_service()
      {
        acceptor_service_.shutdown_service();
@@ -122,7 +122,11 @@ BOOST_CGI_NAMESPACE_BEGIN
      boost::system::error_code
      default_init(implementation_type& impl, boost::system::error_code& ec)
      {
+#if BOOST_VERSION < 104400
        ec = boost::system::error_code(829, boost::system::system_category);
+#else
+       ec = boost::system::error_code(829, boost::system::system_category());
+#endif
        return ec;
      }
 
@@ -284,7 +288,11 @@ BOOST_CGI_NAMESPACE_BEGIN
      boost::system::error_code
        close(implementation_type& impl, boost::system::error_code& ec)
      {
+#if BOOST_VERSION < 104400
        return boost::system::error_code(348, boost::system::system_category);
+#else
+       return boost::system::error_code(348, boost::system::system_category());
+#endif
      }
 
      typename implementation_type::endpoint_type
