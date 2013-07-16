@@ -105,7 +105,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       DWORD bytesRead;
       int ret = -1;
 
-      if (::ReadFile(file_handle, buf, len, &bytesRead, NULL))
+      if (::ReadFile(file_handle, buf, DWORD(len), &bytesRead, NULL))
         ret = bytesRead;
       else
         ec = boost::system::error_code(
@@ -142,7 +142,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       DWORD bytesWritten;
       int ret = -1;
 
-      if (::WriteFile(file_handle, buf, len, &bytesWritten, NULL))
+      if (::WriteFile(file_handle, buf, DWORD(len), &bytesWritten, NULL))
         ret = bytesWritten;
       else
         ec = boost::system::error_code(

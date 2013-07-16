@@ -124,7 +124,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     outbuf_.clear();
     outbuf_.push_back(boost::asio::buffer(header_.data()));
 
-    int total_buffer_size(0);
+    std::size_t total_buffer_size(0);
     for(; iter != end; ++iter)
     {
       boost::asio::const_buffer buffer(*iter);

@@ -128,15 +128,15 @@ BOOST_CGI_NAMESPACE_BEGIN
           , sizeof(impl));
       }
 
-      void reset(request_types t, int id, int len)
+      void reset(request_types t, int id, std::size_t len)
       {
         impl.version_         = (VERSION_NUM);
-        impl.type_            = ((unsigned char)t);
-        impl.requestIdB1_     = ((unsigned char)(id  >> 8) & 0xff);
-        impl.requestIdB0_     = ((unsigned char)(id      ) & 0xff);
-        impl.contentLengthB1_ = ((unsigned char)(len >> 8) & 0xff);
-        impl.contentLengthB0_ = ((unsigned char)(len     ) & 0xff);
-        impl.paddingLength_   = ((unsigned char)0);
+        impl.type_            = unsigned char(t);
+        impl.requestIdB1_     = unsigned char((id  >> 8) & 0xff);
+        impl.requestIdB0_     = unsigned char((id      ) & 0xff);
+        impl.contentLengthB1_ = unsigned char((boost::int32_t(len) >> 8) & 0xff);
+        impl.contentLengthB0_ = unsigned char(boost::int32_t(len) & 0xff);
+        impl.paddingLength_   = unsigned char(0);
         impl.reserved_        = (0);
       }
 
