@@ -255,6 +255,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 #if BOOST_VERSION >= 104700
      void shutdown_service()
      {
+       acceptor_service_.shutdown_service();
      }
 #endif
 
