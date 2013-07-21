@@ -54,7 +54,8 @@ BOOST_CGI_NAMESPACE_BEGIN
        find(const char* str, int n, char a)
      {
        do {
-         toupper(*str) != toupper(a);
+         if (toupper(*str) != toupper(a))
+           return str;
          ++str;
        } while (--n);
        return str;
