@@ -325,8 +325,8 @@ BOOST_CGI_NAMESPACE_BEGIN
         
       if (request_method == "GET")
       {
-          if (common::request_base<Protocol>::parse_get_vars(impl, ec))
-          return ec;
+        if (common::request_base<Protocol>::parse_get_vars(impl, ec))
+          return;
       }
       else
       if (request_method == "POST" 
@@ -345,7 +345,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         }
         
         if (parse_post_vars(impl, ec))
-	      return ec;
+          return;
       }
       if (opts & common::parse_cookies_only)
           common::request_base<Protocol>::parse_cookie_vars(impl, ec);
