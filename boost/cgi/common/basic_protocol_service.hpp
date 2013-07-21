@@ -136,7 +136,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     friend typename traits::request_type;
 #else
     // GCC && GCC < 4.7
-    #if defined(__GNUC__) && defined(__GNUC_MINOR__) && ((__GNUC__ << 16) + __GNUC_MINOR__ < ((4) << 16) + (7))
+    #if defined(__GNUC__) && !defined(__clang__) && defined(__GNUC_MINOR__) && ((__GNUC__ << 16) + __GNUC_MINOR__ < ((4) << 16) + (7))
         friend class traits::request_type;
     #else
         friend typename traits::request_type;
