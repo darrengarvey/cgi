@@ -132,12 +132,11 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// A std::queue of the waiting (ie. not-being-handled) requests.
     queue_type request_queue_;
     
-//#if BOOST_WORKAROUND(BOOST_MSVC, BOOST_TESTED_AT(1400))
+#if BOOST_WORKAROUND(BOOST_MSVC, BOOST_TESTED_AT(1400))
     friend typename traits::request_type;//typename request_type;
-//#else
-  //  friend class traits::request_type;
-//#endif
-    //friend class request_type;
+#else
+    friend class traits::request_type;
+#endif
   };
 
  } // namespace common

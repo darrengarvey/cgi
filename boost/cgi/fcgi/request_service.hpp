@@ -102,11 +102,9 @@ BOOST_CGI_NAMESPACE_BEGIN
       );
     }
 
-#if BOOST_VERSION >= 104700
     void shutdown_service()
     {
     }
-#endif
 
     /// Close the request.
     int close(implementation_type& impl,

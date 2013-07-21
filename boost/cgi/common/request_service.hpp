@@ -64,12 +64,12 @@ BOOST_CGI_NAMESPACE_BEGIN
       service_impl_.destroy(impl);
     }
 
-#if BOOST_VERSION >= 104700
     void shutdown_service()
     {
+#if BOOST_VERSION < 104900
       service_impl_.shutdown_service();
-    }
 #endif
+    }
 
     impl_type null() const
     {

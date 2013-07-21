@@ -112,12 +112,12 @@ BOOST_CGI_NAMESPACE_BEGIN
        acceptor_service_.destroy(impl.acceptor_);
      }
 
-#if BOOST_VERSION >= 104700
      void shutdown_service()
      {
+#if BOOST_VERSION < 104900
        acceptor_service_.shutdown_service();
-     }
 #endif
+     }
 
      boost::system::error_code
      default_init(implementation_type& impl, boost::system::error_code& ec)

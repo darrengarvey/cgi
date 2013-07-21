@@ -252,12 +252,12 @@ BOOST_CGI_NAMESPACE_BEGIN
        acceptor_service_.destroy(impl.acceptor_);
      }
 
-#if BOOST_VERSION >= 104700
      void shutdown_service()
      {
+#if BOOST_VERSION < 104900
        acceptor_service_.shutdown_service();
-     }
 #endif
+     }
 
      /// Check if the given implementation is open.
      bool is_open(implementation_type& impl)
