@@ -1,7 +1,7 @@
 language: cpp
 compiler:
   - gcc
-#  - clang
+  - clang
 before_script:
   ### use the PPA ppa:ukplc-team/testing to get Boost 1.49 in Precise
   - sudo add-apt-repository ppa:ukplc-team/testing -y
@@ -13,4 +13,4 @@ before_script:
   - cd travis-build
   #- cmake -D CMAKE_VERBOSE_MAKEFILE=true -D CMAKE_BUILD_TYPE=Release ..
   - cmake -D CMAKE_BUILD_TYPE=Release ..
-script: make && pushd libs/cgi/test && echo "Tests expected to succeed:\n" && ./testcgi && echo "Tests expected to faild:\n" && (./testcgifailing || true) && popd
+script: make && pushd libs/cgi/test && echo "Tests expected to succeed:\n" && ./testcgi && echo "Tests expected to fail:\n" && (./testcgifailing || true) && popd
