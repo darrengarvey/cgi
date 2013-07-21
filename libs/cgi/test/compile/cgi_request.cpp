@@ -2,7 +2,7 @@
 
 int main()
 {
-  boost::cgi::request req;
+  boost::cgi::request req();
 
   return 0;
 }

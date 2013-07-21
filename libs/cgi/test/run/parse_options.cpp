@@ -1,6 +1,6 @@
 
 #include "boost/cgi/common/parse_options.hpp"
-#define BOOST_TEST_MODULE parse_options_test
+//#define BOOST_TEST_MODULE parse_options_test
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE( test_parse_options )
