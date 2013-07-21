@@ -132,7 +132,16 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// A std::queue of the waiting (ie. not-being-handled) requests.
     queue_type request_queue_;
     
+#if BOOST_WORKAROUND(BOOST_MSVC, BOOST_TESTED_AT(1400))
     friend typename traits::request_type;
+#else
+    // GCC && GCC < 4.7
+    #if defined(__GNUC__) && defined(__GNUC_MINOR__) && ((__GNUC__ << 16) + __GNUC_MINOR__ < ((4) << 16) + (7))
+        friend class traits::request_type;
+    #else
+        friend typename traits::request_type;
+    #endif
+#endif
   };
 
  } // namespace common
