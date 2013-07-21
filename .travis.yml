@@ -6,10 +6,11 @@ before_script:
   ### use the PPA ppa:ukplc-team/testing to get Boost 1.49 in Precise
   - sudo add-apt-repository ppa:ukplc-team/testing -y
   - sudo apt-get update -qq
-  - sudo apt-get install libboost1.49-dev libboost-chrono1.49-dev libboost-date-time1.49-dev libboost-filesystem1.49-dev libboost-iostreams1.49-dev libboost-locale1.49-dev libboost-program-options1.49-dev libboost-regex1.49-dev libboost-serialization1.49-dev libboost-signals1.49-dev libboost-system1.49-dev libboost-test1.49-dev libboost-thread1.49-dev libboost-timer1.49-dev -y -q
-  - ls -l /usr/lib/libboost*
+  - sudo apt-get install libboost1.49-dev libboost-chrono1.49-dev libboost-date-time1.49-dev libboost-filesystem1.49-dev libboost-iostreams1.49-dev libboost-locale1.49-dev libboost-program-options1.49-dev libboost-regex1.49-dev libboost-serialization1.49-dev libboost-signals1.49-dev libboost-system1.49-dev libboost-test1.49-dev libboost-thread1.49-dev libboost-timer1.49-dev -y -qq
+  #- ls -l /usr/lib/libboost*
   ### Generate Makefile using CMake
   - mkdir travis-build
   - cd travis-build
-  - cmake -D CMAKE_VERBOSE_MAKEFILE=true -D CMAKE_BUILD_TYPE=Release ..
+  #- cmake -D CMAKE_VERBOSE_MAKEFILE=true -D CMAKE_BUILD_TYPE=Release ..
+  - cmake -D CMAKE_BUILD_TYPE=Release ..
 script: make && pushd libs/cgi/test && echo "Tests expected to succeed:\n" && ./testcgi && echo "Tests expected to faild:\n" && (./testcgifailing || true) && popd
