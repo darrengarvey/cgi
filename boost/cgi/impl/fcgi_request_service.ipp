@@ -133,6 +133,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       impl.all_done_ = false;
       impl.client_.status_ = common::none_;
       impl.client_.request_id_ = -1;
+	  impl.id_ = 0;
     }
       
     /// Load the request to a point where it can be usefully used.
@@ -523,7 +524,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     BOOST_CGI_INLINE boost::system::error_code
     fcgi_request_service<Protocol>::process_abort_request(
         implementation_type& impl, boost::uint16_t id
-      , const unsigned char* buf, boost::uint32_t
+      , const unsigned char* buf, std::size_t len
       , boost::system::error_code& ec)
     {
       if (id == fcgi::spec::get_request_id(impl.header_buf_))
@@ -545,7 +546,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     BOOST_CGI_INLINE boost::system::error_code
     fcgi_request_service<Protocol>::process_params(
         implementation_type& impl, boost::uint16_t id
-      , const unsigned char* buf, boost::uint32_t len
+      , const unsigned char* buf, std::size_t len
       , boost::system::error_code& ec)
     {
       if (0 == len)
@@ -603,7 +604,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     BOOST_CGI_INLINE boost::system::error_code
     fcgi_request_service<Protocol>::process_stdin(
         implementation_type& impl, boost::uint16_t id
-      , const unsigned char* buf, boost::uint32_t len
+      , const unsigned char* buf,std::size_t len
       , boost::system::error_code& ec)
     {
       if (0 == len)
@@ -769,7 +770,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     BOOST_CGI_INLINE boost::system::error_code
     fcgi_request_service<Protocol>::process_begin_request(
         implementation_type& impl, boost::uint16_t id
-      , const unsigned char* buf, boost::uint32_t
+      , const unsigned char* buf, std::size_t len
       , boost::system::error_code& ec)
     {
       if (impl.client_.request_id_ == 0) // ie. hasn't been set yet.
