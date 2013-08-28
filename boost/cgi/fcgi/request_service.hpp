@@ -229,22 +229,22 @@ BOOST_CGI_NAMESPACE_BEGIN
     // **FIXME**    
     boost::system::error_code
       process_begin_request(implementation_type& impl, boost::uint16_t id
-                           , const unsigned char* buf, boost::uint32_t
+                           , const unsigned char* buf, std::size_t len
                            , boost::system::error_code& ec);
 
     boost::system::error_code
       process_abort_request(implementation_type& impl, boost::uint16_t id
-                           , const unsigned char* buf, boost::uint32_t
+                           , const unsigned char* buf, std::size_t len
                            , boost::system::error_code& ec);
 
     boost::system::error_code
       process_params(implementation_type& impl, boost::uint16_t id
-                    , const unsigned char* buf, boost::uint32_t len
+                    , const unsigned char* buf, std::size_t len
                     , boost::system::error_code& ec);
 
     boost::system::error_code
       process_stdin(implementation_type& impl, boost::uint16_t id
-                   , const unsigned char* buf, boost::uint32_t len
+                   , const unsigned char* buf, std::size_t len
                    , boost::system::error_code& ec);
 
     /// Parse the current header

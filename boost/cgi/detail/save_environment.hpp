@@ -54,7 +54,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      for(; env && *env; ++env)
      {
        int i=0;
-       int j=strlen(*env);
+       int j=int(strlen(*env));
        for(; i < j; ++i)
          if ((*env)[i] == '=')
            break;
