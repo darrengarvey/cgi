@@ -101,7 +101,6 @@ BOOST_CGI_NAMESPACE_BEGIN
        std::queue<boost::shared_ptr<request_type> >  waiting_requests_;
        std::set<request_ptr>                         running_requests_;
        protocol_service_type*                        service_;
-       unsigned short                                port_num_;
        endpoint_type                                 endpoint_;
        
      };

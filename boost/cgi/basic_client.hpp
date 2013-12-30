@@ -16,7 +16,7 @@
 #include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/common/request_status.hpp"
 #if defined(BOOST_WINDOWS)
-#  include "boost/cgi/connections/anonymous_pipe.hpp"
+#  include "boost/cgi/fcgi/win32_connection.hpp"
 #else
 #  include "boost/cgi/connections/tcp_socket.hpp"
 #endif // defined(BOOST_WINDOWS)

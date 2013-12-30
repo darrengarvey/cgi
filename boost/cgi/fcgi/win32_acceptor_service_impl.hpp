@@ -25,6 +25,7 @@
 #include "boost/cgi/common/protocol_traits.hpp"
 #include "boost/cgi/fcgi/error.hpp"
 #include "boost/cgi/fcgi/request.hpp"
+#include "boost/cgi/fcgi/transport_selection.hpp"
 #include "boost/cgi/import/io_service.hpp"
 #include "boost/cgi/detail/throw_error.hpp"
 #include "boost/cgi/detail/service_base.hpp"
@@ -58,10 +59,51 @@ BOOST_CGI_NAMESPACE_BEGIN
        Handler handler;
      };
 
+     inline bool default_init_pipe(HANDLE &listen_handle, boost::system::error_code &ec)
+     {
+       bool is_cgi = false;
+
+
+       if((::GetStdHandle(STD_OUTPUT_HANDLE) == INVALID_HANDLE_VALUE) &&
+          (::GetStdHandle(STD_ERROR_HANDLE)  == INVALID_HANDLE_VALUE) &&
+          (::GetStdHandle(STD_INPUT_HANDLE)  != INVALID_HANDLE_VALUE) )
+       {
+         DWORD pipe_mode = PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT;
+         HANDLE stdin_handle = ::GetStdHandle(STD_INPUT_HANDLE);
+
+         if (!::DuplicateHandle(::GetCurrentProcess(), stdin_handle,
+                                ::GetCurrentProcess(), &listen_handle,
+                                0, TRUE, DUPLICATE_SAME_ACCESS))
+           ec = fcgi::error::unable_to_duplicate_handle;
+         else
+         if (!::SetStdHandle(STD_INPUT_HANDLE, listen_handle))
+           ec = fcgi::error::failed_to_redirect_stdin;
+         else
+         {
+           ::CloseHandle(stdin_handle);
+           if (::SetNamedPipeHandleState(listen_handle, &pipe_mode, NULL, NULL))
+           {
+             // Synchronous pipe.
+             is_cgi = false;
+           }
+           else
+           {
+             // error, a TCP socket is being used, which isn't supported
+             // on Windows for now.
+             is_cgi = false;
+             ec = fcgi::error::unsupported_handle_type;
+           }
+         }
+       }
+       else
+         is_cgi = true;
+
+       return is_cgi;
+    }
      
     template<typename Pipe>
     boost::system::error_code
-      accept_named_pipe(HANDLE& listen_handle, Pipe& pipe, boost::system::error_code& ec)
+    accept_named_pipe(HANDLE& listen_handle, Pipe& pipe, boost::system::error_code& ec)
     {
         OVERLAPPED overlapped;
         ::ZeroMemory(&overlapped, sizeof(overlapped)); 
@@ -101,14 +143,12 @@ BOOST_CGI_NAMESPACE_BEGIN
         }
         ::CloseHandle(overlapped.hEvent);
 
-        pipe.file_handle = listen_handle;
+        pipe.pipe_->file_handle = listen_handle;
         if (!pipe.is_open()) 
           ::DisconnectNamedPipe(listen_handle);
 
       return ec;
     }
-
-
    } // namespace detail
 
   namespace fcgi {
@@ -166,16 +206,15 @@ BOOST_CGI_NAMESPACE_BEGIN
        std::queue<boost::shared_ptr<request_type> >  waiting_requests_;
        std::set<request_ptr>                         running_requests_;
        protocol_service_type*                        service_;
-       unsigned short                                port_num_;
        endpoint_type                                 endpoint_;
-       
      };
 
      explicit win32_acceptor_service_impl(::BOOST_CGI_NAMESPACE::common::io_service& ios)
        : detail::service_base< ::BOOST_CGI_NAMESPACE::fcgi::win32_acceptor_service_impl<Protocol> >(ios)
        , acceptor_service_(boost::asio::use_service<acceptor_service_type>(ios))
        , strand_(ios)
-       , listen_handle(INVALID_HANDLE_VALUE)
+       , transport_(detail::transport_type())
+       , listen_handle_(INVALID_HANDLE_VALUE)
        , is_cgi_(false)
      {
      }
@@ -190,41 +229,11 @@ BOOST_CGI_NAMESPACE_BEGIN
      boost::system::error_code
        default_init(implementation_type& impl, boost::system::error_code& ec)
      {
-       //
-       if((::GetStdHandle(STD_OUTPUT_HANDLE) == INVALID_HANDLE_VALUE) &&
-          (::GetStdHandle(STD_ERROR_HANDLE)  == INVALID_HANDLE_VALUE) &&
-          (::GetStdHandle(STD_INPUT_HANDLE)  != INVALID_HANDLE_VALUE) )
-       {
-         DWORD pipe_mode = PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT;
-         HANDLE stdin_handle = ::GetStdHandle(STD_INPUT_HANDLE);
-
-         if (!::DuplicateHandle(::GetCurrentProcess(), stdin_handle,
-                                ::GetCurrentProcess(), &listen_handle,
-                                0, TRUE, DUPLICATE_SAME_ACCESS))
-           ec = error::unable_to_duplicate_handle;
+         if (transport_ == detail::transport::pipe)
+           is_cgi_ = detail::default_init_pipe(listen_handle_, ec);
          else
-         if (!::SetStdHandle(STD_INPUT_HANDLE, listen_handle))
-           ec = error::failed_to_redirect_stdin;
-         else
-         {
-           ::CloseHandle(stdin_handle);
-           if (::SetNamedPipeHandleState(listen_handle, &pipe_mode, NULL, NULL))
-           {
-             // Synchronous pipe.
-             is_cgi_ = false;
-           }
-           else
-           {
-             // error, a TCP socket is being used, which isn't supported
-             // on Windows for now.
-             is_cgi_ = false;
-             ec = error::unsupported_handle_type;
-           }
-         }
-       }
-       else
-         is_cgi_ = true;
-
+           acceptor_service_.assign(impl.acceptor_, boost::asio::ip::tcp::v4(), 0, ec);
+      
        return ec;
      }
 
@@ -234,10 +243,9 @@ BOOST_CGI_NAMESPACE_BEGIN
        impl.protocol_service_ = &ps;
      }
 
-     protocol_service_type&
-       get_protocol_service(implementation_type& impl)
+     protocol_service_type& get_protocol_service(implementation_type& impl)
      {
-       BOOST_CGI_ASSERT(impl.service_ != NULL);
+       BOOST_ASSERT(impl.service_ != NULL);
        return *impl.service_;
      }
 
@@ -255,13 +263,18 @@ BOOST_CGI_NAMESPACE_BEGIN
 #if BOOST_VERSION >= 104700
      void shutdown_service()
      {
+       //if (transport_ == detail::transport::socket)
+       //  acceptor_service_.shutdown_service();
      }
 #endif
 
      /// Check if the given implementation is open.
      bool is_open(implementation_type& impl)
      {
-       return listen_handle != INVALID_HANDLE_VALUE;
+       if (transport_ == detail::transport::pipe)
+         return listen_handle_ != INVALID_HANDLE_VALUE;
+       else // transport_ == detail::transport::socket
+         acceptor_service_.is_open(impl.acceptor_);
      }
 
      /// Open a new *socket* acceptor implementation.
@@ -314,6 +327,7 @@ BOOST_CGI_NAMESPACE_BEGIN
          new_request = impl.waiting_requests_.front();
          impl.waiting_requests_.pop();
        }
+       new_request->async_requests(48); // **FIXME**  hardcoded is not good!
        
        impl.running_requests_.insert(new_request);
        
@@ -322,22 +336,40 @@ BOOST_CGI_NAMESPACE_BEGIN
        if (!new_request->is_open() && !new_request->client().keep_connection())
        {
          // ...otherwise accept a new connection.
-         boost::system::error_code ec;
-         detail::accept_named_pipe(listen_handle, *new_request->client().connection(), ec);
-         if (!ec)
-           strand_.post(
-             boost::bind(&self_type::handle_accept
-               , this, boost::ref(impl), new_request, handler, ec
-             )
-         );
+         if (transport_ == detail::transport::pipe)
+         {
+            boost::system::error_code ec;
+            detail::accept_named_pipe(listen_handle_, *new_request->client().connection(), ec);
+            if (!ec)
+              strand_.post(boost::bind(&self_type::handle_accept, this, boost::ref(impl), new_request, handler, ec));
+         }
+         else // transport_ == detail::transport::socket
+         {
+           acceptor_service_.async_accept(
+             impl.acceptor_, 
+             new_request->client().connection()->next_layer(),
+             0, 
+             strand_.wrap(boost::bind(&self_type::handle_accept, this, boost::ref(impl), new_request, handler, _1))
+           );
+         }
        }
        else
        {
-         strand_.post(
-           boost::bind(&self_type::handle_accept
-               , this, boost::ref(impl), new_request, handler, boost::system::error_code()
-             )
-           );
+         if (transport_ == detail::transport::pipe)
+         {
+           strand_.post(boost::bind(&self_type::handle_accept, this, boost::ref(impl), new_request, handler, boost::system::error_code()));
+         }
+         else // transport_ == detail::transport::socket
+         {
+           impl.service_->post(strand_.wrap(boost::bind(
+             &self_type::handle_accept, 
+             this, 
+             boost::ref(impl), 
+             new_request, 
+             handler, 
+             boost::system::error_code()
+           )));
+         }
        }
      }
 
@@ -396,9 +428,13 @@ BOOST_CGI_NAMESPACE_BEGIN
          if (!new_request->client().keep_connection())
          {
            // ...otherwise accept a new connection.
-           detail::accept_named_pipe(listen_handle, *new_request->client().connection(), ec);
+           if (transport_ == detail::transport::pipe)
+             detail::accept_named_pipe(listen_handle_, *new_request->client().connection(), ec);
+           else // transport_ == detail::transport::socket
+             boost::asio::connect(new_request->client().connection()->next_layer(), endpoint, ec);
          }
        }
+       new_request->async_requests(1);
        new_request->status(common::accepted);
        int status = handler(*new_request);
        
@@ -431,8 +467,13 @@ BOOST_CGI_NAMESPACE_BEGIN
        }
 
        // If we can reuse this request's connection, return.
-       if (!request.client().keep_connection())
-         detail::accept_named_pipe(listen_handle, *request.client().connection(), ec);
+       if (request.client().keep_connection())
+         return ec;
+
+       if (transport_ == detail::transport::pipe)
+         detail::accept_named_pipe(listen_handle_, *request.client().connection(), ec);
+       else // transport_ == detail::transport::socket
+           boost::asio::connect( request.client().connection()->next_layer(), endpoint, ec);
 
        if (!ec)
          request.status(common::accepted);
@@ -442,12 +483,13 @@ BOOST_CGI_NAMESPACE_BEGIN
      /// Asynchronously accepts one request.
      template<typename Handler>
      void async_accept(implementation_type& impl
-					  , typename implementation_type::request_type& request
+                      , typename implementation_type::request_type& request
                       , Handler handler)
      {
-       strand_.post(
-         detail::accept_handler<self_type, Handler>(*this, impl, request, handler)
-       );
+       if (transport_ == detail::transport::pipe)
+         strand_.post(detail::accept_handler<self_type, Handler>(*this, impl, request, handler));
+       else // transport_ == detail::transport::socket
+         this->io_service().post(detail::accept_handler<self_type, Handler>(*this, impl, request, handler));
      }
 
      /// Close the acceptor (not implemented yet).
@@ -476,7 +518,17 @@ BOOST_CGI_NAMESPACE_BEGIN
      bool
      is_cgi(implementation_type& impl)
      {
-       return is_cgi_;
+       if (transport_ == detail::transport::pipe)
+       {
+         return is_cgi_;
+       }
+       else // transport_ == detail::transport::socket
+       {
+         boost::system::error_code ec;
+         socklen_t len(static_cast<socklen_t>(local_endpoint(impl,ec).capacity()));
+         int check (getpeername(native(impl), local_endpoint(impl,ec).data(), &len));
+         return ( check == SOCKET_ERROR && WSAGetLastError() == WSAENOTCONN ) ? false : true;
+       }
      }
 
    public:
@@ -496,15 +548,22 @@ BOOST_CGI_NAMESPACE_BEGIN
          request.clear();
        }
 
-       boost::system::error_code ec;
        // If we can reuse this request's connection, return.
        if (request.client().keep_connection())
-         return handler(ec);
+         return handler(boost::system::error_code());
 
        // ...otherwise accept a new connection.
+       if (transport_ == detail::transport::pipe)
+       {
+         boost::system::error_code ec;
+         detail::accept_named_pipe(listen_handle_, *request.client().connection(), ec);
+         strand_.post(handler);
+       }
+       else // transport_ == detail::transport::socket
+       {
+           acceptor_service_.async_accept(impl.acceptor_, request.client().connection()->next_layer(), 0, handler);
+       }
 
-       detail::accept_named_pipe(listen_handle, *request.client().connection(), ec);
-       strand_.post(handler);
        return 0;
      }
 
@@ -512,7 +571,8 @@ BOOST_CGI_NAMESPACE_BEGIN
      /// The underlying socket acceptor service.
      acceptor_service_type&          acceptor_service_;
      boost::asio::io_service::strand strand_;
-     HANDLE listen_handle;
+     detail::transport::type transport_;
+     HANDLE listen_handle_;
      bool is_cgi_;
    };
 

@@ -9,10 +9,13 @@
 #ifndef CGI_FCGI_REQUEST_SERVICE_IPP_INCLUDED__
 #define CGI_FCGI_REQUEST_SERVICE_IPP_INCLUDED__
 
+#include <vector>
+
 #include <boost/fusion/support.hpp>
 #include <boost/fusion/include/algorithm.hpp>
-#include <boost/system/error_code.hpp>
 #include <boost/fusion/include/vector.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/system/error_code.hpp>
 ////////////////////////////////////////////////////////////////
 #include "boost/cgi/fcgi/error.hpp"
 #include "boost/cgi/fcgi/client.hpp"
@@ -34,6 +37,31 @@
 BOOST_CGI_NAMESPACE_BEGIN
 
    namespace detail {
+
+     /// Helper function to determine the fcgi param length of a parameter (for get values request).
+     template <class String>
+     std::string param_length(String const &str) {
+       std::string result;
+       boost::uint32_t length = boost::uint32_t(str.size());
+       if (length < 128)
+       {
+         unsigned char c(length & 0x0000007F);
+         result += reinterpret_cast<char const&>(c);
+       }
+       else
+       {
+         unsigned char c(((length & 0xFF000000) >> 24) | 0x80);
+         result += reinterpret_cast<char const&>(c);
+         c = ((length & 0x00FF0000) >> 16);
+         result += reinterpret_cast<char const&>(c);
+         c = ((length & 0x0000FF00) >> 8);
+         result += reinterpret_cast<char const&>(c);
+         c = (length & 0x000000FF);
+         result += reinterpret_cast<char const&>(c);
+       }
+
+       return result;
+     }
      
      /// Helper class to asynchronously load a request.
      /**
@@ -163,7 +191,7 @@ BOOST_CGI_NAMESPACE_BEGIN
           break;
         int id(spec::get_request_id(impl.header_buf_));
         if (id == spec::null_request_id::value)
-          handle_admin_request(impl);
+          ec = handle_admin_request(impl, ec);
         else
         if (impl.id_ && impl.id_ != id)
         {
@@ -502,13 +530,18 @@ BOOST_CGI_NAMESPACE_BEGIN
     /*** Various handlers go below here; they might find a
      * better place to live ***/
 
-    // **FIXME**
     template<typename Protocol>
-    BOOST_CGI_INLINE void
-    fcgi_request_service<Protocol>::handle_admin_request(implementation_type& /* impl */)
+    BOOST_CGI_INLINE boost::system::error_code
+    fcgi_request_service<Protocol>::handle_admin_request(implementation_type& impl, boost::system::error_code& ec)
     {
-      //std::cerr<< std::endl << "**FIXME** " << __FILE__ << ":" << __LINE__ 
-      //  << " handle_admin_request()" << std::endl;
+      switch(fcgi::spec::get_type(impl.header_buf_))
+      {
+      case 9: process_get_values(impl, fcgi::spec::get_request_id(impl.header_buf_), ec);
+              break;
+      default: break;
+      }
+
+      return ec;
     }
 
     // **FIXME**
@@ -542,7 +575,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       return ec;
     }
 
-	template<typename Protocol>
+    template<typename Protocol>
     BOOST_CGI_INLINE boost::system::error_code
     fcgi_request_service<Protocol>::process_params(
         implementation_type& impl, boost::uint16_t id
@@ -649,6 +682,45 @@ BOOST_CGI_NAMESPACE_BEGIN
       default:
         return true;
       }
+    }
+
+	template<typename Protocol>
+    BOOST_CGI_INLINE boost::system::error_code
+    fcgi_request_service<Protocol>::process_get_values(
+        implementation_type& impl, boost::uint16_t id, boost::system::error_code& ec)
+    {
+      using namespace spec_detail;
+      env_map vals;
+      vals["FCGI_MAX_CONNS"] = "1";
+      vals["FCGI_MPXS_CONNS"] = (impl.async_requests_ != 0) ? "1" : "0";
+      vals["FCGI_MAX_REQS"] = boost::lexical_cast<std::string>(impl.async_requests_);
+
+      std::vector<char> valuesbuff;
+      std::for_each(std::begin(vals), std::end(vals), [&](std::pair<boost::cgi::common::name, std::string> const &pair)
+      {
+        std::string name_len = detail::param_length(pair.first);
+        std::string value_len = detail::param_length(pair.second);
+
+        std::copy(std::begin(name_len), std::end(name_len), std::back_inserter(valuesbuff));
+        std::copy(std::begin(value_len), std::end(value_len), std::back_inserter(valuesbuff));
+        std::copy(std::begin(pair.first), std::end(pair.first), std::back_inserter(valuesbuff));
+        std::copy(std::begin(pair.second), std::end(pair.second), std::back_inserter(valuesbuff));
+      });
+
+      std::vector<char> buffer;
+      Header hdr;
+      hdr.reset(GET_VALUES_RESULT, id, valuesbuff.size());
+      buffer.reserve(buffer.size() + sizeof(valuesbuff));
+      char const* beg = reinterpret_cast<char const*>(&hdr);
+      char const* end = beg + sizeof(hdr);
+      std::copy(beg, end, std::back_inserter(buffer));
+      std::copy(std::begin(valuesbuff), std::end(valuesbuff), std::back_inserter(buffer));
+
+      std::vector<boost::asio::const_buffer> buffers;
+      buffers.push_back(boost::asio::buffer(&(buffer.at(0)), buffer.size()));
+      boost::asio::write(impl.client_.connection()->next_layer(), buffers, ec);
+
+      return ec;
     }
 
 	template<typename Protocol>

@@ -638,6 +638,12 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       this->service.status(this->implementation, status);
     }
+
+    /// Sets the maximum number of async requests.
+    void async_requests(boost::uint16_t mr)
+    {
+      this->implementation.async_requests_ = mr;
+    }
    };
 
  } // namespace common

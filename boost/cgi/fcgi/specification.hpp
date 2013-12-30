@@ -9,6 +9,8 @@
 #ifndef CGI_FCGI_SPECIFICATION_HPP_INCLUDED__
 #define CGI_FCGI_SPECIFICATION_HPP_INCLUDED__
 
+#include <algorithm>
+
 #include <boost/mpl/int.hpp>
 #include <boost/array.hpp>
 #include <boost/cstdint.hpp>
@@ -193,10 +195,30 @@ BOOST_CGI_NAMESPACE_BEGIN
         return (impl.roleB1_ << 8 ) + impl.roleB0_;
       }
 
+      void role(uint16_t r)
+      {
+          impl.roleB1_ = unsigned char((r & 0xFF00) >> 8);
+          impl.roleB0_ = unsigned char(r & 0x00FF);
+          std::for_each(&impl.reserved_[0], &impl.reserved_[0] + 5, [](unsigned char &c)
+          {
+              c = 0;
+          });
+      }
+
       unsigned char flags() const
       {
         return impl.flags_;
       }
+
+      void flags(unsigned char f)
+      {
+          impl.flags_ = f;
+          std::for_each(&impl.reserved_[0], &impl.reserved_[0] + 5, [](unsigned char &c)
+          {
+              c = 0;
+          });
+      }
+
     };
 
     struct BeginRequestRecord

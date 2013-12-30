@@ -61,11 +61,13 @@ BOOST_CGI_NAMESPACE_BEGIN
 
       implementation_type()
         : id_(0)
+        , async_requests_(1)
         , request_role_(spec_detail::NONE)
       {
       }
 
       boost::uint16_t id_;
+      boost::uint16_t async_requests_;
 
       fcgi::spec_detail::role_types request_role_;
 
@@ -220,8 +222,8 @@ BOOST_CGI_NAMESPACE_BEGIN
     /*** Various handlers go below here; they might find a
      * better place to live ***/
 
-    // **FIXME**
-    void handle_admin_request(implementation_type& impl);
+    boost::system::error_code
+      handle_admin_request(implementation_type& impl, boost::system::error_code& ec);
 
     // **FIXME**
     void handle_other_request_header(implementation_type& impl);
@@ -246,6 +248,11 @@ BOOST_CGI_NAMESPACE_BEGIN
       process_stdin(implementation_type& impl, boost::uint16_t id
                    , const unsigned char* buf, std::size_t len
                    , boost::system::error_code& ec);
+
+    boost::system::error_code
+      process_get_values(implementation_type& impl, boost::uint16_t id
+                   , boost::system::error_code& ec);
+
 
     /// Parse the current header
     boost::tribool parse_header(implementation_type& impl);

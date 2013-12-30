@@ -45,14 +45,12 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     template<typename IoServiceProvider>
     explicit basic_request_acceptor(
-          common::basic_protocol_service<protocol_type, IoServiceProvider>& ps,
-          unsigned short port_num = 0)
+          common::basic_protocol_service<protocol_type, IoServiceProvider>& ps)
       : boost::asio::basic_io_object<service_type>(ps.get_io_service())
     {
       this->service.set_protocol_service(this->implementation, ps);
-      this->implementation.port_num_ = port_num;
       
-      if (!port_num)
+      if (detail::transport_type() == detail::transport::pipe)
       {
         boost::system::error_code ec;
         if (this->service.default_init(this->implementation, ec)) {
@@ -61,19 +59,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       }
       else
       {
-        boost::asio::ip::tcp::endpoint
-          endpoint(boost::asio::ip::tcp::v4(), port_num);
-        this->implementation.endpoint_ = endpoint;
-        // This strange-looking conditional checks there's no error at each
-        // stage of preparation.
-        boost::system::error_code ec;
-        if (
-           this->service.open(this->implementation, endpoint.protocol(), ec)
-        || this->service.bind(this->implementation, endpoint, ec)
-        || this->service.listen(this->implementation, 15, ec))
-        {
-          detail::throw_error(ec);
-        }
+        this->implementation.endpoint_ = detail::detect_endpoint();
       }
     }
 
@@ -85,16 +71,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       : boost::asio::basic_io_object<service_type>(ps.get_io_service())
     {
       this->service.set_protocol_service(this->implementation, ps);
-
-      // This strange-looking conditional checks there's no error at each
-      // stage of preparation.
-      boost::system::error_code ec;
-      if (this->service.open(this->implementation, endpoint.protocol(), ec)
-      ||  this->service.bind(this->implementation, endpoint, ec)
-      ||  this->service.listen(this->implementation, 15, ec))
-      {
-        detail::throw_error(ec);
-      }
+      this->implementation.endpoint_ = endpoint;
     }
 
     template<typename IoServiceProvider, typename InternetProtocol>
@@ -215,14 +192,14 @@ BOOST_CGI_NAMESPACE_BEGIN
     int accept(accept_handler_type handler)
     {
       boost::system::error_code ec;
-      int status = this->service.accept(this->implementation, handler, 0, ec);
+      int status = this->service.accept(this->implementation, handler, &this->implementation.endpoint_, ec);
       detail::throw_error(ec);
       return status;
     }
 
     int accept(accept_handler_type handler, boost::system::error_code& ec)
     {
-      return this->service.accept(this->implementation, handler, 0, ec);
+      return this->service.accept(this->implementation, handler, &this->implementation.endpoint_, ec);
     }
 
     void async_accept(accept_handler_type handler)
@@ -234,7 +211,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     void accept(CommonGatewayRequest& request)
     {
       boost::system::error_code ec;
-      this->service.accept(this->implementation, request, 0, ec);
+      this->service.accept(this->implementation, request, &this->implementation.endpoint_, ec);
       detail::throw_error(ec);
     }
 
@@ -243,7 +220,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     boost::system::error_code
       accept(CommonGatewayRequest& request, boost::system::error_code& ec)
     {
-      return this->service.accept(this->implementation, request, 0, ec);
+      return this->service.accept(this->implementation, request, &this->implementation.endpoint_, ec);
     }
 
     template<typename CommonGatewayRequest>

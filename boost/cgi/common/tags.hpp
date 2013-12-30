@@ -42,6 +42,8 @@ BOOST_CGI_NAMESPACE_BEGIN
     // A shareable tcp_socket (ie. one that can be locked)
     struct shareable_tcp_socket {};
     struct anonymous_pipe {};
+    struct fcgi_transport {};
+
 
   } // namespace tags
  } // namespace common

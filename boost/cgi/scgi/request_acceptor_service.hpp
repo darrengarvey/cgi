@@ -70,9 +70,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
        acceptor_impl_type                            acceptor_;
        protocol_service_type*                        protocol_service_;
-       unsigned short                                port_num_;
        endpoint_type                                 endpoint_;
-       
      };
 
      explicit scgi_request_acceptor_service(::BOOST_CGI_NAMESPACE::common::io_service& ios)
