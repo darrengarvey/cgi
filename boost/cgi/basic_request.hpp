@@ -255,7 +255,8 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       boost::system::error_code ec;
       load(parse_opts, ec, base_env);
-      detail::throw_error(ec);
+      if (ec != error::eof)
+        detail::throw_error(ec);
     }
 
     // Error-code semantics
@@ -640,10 +641,11 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     /// Sets the maximum number of async requests.
-    void async_requests(boost::uint16_t mr)
+    boost::uint16_t& async_requests()
     {
-      this->implementation.async_requests_ = mr;
+      return this->implementation.async_requests_;
     }
+
    };
 
  } // namespace common

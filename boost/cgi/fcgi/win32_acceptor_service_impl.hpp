@@ -101,9 +101,9 @@ BOOST_CGI_NAMESPACE_BEGIN
        return is_cgi;
     }
      
-    template<typename Pipe>
+    template<typename Connection>
     boost::system::error_code
-    accept_named_pipe(HANDLE& listen_handle, Pipe& pipe, boost::system::error_code& ec)
+    accept_named_pipe(HANDLE& listen_handle, Connection& connection, boost::system::error_code& ec)
     {
         OVERLAPPED overlapped;
         ::ZeroMemory(&overlapped, sizeof(overlapped)); 
@@ -129,9 +129,11 @@ BOOST_CGI_NAMESPACE_BEGIN
 #endif
             } 
             break;
+
           case ERROR_PIPE_CONNECTED:
             // ok, a valid connection.
             break;
+
           default:
             ::CloseHandle(overlapped.hEvent); 
 #if BOOST_VERSION < 104400
@@ -143,8 +145,8 @@ BOOST_CGI_NAMESPACE_BEGIN
         }
         ::CloseHandle(overlapped.hEvent);
 
-        pipe.pipe_->file_handle = listen_handle;
-        if (!pipe.is_open()) 
+        connection.pipe_->assign(listen_handle);
+        if (!connection.is_open()) 
           ::DisconnectNamedPipe(listen_handle);
 
       return ec;
@@ -207,6 +209,10 @@ BOOST_CGI_NAMESPACE_BEGIN
        std::set<request_ptr>                         running_requests_;
        protocol_service_type*                        service_;
        endpoint_type                                 endpoint_;
+       boost::uint16_t                               async_accepts_;
+       boost::system::error_code                     error_code_;
+
+       implementation_type() : async_accepts_(0) {}
      };
 
      explicit win32_acceptor_service_impl(::BOOST_CGI_NAMESPACE::common::io_service& ios)
@@ -233,7 +239,7 @@ BOOST_CGI_NAMESPACE_BEGIN
            is_cgi_ = detail::default_init_pipe(listen_handle_, ec);
          else
            acceptor_service_.assign(impl.acceptor_, boost::asio::ip::tcp::v4(), 0, ec);
-      
+
        return ec;
      }
 
@@ -327,8 +333,7 @@ BOOST_CGI_NAMESPACE_BEGIN
          new_request = impl.waiting_requests_.front();
          impl.waiting_requests_.pop();
        }
-       new_request->async_requests(48); // **FIXME**  hardcoded is not good!
-       
+       new_request->async_requests() = impl.async_accepts_;
        impl.running_requests_.insert(new_request);
        
        // The waiting request may be open if it is a multiplexed request.
@@ -345,12 +350,10 @@ BOOST_CGI_NAMESPACE_BEGIN
          }
          else // transport_ == detail::transport::socket
          {
-           acceptor_service_.async_accept(
-             impl.acceptor_, 
-             new_request->client().connection()->next_layer(),
-             0, 
-             strand_.wrap(boost::bind(&self_type::handle_accept, this, boost::ref(impl), new_request, handler, _1))
-           );
+           boost::system::error_code ec;
+           boost::asio::connect(*new_request->client().connection()->socket_, &impl.endpoint_, ec);
+           if (!ec)
+              strand_.post(boost::bind(&self_type::handle_accept, this, boost::ref(impl), new_request, handler, ec));
          }
        }
        else
@@ -362,13 +365,12 @@ BOOST_CGI_NAMESPACE_BEGIN
          else // transport_ == detail::transport::socket
          {
            impl.service_->post(strand_.wrap(boost::bind(
-             &self_type::handle_accept, 
-             this, 
-             boost::ref(impl), 
-             new_request, 
-             handler, 
-             boost::system::error_code()
-           )));
+             &self_type::handle_accept
+             , this
+             , boost::ref(impl)
+             , new_request
+             , handler
+             , boost::system::error_code())));
          }
        }
      }
@@ -378,14 +380,35 @@ BOOST_CGI_NAMESPACE_BEGIN
          accept_handler_type handler, const boost::system::error_code& ec
       )
      {
+       if (impl.error_code_)
+           return; // There is already an error, don't overwrite it.
+
+       if (ec)
+       {
+           impl.error_code_ = ec;
+           return;
+       }
+
        new_request->status(common::accepted);
        int status = handler(*new_request);
        impl.running_requests_.erase(impl.running_requests_.find(new_request));
-       if (new_request->is_open()) {
+       if (new_request->is_open())
          new_request->close(http::ok, status);
-       }
+
        new_request->clear();
        impl.waiting_requests_.push(new_request);
+
+       if (status != 0)
+       {
+         impl.error_code_ = boost::system::error_code(status, boost::system::generic_category());
+         return;
+       }
+ 
+       strand_.post(
+         boost::bind(&self_type::do_accept
+         , this
+         , boost::ref(impl)
+         , handler));
      }
 
      /// Accepts a request and runs the passed handler.
@@ -396,6 +419,7 @@ BOOST_CGI_NAMESPACE_BEGIN
          boost::bind(&self_type::do_accept,
              this, boost::ref(impl), handler)
          );
+       ++impl.async_accepts_;
      }
      
      int accept(implementation_type& impl, accept_handler_type handler
@@ -431,10 +455,10 @@ BOOST_CGI_NAMESPACE_BEGIN
            if (transport_ == detail::transport::pipe)
              detail::accept_named_pipe(listen_handle_, *new_request->client().connection(), ec);
            else // transport_ == detail::transport::socket
-             boost::asio::connect(new_request->client().connection()->next_layer(), endpoint, ec);
+             boost::asio::connect(*new_request->client().connection()->socket_, endpoint, ec);
          }
        }
-       new_request->async_requests(1);
+       new_request->async_requests() = 1;
        new_request->status(common::accepted);
        int status = handler(*new_request);
        
@@ -473,7 +497,7 @@ BOOST_CGI_NAMESPACE_BEGIN
        if (transport_ == detail::transport::pipe)
          detail::accept_named_pipe(listen_handle_, *request.client().connection(), ec);
        else // transport_ == detail::transport::socket
-           boost::asio::connect( request.client().connection()->next_layer(), endpoint, ec);
+           boost::asio::connect(*request.client().connection()->socket_, endpoint, ec);
 
        if (!ec)
          request.status(common::accepted);
@@ -561,7 +585,7 @@ BOOST_CGI_NAMESPACE_BEGIN
        }
        else // transport_ == detail::transport::socket
        {
-           acceptor_service_.async_accept(impl.acceptor_, request.client().connection()->next_layer(), 0, handler);
+           acceptor_service_.async_accept(impl.acceptor_, *request.client().connection()->socket_, impl.endpoint_, handler);
        }
 
        return 0;

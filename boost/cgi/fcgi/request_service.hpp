@@ -164,6 +164,11 @@ BOOST_CGI_NAMESPACE_BEGIN
         Handler handler, boost::system::error_code& ec
       );
 
+
+    void handle_read_header(
+        boost::system::error_code&
+      );
+
     template<typename Handler>
     void handle_read_header(
         implementation_type& impl, 
@@ -185,14 +190,11 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename Handler>
     void async_read_header(
         implementation_type& impl,
-        common::parse_options opts,
         Handler handler)
     {
       // clear the header first (might be unneccesary).
       impl.header_buf_ = implementation_type::header_buffer_type();
-
-      async_read(*impl.client_.connection(), buffer(impl.header_buf_)
-                , boost::asio::transfer_all(), handler);
+      async_read(*impl.client_.connection(), buffer(impl.header_buf_), handler);
     }
 
     template<typename Handler>

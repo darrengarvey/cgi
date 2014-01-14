@@ -226,7 +226,7 @@ BOOST_CGI_NAMESPACE_BEGIN
        {
          // ...otherwise accept a new connection.
          acceptor_service_.async_accept(impl.acceptor_,
-             new_request->client().connection()->next_layer(), 0,
+             *new_request->client().connection()->socket_, 0,
              strand_.wrap(
                boost::bind(&self_type::handle_accept
                 , this, boost::ref(impl), new_request, handler, _1
@@ -304,7 +304,7 @@ BOOST_CGI_NAMESPACE_BEGIN
          {
            // ...otherwise accept a new connection.
            ec = acceptor_service_.accept(impl.acceptor_,
-                    new_request->client().connection()->next_layer(), endpoint, ec);
+                    *new_request->client().connection()->socket_, endpoint, ec);
          }
        }
        new_request->status(common::accepted);
@@ -344,7 +344,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
        // ...otherwise accept a new connection.
        ec = acceptor_service_.accept(impl.acceptor_,
-                request.client().connection()->next_layer(), endpoint, ec);
+                *request.client().connection()->socket_, endpoint, ec);
        if (!ec)
          request.status(common::accepted);
        return ec;
@@ -426,7 +426,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
        // ...otherwise accept a new connection (asynchronously).
        acceptor_service_.async_accept(impl.acceptor_,
-         request.client().connection()->next_layer(), 0, handler);
+         *request.client().connection()->socket_, 0, handler);
        return 0;
      }
 

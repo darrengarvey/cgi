@@ -27,15 +27,18 @@ BOOST_CGI_NAMESPACE_BEGIN
   public:
     typedef basic_connection<tags::fcgi_transport> type;
     typedef boost::shared_ptr<type>                pointer;
-    typedef boost::asio::ip::tcp::socket           next_layer_type;
 
     basic_connection(io_service& ios)
       : transport_(detail::transport_type())
     {
       if (transport_ == detail::transport::pipe)
-        pipe_.reset(new basic_connection<tags::anonymous_pipe>(ios));
+#if BOOST_WINDOWS
+        pipe_.reset(new boost::asio::windows::stream_handle(ios));
+#else
+        pipe_.reset(new boost::asio::local::stream_protocol::socket(ios));
+#endif // BOOST_WINDOWS
       else // transport_ == detail::transport::socket
-        socket_.reset(new basic_connection<tags::shareable_tcp_socket>(ios));
+        socket_.reset(new boost::asio::ip::tcp::socket(ios));
     }
 
     bool is_open() const
@@ -115,14 +118,13 @@ BOOST_CGI_NAMESPACE_BEGIN
         socket_->async_write_some(buf, handler);
     }
 
-    next_layer_type& next_layer()
-    {
-      return socket_->next_layer();
-    }
-
   public:
-    boost::scoped_ptr<basic_connection<common::tags::anonymous_pipe>> pipe_;
-    boost::scoped_ptr<basic_connection<common::tags::shareable_tcp_socket>> socket_;
+#if BOOST_WINDOWS
+    boost::scoped_ptr<boost::asio::windows::stream_handle> pipe_;
+#else
+    boost::scoped_ptr<boost::asio::local::stream_protocol::socket> pipe_;
+#endif // BOOST_WINDOWS
+    boost::scoped_ptr<boost::asio::ip::tcp::socket> socket_;
   private:
 
     detail::transport::type transport_;

@@ -189,11 +189,13 @@ BOOST_CGI_NAMESPACE_BEGIN
       {
         if (read_header(impl, ec))
           break;
+
         int id(spec::get_request_id(impl.header_buf_));
         if (id == spec::null_request_id::value)
+        {
           ec = handle_admin_request(impl, ec);
-        else
-        if (impl.id_ && impl.id_ != id)
+        }
+        else if (impl.id_ && impl.id_ != id)
         {
           // The library doesn't support multiplexed connections yet,
           // mainly because I've never had access to a server that
@@ -202,9 +204,7 @@ BOOST_CGI_NAMESPACE_BEGIN
           // If you have one, can I use it?
           ec = error::multiplexing_not_supported;
         }
-        else
-        if (spec::get_type(impl.header_buf_) 
-            == spec::begin_request::value)
+        else if (spec::get_type(impl.header_buf_) == spec::begin_request::value)
         {
           impl.id_ = id;
           impl.client_.request_id_ = id;
@@ -216,31 +216,34 @@ BOOST_CGI_NAMESPACE_BEGIN
               = packet.flags() & spec::keep_connection;
             break;
           }
-        }else
+        }
+        else
+        {
           handle_other_request_header(impl);
-      }
-      
-      if (//impl.request_status_ < common::env_read &&
-          opts & common::parse_env)
-      {
-        read_env_vars(impl, ec);
-        //impl.request_status_ = common::env_read;
+        }
       }
 
-      string_type const&
-        request_method (env_vars(impl.vars_)["REQUEST_METHOD"]);
-        
+      if (ec)
+      {
+        impl.client_.close();
+        impl.client_.connection()->close();
+        impl.request_status_ = common::closed;
+        return ec;
+      }
+      
+      if (opts & common::parse_env)
+      {
+        read_env_vars(impl, ec);
+      }
+
+      string_type const &request_method = env_vars(impl.vars_)["REQUEST_METHOD"];
       if (request_method == "GET")
       {
         if (common::request_base<Protocol>::parse_get_vars(impl, ec))
           return ec;
       }
-      else
-      if (request_method == "POST" 
-          && opts & common::parse_post_only)
+      else if (request_method == "POST" && (opts & common::parse_post_only))
       {
-        //std::cerr<< "Parsing post vars now.\n";
-
         if (opts & common::parse_post_only)
         {
           while(!ec 
@@ -252,18 +255,11 @@ BOOST_CGI_NAMESPACE_BEGIN
         }
         
         if (parse_post_vars(impl, ec))
-	      return ec;
+          return ec;
       }
+     
       if (opts & common::parse_cookies_only)
           common::request_base<Protocol>::parse_cookie_vars(impl, "HTTP_COOKIE", ec);
-        
-      if (ec == error::eof) {
-        ec = boost::system::error_code();
-        return ec;
-      }
-      else if (ec) return ec;
-      
-      //bool check = impl.client_.is_open();
 
       return ec;
     }
@@ -300,7 +296,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       {
         int id(spec::get_request_id(impl.header_buf_));
         if (id == spec::null_request_id::value)
-          handle_admin_request(impl);
+          ec = handle_admin_request(impl, ec);
         else
         if (impl.id_ && impl.id_ != id)
         {
@@ -494,15 +490,24 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       // clear the header first (might be unneccesary).
       impl.header_buf_ = header_buffer_type();
+      get_io_service().poll();
 
-      if (8 != read(*impl.client_.connection(), buffer(impl.header_buf_)
-                   , boost::asio::transfer_all(), ec) || ec)
-        return ec;
+      async_read(*impl.client_.connection(), buffer(impl.header_buf_), [&](boost::system::error_code const &e, std::size_t bytes_transfered) -> void
+      {
+        ec = e;
+      });
+
+      while (impl.header_buf_ == header_buffer_type() && !ec)
+      {
+        get_io_service().run_one();
+        if (get_io_service().stopped())
+          ec = error::eof;
+      }
       
       return ec;
     }
 
-	template<typename Protocol>
+    template<typename Protocol>
     template<typename Handler>
     BOOST_CGI_INLINE void
     fcgi_request_service<Protocol>::async_read_header(
@@ -718,7 +723,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
       std::vector<boost::asio::const_buffer> buffers;
       buffers.push_back(boost::asio::buffer(&(buffer.at(0)), buffer.size()));
-      boost::asio::write(impl.client_.connection()->next_layer(), buffers, ec);
+      boost::asio::write(*impl.client_.connection()->socket_, buffers, ec);
 
       return ec;
     }
