@@ -33,7 +33,8 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       if (transport_ == detail::transport::pipe)
 #if BOOST_WINDOWS
-        pipe_.reset(new boost::asio::windows::stream_handle(ios));
+        // pipe_.reset(new boost::asio::windows::stream_handle(ios));
+        pipe_.reset(new basic_connection<tags::anonymous_pipe>(ios));
 #else
         pipe_.reset(new boost::asio::local::stream_protocol::socket(ios));
 #endif // BOOST_WINDOWS
@@ -120,7 +121,14 @@ BOOST_CGI_NAMESPACE_BEGIN
 
   public:
 #if BOOST_WINDOWS
-    boost::scoped_ptr<boost::asio::windows::stream_handle> pipe_;
+    // boost::scoped_ptr<boost::asio::windows::stream_handle> pipe_;
+    // NOTE: windows::stream_handle has the precondition that the handle was opened with FILE_FLAG_OVERLAPPED.
+    //       Apache's mod_fcgid (and others?) create the named pipe handle without this before passing it as
+    //       stdin.  Due to the way that windows pipe client/server semantics work it is impossiblet to upgrade
+    //       the handle access using ReOpenFile() since the result is ERROR_PIPE_BUSY ... indefinately due to
+    //       blocking nature of the current handle state...  in short, not compatible with windows::stream_handle.
+    boost::scoped_ptr<basic_connection<tags::anonymous_pipe>> pipe_;
+    
 #else
     boost::scoped_ptr<boost::asio::local::stream_protocol::socket> pipe_;
 #endif // BOOST_WINDOWS
