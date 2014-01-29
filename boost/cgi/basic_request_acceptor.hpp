@@ -49,17 +49,10 @@ BOOST_CGI_NAMESPACE_BEGIN
       : boost::asio::basic_io_object<service_type>(ps.get_io_service())
     {
       this->service.set_protocol_service(this->implementation, ps);
-      
-      if (detail::transport_type() == detail::transport::pipe)
-      {
-        boost::system::error_code ec;
-        if (this->service.default_init(this->implementation, ec)) {
-          detail::throw_error(ec);
-        }
-      }
-      else
-      {
-        this->implementation.endpoint_ = detail::detect_endpoint();
+
+      boost::system::error_code ec;
+      if (this->service.default_init(this->implementation, ec)) {
+        detail::throw_error(ec);
       }
     }
 
