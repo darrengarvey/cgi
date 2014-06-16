@@ -61,11 +61,13 @@ BOOST_CGI_NAMESPACE_BEGIN
 
       implementation_type()
         : id_(0)
+        , async_requests_(1)
         , request_role_(spec_detail::NONE)
       {
       }
 
       boost::uint16_t id_;
+      boost::uint16_t async_requests_;
 
       fcgi::spec_detail::role_types request_role_;
 
@@ -102,7 +104,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       );
     }
 
-#if BOOST_VERSION <= 104800
+#if BOOST_VERSION >= 104700
     void shutdown_service()
     {
     }
@@ -162,6 +164,11 @@ BOOST_CGI_NAMESPACE_BEGIN
         Handler handler, boost::system::error_code& ec
       );
 
+
+    void handle_read_header(
+        boost::system::error_code&
+      );
+
     template<typename Handler>
     void handle_read_header(
         implementation_type& impl, 
@@ -183,14 +190,11 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename Handler>
     void async_read_header(
         implementation_type& impl,
-        common::parse_options opts,
         Handler handler)
     {
       // clear the header first (might be unneccesary).
       impl.header_buf_ = implementation_type::header_buffer_type();
-
-      async_read(*impl.client_.connection(), buffer(impl.header_buf_)
-                , boost::asio::transfer_all(), handler);
+      async_read(*impl.client_.connection(), buffer(impl.header_buf_), handler);
     }
 
     template<typename Handler>
@@ -220,8 +224,8 @@ BOOST_CGI_NAMESPACE_BEGIN
     /*** Various handlers go below here; they might find a
      * better place to live ***/
 
-    // **FIXME**
-    void handle_admin_request(implementation_type& impl);
+    boost::system::error_code
+      handle_admin_request(implementation_type& impl, boost::system::error_code& ec);
 
     // **FIXME**
     void handle_other_request_header(implementation_type& impl);
@@ -229,23 +233,28 @@ BOOST_CGI_NAMESPACE_BEGIN
     // **FIXME**    
     boost::system::error_code
       process_begin_request(implementation_type& impl, boost::uint16_t id
-                           , const unsigned char* buf, boost::uint32_t
+                           , const unsigned char* buf, std::size_t len
                            , boost::system::error_code& ec);
 
     boost::system::error_code
       process_abort_request(implementation_type& impl, boost::uint16_t id
-                           , const unsigned char* buf, boost::uint32_t
+                           , const unsigned char* buf, std::size_t len
                            , boost::system::error_code& ec);
 
     boost::system::error_code
       process_params(implementation_type& impl, boost::uint16_t id
-                    , const unsigned char* buf, boost::uint32_t len
+                    , const unsigned char* buf, std::size_t len
                     , boost::system::error_code& ec);
 
     boost::system::error_code
       process_stdin(implementation_type& impl, boost::uint16_t id
-                   , const unsigned char* buf, boost::uint32_t len
+                   , const unsigned char* buf, std::size_t len
                    , boost::system::error_code& ec);
+
+    boost::system::error_code
+      process_get_values(implementation_type& impl, boost::uint16_t id
+                   , boost::system::error_code& ec);
+
 
     /// Parse the current header
     boost::tribool parse_header(implementation_type& impl);

@@ -9,10 +9,13 @@
 #ifndef CGI_FCGI_REQUEST_SERVICE_IPP_INCLUDED__
 #define CGI_FCGI_REQUEST_SERVICE_IPP_INCLUDED__
 
+#include <vector>
+
 #include <boost/fusion/support.hpp>
 #include <boost/fusion/include/algorithm.hpp>
-#include <boost/system/error_code.hpp>
 #include <boost/fusion/include/vector.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/system/error_code.hpp>
 ////////////////////////////////////////////////////////////////
 #include "boost/cgi/fcgi/error.hpp"
 #include "boost/cgi/fcgi/client.hpp"
@@ -34,6 +37,31 @@
 BOOST_CGI_NAMESPACE_BEGIN
 
    namespace detail {
+
+     /// Helper function to determine the fcgi param length of a parameter (for get values request).
+     template <class String>
+     std::string param_length(String const &str) {
+       std::string result;
+       boost::uint32_t length = boost::uint32_t(str.size());
+       if (length < 128)
+       {
+         unsigned char c(length & 0x0000007F);
+         result += reinterpret_cast<char const&>(c);
+       }
+       else
+       {
+         unsigned char c(((length & 0xFF000000) >> 24) | 0x80);
+         result += reinterpret_cast<char const&>(c);
+         c = ((length & 0x00FF0000) >> 16);
+         result += reinterpret_cast<char const&>(c);
+         c = ((length & 0x0000FF00) >> 8);
+         result += reinterpret_cast<char const&>(c);
+         c = (length & 0x000000FF);
+         result += reinterpret_cast<char const&>(c);
+       }
+
+       return result;
+     }
      
      /// Helper class to asynchronously load a request.
      /**
@@ -133,6 +161,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       impl.all_done_ = false;
       impl.client_.status_ = common::none_;
       impl.client_.request_id_ = -1;
+	  impl.id_ = 0;
     }
       
     /// Load the request to a point where it can be usefully used.
@@ -160,11 +189,13 @@ BOOST_CGI_NAMESPACE_BEGIN
       {
         if (read_header(impl, ec))
           break;
+
         int id(spec::get_request_id(impl.header_buf_));
         if (id == spec::null_request_id::value)
-          handle_admin_request(impl);
-        else
-        if (impl.id_ && impl.id_ != id)
+        {
+          ec = handle_admin_request(impl, ec);
+        }
+        else if (impl.id_ && impl.id_ != id)
         {
           // The library doesn't support multiplexed connections yet,
           // mainly because I've never had access to a server that
@@ -173,9 +204,7 @@ BOOST_CGI_NAMESPACE_BEGIN
           // If you have one, can I use it?
           ec = error::multiplexing_not_supported;
         }
-        else
-        if (spec::get_type(impl.header_buf_) 
-            == spec::begin_request::value)
+        else if (spec::get_type(impl.header_buf_) == spec::begin_request::value)
         {
           impl.id_ = id;
           impl.client_.request_id_ = id;
@@ -187,31 +216,34 @@ BOOST_CGI_NAMESPACE_BEGIN
               = packet.flags() & spec::keep_connection;
             break;
           }
-        }else
+        }
+        else
+        {
           handle_other_request_header(impl);
-      }
-      
-      if (//impl.request_status_ < common::env_read &&
-          opts & common::parse_env)
-      {
-        read_env_vars(impl, ec);
-        //impl.request_status_ = common::env_read;
+        }
       }
 
-      string_type const&
-        request_method (env_vars(impl.vars_)["REQUEST_METHOD"]);
-        
+      if (ec)
+      {
+        impl.client_.close();
+        impl.client_.connection()->close();
+        impl.request_status_ = common::closed;
+        return ec;
+      }
+      
+      if (opts & common::parse_env)
+      {
+        read_env_vars(impl, ec);
+      }
+
+      string_type const &request_method = env_vars(impl.vars_)["REQUEST_METHOD"];
       if (request_method == "GET")
       {
         if (common::request_base<Protocol>::parse_get_vars(impl, ec))
           return ec;
       }
-      else
-      if (request_method == "POST" 
-          && opts & common::parse_post_only)
+      else if (request_method == "POST" && (opts & common::parse_post_only))
       {
-        //std::cerr<< "Parsing post vars now.\n";
-
         if (opts & common::parse_post_only)
         {
           while(!ec 
@@ -223,18 +255,11 @@ BOOST_CGI_NAMESPACE_BEGIN
         }
         
         if (parse_post_vars(impl, ec))
-	      return ec;
+          return ec;
       }
+     
       if (opts & common::parse_cookies_only)
           common::request_base<Protocol>::parse_cookie_vars(impl, "HTTP_COOKIE", ec);
-        
-      if (ec == error::eof) {
-        ec = boost::system::error_code();
-        return ec;
-      }
-      else if (ec) return ec;
-      
-      //bool check = impl.client_.is_open();
 
       return ec;
     }
@@ -271,7 +296,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       {
         int id(spec::get_request_id(impl.header_buf_));
         if (id == spec::null_request_id::value)
-          handle_admin_request(impl);
+          ec = handle_admin_request(impl, ec);
         else
         if (impl.id_ && impl.id_ != id)
         {
@@ -465,15 +490,24 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       // clear the header first (might be unneccesary).
       impl.header_buf_ = header_buffer_type();
+      get_io_service().poll();
 
-      if (8 != read(*impl.client_.connection(), buffer(impl.header_buf_)
-                   , boost::asio::transfer_all(), ec) || ec)
-        return ec;
+      async_read(*impl.client_.connection(), buffer(impl.header_buf_), [&](boost::system::error_code const &e, std::size_t bytes_transfered) -> void
+      {
+        ec = e;
+      });
+
+      while (impl.header_buf_ == header_buffer_type() && !ec)
+      {
+        get_io_service().run_one();
+        if (get_io_service().stopped())
+          ec = error::eof;
+      }
       
       return ec;
     }
 
-	template<typename Protocol>
+    template<typename Protocol>
     template<typename Handler>
     BOOST_CGI_INLINE void
     fcgi_request_service<Protocol>::async_read_header(
@@ -501,13 +535,18 @@ BOOST_CGI_NAMESPACE_BEGIN
     /*** Various handlers go below here; they might find a
      * better place to live ***/
 
-    // **FIXME**
     template<typename Protocol>
-    BOOST_CGI_INLINE void
-    fcgi_request_service<Protocol>::handle_admin_request(implementation_type& /* impl */)
+    BOOST_CGI_INLINE boost::system::error_code
+    fcgi_request_service<Protocol>::handle_admin_request(implementation_type& impl, boost::system::error_code& ec)
     {
-      //std::cerr<< std::endl << "**FIXME** " << __FILE__ << ":" << __LINE__ 
-      //  << " handle_admin_request()" << std::endl;
+      switch(fcgi::spec::get_type(impl.header_buf_))
+      {
+      case 9: process_get_values(impl, fcgi::spec::get_request_id(impl.header_buf_), ec);
+              break;
+      default: break;
+      }
+
+      return ec;
     }
 
     // **FIXME**
@@ -523,7 +562,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     BOOST_CGI_INLINE boost::system::error_code
     fcgi_request_service<Protocol>::process_abort_request(
         implementation_type& impl, boost::uint16_t id
-      , const unsigned char* buf, boost::uint32_t
+      , const unsigned char* buf, std::size_t len
       , boost::system::error_code& ec)
     {
       if (id == fcgi::spec::get_request_id(impl.header_buf_))
@@ -541,11 +580,11 @@ BOOST_CGI_NAMESPACE_BEGIN
       return ec;
     }
 
-	template<typename Protocol>
+    template<typename Protocol>
     BOOST_CGI_INLINE boost::system::error_code
     fcgi_request_service<Protocol>::process_params(
         implementation_type& impl, boost::uint16_t id
-      , const unsigned char* buf, boost::uint32_t len
+      , const unsigned char* buf, std::size_t len
       , boost::system::error_code& ec)
     {
       if (0 == len)
@@ -603,7 +642,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     BOOST_CGI_INLINE boost::system::error_code
     fcgi_request_service<Protocol>::process_stdin(
         implementation_type& impl, boost::uint16_t id
-      , const unsigned char* buf, boost::uint32_t len
+      , const unsigned char* buf,std::size_t len
       , boost::system::error_code& ec)
     {
       if (0 == len)
@@ -648,6 +687,45 @@ BOOST_CGI_NAMESPACE_BEGIN
       default:
         return true;
       }
+    }
+
+	template<typename Protocol>
+    BOOST_CGI_INLINE boost::system::error_code
+    fcgi_request_service<Protocol>::process_get_values(
+        implementation_type& impl, boost::uint16_t id, boost::system::error_code& ec)
+    {
+      using namespace spec_detail;
+      env_map vals;
+      vals["FCGI_MAX_CONNS"] = "1";
+      vals["FCGI_MPXS_CONNS"] = (impl.async_requests_ != 0) ? "1" : "0";
+      vals["FCGI_MAX_REQS"] = boost::lexical_cast<std::string>(impl.async_requests_);
+
+      std::vector<char> valuesbuff;
+      std::for_each(std::begin(vals), std::end(vals), [&](std::pair<boost::cgi::common::name, std::string> const &pair)
+      {
+        std::string name_len = detail::param_length(pair.first);
+        std::string value_len = detail::param_length(pair.second);
+
+        std::copy(std::begin(name_len), std::end(name_len), std::back_inserter(valuesbuff));
+        std::copy(std::begin(value_len), std::end(value_len), std::back_inserter(valuesbuff));
+        std::copy(std::begin(pair.first), std::end(pair.first), std::back_inserter(valuesbuff));
+        std::copy(std::begin(pair.second), std::end(pair.second), std::back_inserter(valuesbuff));
+      });
+
+      std::vector<char> buffer;
+      Header hdr;
+      hdr.reset(GET_VALUES_RESULT, id, valuesbuff.size());
+      buffer.reserve(buffer.size() + sizeof(valuesbuff));
+      char const* beg = reinterpret_cast<char const*>(&hdr);
+      char const* end = beg + sizeof(hdr);
+      std::copy(beg, end, std::back_inserter(buffer));
+      std::copy(std::begin(valuesbuff), std::end(valuesbuff), std::back_inserter(buffer));
+
+      std::vector<boost::asio::const_buffer> buffers;
+      buffers.push_back(boost::asio::buffer(&(buffer.at(0)), buffer.size()));
+      boost::asio::write(*impl.client_.connection()->socket_, buffers, ec);
+
+      return ec;
     }
 
 	template<typename Protocol>
@@ -769,7 +847,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     BOOST_CGI_INLINE boost::system::error_code
     fcgi_request_service<Protocol>::process_begin_request(
         implementation_type& impl, boost::uint16_t id
-      , const unsigned char* buf, boost::uint32_t
+      , const unsigned char* buf, std::size_t len
       , boost::system::error_code& ec)
     {
       if (impl.client_.request_id_ == 0) // ie. hasn't been set yet.

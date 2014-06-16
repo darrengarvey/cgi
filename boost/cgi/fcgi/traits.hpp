@@ -17,6 +17,9 @@
 #include "boost/cgi/common/protocol_traits.hpp"
 #include "boost/cgi/common/role_type.hpp"
 #include "boost/cgi/common/tags.hpp"
+
+
+
 #include "boost/cgi/fwd/basic_client_fwd.hpp"
 #include "boost/cgi/fwd/basic_connection_fwd.hpp"
 #include "boost/cgi/fwd/basic_protocol_service_fwd.hpp"
@@ -69,7 +72,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       typedef basic_client<protocol_type>            client_type;
 #if defined(BOOST_WINDOWS)
       typedef basic_connection<
-                  tags::anonymous_pipe
+                  tags::fcgi_transport
               >                                      connection_type;
 #else
       typedef basic_connection<

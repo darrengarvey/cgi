@@ -76,23 +76,23 @@ BOOST_CGI_NAMESPACE_BEGIN
       ec = error::already_closed;
     else
     {
+      if ((constructed < status_) && (status_ < end_request_sent))
+      {
+        status_ = closed_;
+
+        // Write an EndRequest packet to the server.
+        outbuf_.clear();
+        header_.reset(fcgi::spec_detail::END_REQUEST, request_id_, 8);
+
+        fcgi::spec::end_request_body body(app_status, fcgi::spec_detail::REQUEST_COMPLETE);
+        outbuf_.push_back(header_.data());
+        outbuf_.push_back(body.data());
+        write(*connection_, outbuf_, boost::asio::transfer_all(), ec);
+      }
       status_ = closed_;
-      outbuf_.clear();
-      header_.reset(fcgi::spec_detail::END_REQUEST, request_id_, 8);
-
-      // Write an EndRequest packet to the server.
-      fcgi::spec::end_request_body body(
-        app_status, fcgi::spec_detail::REQUEST_COMPLETE);
-
-      outbuf_.push_back(header_.data());
-      outbuf_.push_back(body.data());
-
-      write(*connection_, outbuf_, boost::asio::transfer_all(), ec);
 
       if (!ec && !keep_connection_)
-      {
         connection_->close();
-      }
     }
     return ec;
   }
@@ -124,7 +124,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     outbuf_.clear();
     outbuf_.push_back(boost::asio::buffer(header_.data()));
 
-    int total_buffer_size(0);
+    std::size_t total_buffer_size(0);
     for(; iter != end; ++iter)
     {
       boost::asio::const_buffer buffer(*iter);

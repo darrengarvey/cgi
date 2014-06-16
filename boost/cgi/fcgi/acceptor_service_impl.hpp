@@ -101,7 +101,6 @@ BOOST_CGI_NAMESPACE_BEGIN
        std::queue<boost::shared_ptr<request_type> >  waiting_requests_;
        std::set<request_ptr>                         running_requests_;
        protocol_service_type*                        service_;
-       unsigned short                                port_num_;
        endpoint_type                                 endpoint_;
        
      };
@@ -155,12 +154,12 @@ BOOST_CGI_NAMESPACE_BEGIN
        acceptor_service_.destroy(impl.acceptor_);
      }
 
+#if BOOST_VERSION >= 104700
      void shutdown_service()
      {
-#if BOOST_VERSION < 104800
        acceptor_service_.shutdown_service();
-#endif
      }
+#endif
 
      /// Check if the given implementation is open.
      bool is_open(implementation_type& impl)
@@ -227,7 +226,7 @@ BOOST_CGI_NAMESPACE_BEGIN
        {
          // ...otherwise accept a new connection.
          acceptor_service_.async_accept(impl.acceptor_,
-             new_request->client().connection()->next_layer(), 0,
+             *new_request->client().connection()->socket_, 0,
              strand_.wrap(
                boost::bind(&self_type::handle_accept
                 , this, boost::ref(impl), new_request, handler, _1
@@ -305,7 +304,7 @@ BOOST_CGI_NAMESPACE_BEGIN
          {
            // ...otherwise accept a new connection.
            ec = acceptor_service_.accept(impl.acceptor_,
-                    new_request->client().connection()->next_layer(), endpoint, ec);
+                    *new_request->client().connection()->socket_, endpoint, ec);
          }
        }
        new_request->status(common::accepted);
@@ -345,7 +344,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
        // ...otherwise accept a new connection.
        ec = acceptor_service_.accept(impl.acceptor_,
-                request.client().connection()->next_layer(), endpoint, ec);
+                *request.client().connection()->socket_, endpoint, ec);
        if (!ec)
          request.status(common::accepted);
        return ec;
@@ -366,7 +365,11 @@ BOOST_CGI_NAMESPACE_BEGIN
      boost::system::error_code
        close(implementation_type& impl, boost::system::error_code& ec)
      {
+#if BOOST_VERSION < 104400
+       return boost::system::error_code(348, boost::system::system_category);
+#else
        return boost::system::error_code(348, boost::system::system_category());
+#endif
      }
 
      typename implementation_type::endpoint_type
@@ -423,7 +426,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
        // ...otherwise accept a new connection (asynchronously).
        acceptor_service_.async_accept(impl.acceptor_,
-         request.client().connection()->next_layer(), 0, handler);
+         *request.client().connection()->socket_, 0, handler);
        return 0;
      }
 

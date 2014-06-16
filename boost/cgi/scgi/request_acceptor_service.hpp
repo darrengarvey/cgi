@@ -70,9 +70,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
        acceptor_impl_type                            acceptor_;
        protocol_service_type*                        protocol_service_;
-       unsigned short                                port_num_;
        endpoint_type                                 endpoint_;
-       
      };
 
      explicit scgi_request_acceptor_service(::BOOST_CGI_NAMESPACE::common::io_service& ios)
@@ -112,7 +110,7 @@ BOOST_CGI_NAMESPACE_BEGIN
        acceptor_service_.destroy(impl.acceptor_);
      }
 
-#if BOOST_VERSION <= 104800
+#if BOOST_VERSION >= 104700
      void shutdown_service()
      {
        acceptor_service_.shutdown_service();
@@ -122,7 +120,11 @@ BOOST_CGI_NAMESPACE_BEGIN
      boost::system::error_code
      default_init(implementation_type& impl, boost::system::error_code& ec)
      {
+#if BOOST_VERSION < 104400
        ec = boost::system::error_code(829, boost::system::system_category);
+#else
+       ec = boost::system::error_code(829, boost::system::system_category());
+#endif
        return ec;
      }
 
@@ -284,7 +286,11 @@ BOOST_CGI_NAMESPACE_BEGIN
      boost::system::error_code
        close(implementation_type& impl, boost::system::error_code& ec)
      {
+#if BOOST_VERSION < 104400
        return boost::system::error_code(348, boost::system::system_category);
+#else
+       return boost::system::error_code(348, boost::system::system_category());
+#endif
      }
 
      typename implementation_type::endpoint_type

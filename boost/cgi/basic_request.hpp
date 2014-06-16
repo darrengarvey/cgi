@@ -255,7 +255,8 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       boost::system::error_code ec;
       load(parse_opts, ec, base_env);
-      detail::throw_error(ec);
+      if (ec != error::eof)
+        detail::throw_error(ec);
     }
 
     // Error-code semantics
@@ -290,10 +291,10 @@ BOOST_CGI_NAMESPACE_BEGIN
           post.set(post_vars(this->implementation.vars_));
           uploads.set(upload_vars(this->implementation.vars_));
         }
-        if (parse_opts & parse_cookies) {
+        if ((parse_opts & parse_cookies) == parse_cookies) {
           cookies.set(cookie_vars(this->implementation.vars_));
         }
-        if (parse_opts & parse_form_only)
+        if ((parse_opts & parse_form_only) == parse_form_only)
         {
           common::name rm(request_method().c_str());
           form.set(rm == "POST" ? post.impl() : get.impl());
@@ -638,6 +639,13 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       this->service.status(this->implementation, status);
     }
+
+    /// Sets the maximum number of async requests.
+    boost::uint16_t& async_requests()
+    {
+      return this->implementation.async_requests_;
+    }
+
    };
 
  } // namespace common
