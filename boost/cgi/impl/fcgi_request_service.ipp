@@ -695,7 +695,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         implementation_type& impl, boost::uint16_t id, boost::system::error_code& ec)
     {
       using namespace spec_detail;
-      env_map vals;
+      common::env_map vals;
       vals["FCGI_MAX_CONNS"] = "1";
       vals["FCGI_MPXS_CONNS"] = (impl.async_requests_ != 0) ? "1" : "0";
       vals["FCGI_MAX_REQS"] = boost::lexical_cast<std::string>(impl.async_requests_);
