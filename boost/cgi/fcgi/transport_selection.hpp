@@ -158,4 +158,4 @@ BOOST_CGI_NAMESPACE_END
 
 #include "boost/cgi/detail/pop_options.hpp"
 
-#endif CGI_FCGI_TRANSPORT_SELECTION_HPP_INCLUDED__
+#endif // CGI_FCGI_TRANSPORT_SELECTION_HPP_INCLUDED__

@@ -150,4 +150,4 @@ BOOST_CGI_NAMESPACE_END
 
 #include "boost/cgi/detail/pop_options.hpp"
 
-#endif BOOST_CGI_WIN32_CONNECTION_INCLUDED__
+#endif // BOOST_CGI_WIN32_CONNECTION_INCLUDED__
