@@ -723,8 +723,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
       std::vector<boost::asio::const_buffer> buffers;
       buffers.push_back(boost::asio::buffer(&(buffer.at(0)), buffer.size()));
-      boost::asio::write(*impl.client_.connection()->socket_, buffers, ec);
-
+      boost::asio::write(impl.client_.connection()->next_layer(), buffers, ec);
       return ec;
     }
 
