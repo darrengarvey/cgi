@@ -64,7 +64,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     template<typename MutableBufferSequence, typename Handler>
-    void async_read_some(MutableBufferSequence& buf, Handler handler)
+    void async_read_some(const MutableBufferSequence& buf, Handler handler)
     {
       sock_.async_read_some(buf, handler);
     }
