@@ -24,7 +24,7 @@
 #include "boost/cgi/import/io_service.hpp"
 #include "boost/cgi/detail/push_options.hpp"
 #include "boost/cgi/common/connection_base.hpp"
-
+#include "boost/cgi/fcgi/traits.hpp"
 #include "boost/cgi/common/protocol_traits.hpp"
 
 BOOST_CGI_NAMESPACE_BEGIN
