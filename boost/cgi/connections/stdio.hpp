@@ -78,7 +78,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     template<typename MutableBufferSequence>
-    std::size_t read_some(MutableBufferSequence buf
+    std::size_t read_some(const MutableBufferSequence buf
                          , boost::system::error_code& ec)
     {
       if (std::fread(boost::asio::buffer_cast<void *>(buf)

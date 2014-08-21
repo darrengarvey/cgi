@@ -64,7 +64,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     }      
 
     template<typename MutableBufferSequence>
-    std::size_t read_some(MutableBufferSequence& buf)
+    std::size_t read_some(const MutableBufferSequence& buf)
     {
       if (transport_ == detail::transport::pipe)
         return pipe_->read_some(buf);
@@ -73,7 +73,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     template<typename MutableBufferSequence>
-    std::size_t read_some(MutableBufferSequence& buf
+    std::size_t read_some(const MutableBufferSequence& buf
                          , boost::system::error_code& ec)
     {
       if (transport_ == detail::transport::pipe)
