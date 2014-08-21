@@ -178,7 +178,7 @@ BOOST_CGI_NAMESPACE_BEGIN
           && parse_opts > common::parse_env
           && parse_opts & common::parse_get_only)
       {
-        parse_get_vars(impl, ec);
+        this->parse_get_vars(impl, ec);
       }
       else
       if (request_method == "POST"
@@ -191,11 +191,11 @@ BOOST_CGI_NAMESPACE_BEGIN
 
       if (parse_opts & common::parse_cookie_only)
       {
-        if (parse_cookie_vars(impl, "HTTP_COOKIE", ec)) // returns an error_code
+        if (this->parse_cookie_vars(impl, "HTTP_COOKIE", ec)) // returns an error_code
           return ec;
       }
 
-      status(impl, common::loaded);
+      this->status(impl, common::loaded);
 
       return ec;
     }
