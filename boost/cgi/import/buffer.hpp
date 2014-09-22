@@ -9,6 +9,7 @@
 #ifndef CGI_BUFFER_HPP_INCLUDED__
 #define CGI_BUFFER_HPP_INCLUDED__
 
+#include "boost/cgi/config.hpp"
 #include <boost/asio/buffer.hpp>
 
 BOOST_CGI_NAMESPACE_BEGIN
