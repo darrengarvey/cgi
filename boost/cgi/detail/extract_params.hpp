@@ -52,7 +52,15 @@ BOOST_CGI_NAMESPACE_BEGIN
      {
        if(*iter == "=")
        {
-         name = current_token;
+         std::string::size_type s =
+           current_token.find_first_not_of(" \f\n\r\t\v");
+         if (s != std::string::npos)
+           name = current_token.substr(s);
+         else
+           /* name consists of whitespace-only?!
+            * I would leave it at clear() in this case, but perhaps someone
+            * fancies such cookie-names so give them what they deserve */
+           name = current_token;
          current_token.clear();
        }else
        if( *iter == "&" || *iter == ";" )
