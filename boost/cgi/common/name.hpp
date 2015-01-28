@@ -41,8 +41,10 @@ BOOST_CGI_NAMESPACE_BEGIN
      {
        if (num)
          do {
-           if (toupper(*str1) != toupper(*str2))
-             return (toupper(*str1) - toupper(*str2));
+           int u1 = std::toupper(*str1);
+           int u2 = std::toupper(*str2);
+           if (u1 != u2)
+             return u1 - u2;
            ++str1;
            ++str2;
          } while (--num);
@@ -53,11 +55,14 @@ BOOST_CGI_NAMESPACE_BEGIN
      static const char*
        find(const char* str, int n, char a)
      {
-       do {
-         toupper(*str) != toupper(a);
-         ++str;
-       } while (--n);
-       return str;
+       int u = std::toupper(a);
+       while (n-- > 0) {
+         if (std::toupper(*str) == u)
+           return str;
+         else
+           ++str;
+       }
+       return 0;
      }
 
    };

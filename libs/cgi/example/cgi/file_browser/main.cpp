@@ -36,18 +36,17 @@ namespace algo = boost::algorithm;
  */
 std::string get_mime_type(fs::path const& file)
 {
-  std::string filetype (file.filename());
-  // Note: we want the string after the '.'
-  std::size_t pos (filetype.rfind(".")+1);
-  if (pos == std::string::npos)
+  fs::path ext = file.extension();
+  if (ext.empty())
     return "";
-  
-  filetype = filetype.substr(pos);
+  // Note: we want the string after the '.'
+  std::size_t pos(ext.string().rfind("."));
+  std::string filetype (ext.string().substr(pos));
   algo::to_lower(filetype);
   
   /// Ordinary text files.
   if (filetype == "ini" || filetype == "txt" || filetype == "conf")
-    return "text/plain";  
+    return "text/plain";
   else
   if (filetype == "js")
     return "application/javascript";
@@ -197,30 +196,45 @@ void show_paths(Response& resp, fs::path const& parent, bool recursive = true)
     resp<< "File does not exist\n";
     return;
   }
-  
+
   resp<< "<ul>";
   if (fs::is_directory(parent))
   {
-    resp<< parent << "\n";
+    resp<< parent.string() << "\n";
     resp<< "<li class=\"directory\"><a href=\"?dir="
         << parent.string() << "\">.</a></li>\n";
     if (fs::is_directory(parent.parent_path()))
+    {
+
       resp<< "<li class=\"directory\"><a href=\"?dir="
           << parent.parent_path().string() << "\">..</a></li>\n";
-    for (fs::directory_iterator iter(parent), end; iter != end; ++iter)
+    }
+    boost::system::error_code ec0, ec1;
+    for (fs::directory_iterator iter(parent, ec0), end; iter != end; ++iter)
     {
-      if (fs::is_directory(*iter))
+      const bool is_dir = fs::is_directory(*iter, ec1);
+      if (ec0.value() || ec1.value())
+      {
+        resp << "<li>" << iter->path().filename().string()
+             << " ("
+             << (ec0.value() ? ec0.message() : ec1.message())
+             << ")</li>\n";
+      }
+      else if (is_dir)
       {
         resp<< "<li class=\"directory\"><a href=\"?dir="
-            << iter->string() << "\">" << iter->path() << "</a></li>\n";
-        if (recursive)
+            << iter->path().string() << "\">"
+	    << iter->path().filename().string()
+            << iter->path().preferred_separator << "</a></li>\n";
+        if (recursive && !fs::is_symlink(*iter))
           show_paths(resp, iter->path(), recursive);
       }
       else
       {
         // display filename only.
         resp<< "<li class=\"file\"><a href=\"?file="
-            << iter->string() << "\">" << iter->path().filename()
+            << iter->path().string() << "\">"
+            << iter->path().filename().string()
             << "</a>";
         //if (fs::is_regular_file(iter->status()))
         //  resp<< " [" << fs::file_size(iter->path()) << " bytes]";

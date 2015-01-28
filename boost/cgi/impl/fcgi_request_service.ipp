@@ -351,7 +351,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       if (request_method == "GET")
       {
           if (common::request_base<Protocol>::parse_get_vars(impl, ec))
-          return ec;
+          return;
       }
       else
       if (request_method == "POST" 
@@ -370,7 +370,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         }
         
         if (parse_post_vars(impl, ec))
-	      return ec;
+	      return;
       }
       if (opts & common::parse_cookies_only)
           common::request_base<Protocol>::parse_cookie_vars(impl, ec);
@@ -490,7 +490,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       // clear the header first (might be unneccesary).
       impl.header_buf_ = header_buffer_type();
-      get_io_service().poll();
+      this->get_io_service().poll();
 
       async_read(*impl.client_.connection(), buffer(impl.header_buf_), [&](boost::system::error_code const &e, std::size_t bytes_transfered) -> void
       {
@@ -499,8 +499,8 @@ BOOST_CGI_NAMESPACE_BEGIN
 
       while (impl.header_buf_ == header_buffer_type() && !ec)
       {
-        get_io_service().run_one();
-        if (get_io_service().stopped())
+        this->get_io_service().run_one();
+        if (this->get_io_service().stopped())
           ec = error::eof;
       }
       
@@ -695,7 +695,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         implementation_type& impl, boost::uint16_t id, boost::system::error_code& ec)
     {
       using namespace spec_detail;
-      env_map vals;
+      common::env_map vals;
       vals["FCGI_MAX_CONNS"] = "1";
       vals["FCGI_MPXS_CONNS"] = (impl.async_requests_ != 0) ? "1" : "0";
       vals["FCGI_MAX_REQS"] = boost::lexical_cast<std::string>(impl.async_requests_);
@@ -723,8 +723,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
       std::vector<boost::asio::const_buffer> buffers;
       buffers.push_back(boost::asio::buffer(&(buffer.at(0)), buffer.size()));
-      boost::asio::write(*impl.client_.connection()->socket_, buffers, ec);
-
+      boost::asio::write(impl.client_.connection()->next_layer(), buffers, ec);
       return ec;
     }
 

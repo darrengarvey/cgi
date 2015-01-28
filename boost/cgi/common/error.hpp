@@ -80,7 +80,7 @@ class cgi_category
   : public boost::system::error_category
 {
 public:
-  const char* name() const { return "CGI Error"; }
+  const char* name() const BOOST_NOEXCEPT { return "CGI Error"; }
   std::string message(int e) const
   {
     switch(e)

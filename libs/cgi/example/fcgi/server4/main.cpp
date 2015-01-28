@@ -180,7 +180,7 @@ try
 }catch(boost::system::system_error& se){
   cerr<< "[fcgi] System error: " << se.what() << endl;
   return 1313;
-}catch(exception& e){
+}catch(std::exception& e){
   cerr<< "[fcgi] Exception: " << e.what() << endl;
   return 666;
 }catch(...){

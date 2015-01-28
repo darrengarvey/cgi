@@ -64,7 +64,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     }      
 
     template<typename MutableBufferSequence>
-    std::size_t read_some(MutableBufferSequence& buf)
+    std::size_t read_some(const MutableBufferSequence& buf)
     {
       if (transport_ == detail::transport::pipe)
         return pipe_->read_some(buf);
@@ -73,7 +73,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     template<typename MutableBufferSequence>
-    std::size_t read_some(MutableBufferSequence& buf
+    std::size_t read_some(const MutableBufferSequence& buf
                          , boost::system::error_code& ec)
     {
       if (transport_ == detail::transport::pipe)
@@ -83,7 +83,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     template<typename MutableBufferSequence, typename Handler>
-    void async_read_some(MutableBufferSequence& buf, Handler handler)
+    void async_read_some(const MutableBufferSequence& buf, Handler handler)
     {
       if (transport_ == detail::transport::pipe)
         pipe_->async_read_some(buf, handler);
@@ -150,4 +150,4 @@ BOOST_CGI_NAMESPACE_END
 
 #include "boost/cgi/detail/pop_options.hpp"
 
-#endif BOOST_CGI_WIN32_CONNECTION_INCLUDED__
+#endif // BOOST_CGI_WIN32_CONNECTION_INCLUDED__

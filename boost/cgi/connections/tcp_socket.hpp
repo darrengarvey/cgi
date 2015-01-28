@@ -51,20 +51,20 @@ BOOST_CGI_NAMESPACE_BEGIN
     }      
 
     template<typename MutableBufferSequence>
-    std::size_t read_some(MutableBufferSequence& buf)
+    std::size_t read_some(const MutableBufferSequence& buf)
     {
       return sock_.read_some(buf);
     }
 
     template<typename MutableBufferSequence>
-    std::size_t read_some(MutableBufferSequence& buf
+    std::size_t read_some(const MutableBufferSequence& buf
                          , boost::system::error_code& ec)
     {
       return sock_.read_some(buf, ec);
     }
 
     template<typename MutableBufferSequence, typename Handler>
-    void async_read_some(MutableBufferSequence& buf, Handler handler)
+    void async_read_some(const MutableBufferSequence& buf, Handler handler)
     {
       sock_.async_read_some(buf, handler);
     }

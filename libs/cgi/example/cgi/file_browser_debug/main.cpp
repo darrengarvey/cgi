@@ -43,13 +43,12 @@ std::size_t process_id()
  */
 std::string get_mime_type(fs::path const& file)
 {
-  std::string filetype (file.filename());
-  // Note: we want the string after the '.'
-  std::size_t pos (filetype.rfind(".")+1);
-  if (pos == std::string::npos)
+  fs::path ext = file.extension();
+  if (ext.empty())
     return "";
-  
-  filetype = filetype.substr(pos);
+  // Note: we want the string after the '.'
+  std::size_t pos(ext.string().rfind("."));
+  std::string filetype (ext.string().substr(pos));
   algo::to_lower(filetype);
   
   /// Ordinary text files.
@@ -259,7 +258,7 @@ void show_paths(Response& resp, fs::path const& parent, bool recursive = true)
       if (fs::is_directory(*iter))
       {
         resp<< "<li class=\"directory\"><a href=\"?dir="
-            << iter->string() << "\">" << iter->path() << "</a></li>\n";
+            << iter->path() << "\">" << iter->path() << "</a></li>\n";
         if (recursive)
           show_paths(resp, iter->path(), recursive);
       }
@@ -267,7 +266,7 @@ void show_paths(Response& resp, fs::path const& parent, bool recursive = true)
       {
         // Display only the filename.
         resp<< "<li class=\"file\"><a href=\"?file="
-            << iter->string() << "\">" << iter->path().filename()
+            << iter->path() << "\">" << iter->path().filename()
             << "</a>";
         resp<< "</li>\n";
       }
