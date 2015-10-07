@@ -1,5 +1,5 @@
 #include <boost/system/error_code.hpp>
-#include "boost/cgi/buffer.hpp"
+#include "boost/cgi/import/buffer.hpp"
 #include "boost/cgi/connections/stdio.hpp"
 
 int main()
