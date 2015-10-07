@@ -20,6 +20,14 @@ namespace boost {
  */
 //#define BOOST_CGI_KEEP_FILE_UPLOADS
 
+/// Prevent the library from using boost filesystem
+/**
+ * Sessions and uploads use boost::filesystem, which creates a linker 
+ * dependency.  Sometimes this is not desirable, i.e. when not using sessions
+ * or file uploads.
+ */
+//#define BOOST_CGI_NO_BOOST_FILESYSTEM
+
 #ifndef NDEBUG
 # include <iostream>
 #endif // NDEBUG

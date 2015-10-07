@@ -174,6 +174,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         // here. Leaving that out as it would not be expected, AFAIK.
         if (!filename.empty())
         {
+#ifndef BOOST_CGI_NO_BOOST_FILESYSTEM
           part.filename = filename;
           // Load the data to a local file.
           string_type content (
@@ -191,6 +192,7 @@ BOOST_CGI_NAMESPACE_BEGIN
             , std::ios::out | std::ios::binary);
           file<< content;
           context_->uploads_map.insert(std::make_pair(part.name.c_str(), part));
+#endif // BOOST_CGI_NO_BOOST_FILESYSTEM
         }
       }
       // Load the data to the request's post map.

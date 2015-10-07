@@ -5,7 +5,9 @@
 #include <vector>
 #include <string>
 #include <boost/range.hpp>
+#ifndef BOOST_CGI_NO_BOOST_FILESYSTEM
 #include <boost/filesystem.hpp>
+#endif // BOOST_CGI_NO_BOOST_FILESYSTEM
 #include "boost/cgi/config.hpp"
 #include "boost/cgi/common/name.hpp"
 
@@ -36,6 +38,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      ~form_part()
      {
 #ifndef BOOST_CGI_KEEP_FILE_UPLOADS
+#ifndef BOOST_CGI_NO_BOOST_FILESYSTEM
        try {
            // Delete any file saved in uploading this.
            namespace fs = boost::filesystem;
@@ -45,6 +48,7 @@ BOOST_CGI_NAMESPACE_BEGIN
        } catch(...) {
            // pass
        }
+#endif // BOOST_CGI_NO_BOOST_FILESYSTEM
 #endif // BOOST_CGI_KEEP_FILE_UPLOADS
      }
 
@@ -61,9 +65,11 @@ BOOST_CGI_NAMESPACE_BEGIN
      string_type content_disposition; // must exist
      string_type name; // must exist
      string_type value; // Either the data itself, or the filename for file uploads.
+#ifndef BOOST_CGI_NO_BOOST_FILESYSTEM
      boost::filesystem::path filename;
      // Where the actual uploaded file is stored.
      boost::filesystem::path path;
+#endif // BOOST_CGI_NO_BOOST_FILESYSTEM
 
    public:
      /// TODO: Check that the uploaded file isn't empty too.

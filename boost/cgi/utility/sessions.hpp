@@ -15,7 +15,9 @@
 #include <boost/serialization/map.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/uuid/uuid.hpp>
+#ifndef BOOST_CGI_NO_BOOST_FILESYSTEM
 #include <boost/filesystem.hpp>
+#endif // BOOST_CGI_NO_BOOST_FILESYSTEM
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/import/write.hpp"
 #include "boost/cgi/common/header.hpp"
@@ -145,6 +147,7 @@ public:
   template<typename T>
   void stop(basic_session<T>& sesh)
   {
+#ifndef BOOST_CGI_NO_BOOST_FILESYSTEM
     namespace fs = boost::filesystem;
     if (sesh.loaded()) {
       fs::path file (save_dir + sesh.id() + ".arc");
@@ -152,6 +155,7 @@ public:
         fs::remove(file);
       sesh.id("");
     }
+#endif // BOOST_CGI_NO_BOOST_FILESYSTEM
   }
   
   template<typename T>
