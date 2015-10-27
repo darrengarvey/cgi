@@ -77,6 +77,7 @@ LDFLAGS-libs/cgi/test/compile/async_stdio_connection := -lboost_system
 LDFLAGS-libs/cgi/test/compile/scgi_acceptor := -lboost_system
 LDFLAGS-libs/cgi/test/compile/shareable_tcp_connection := -lboost_system
 LDFLAGS-libs/cgi/test/run/cgi_simple_request := -lboost_filesystem
+LDFLAGS-libs/cgi/test/run/hello_world := -lboost_filesystem
 
 $(EXAMPLE_CGI_BIN): LDFLAGS += -lboost_filesystem -lboost_system
 $(EXAMPLE_FCGI_BIN): LDFLAGS += -lboost_filesystem -lboost_system

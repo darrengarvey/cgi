@@ -138,12 +138,12 @@ int handle_request(cgi::request& req)
   resp.include(
       cgi::section(
           "include",
-          "cgi_stencil.include.html"
+          "stencil.include.html"
         )
     );
   
   // Short-cut for stencil includes.
-  resp.include("include", "cgi_stencil.include.html");
+  resp.include("include", "stencil.include.html");
   
   // Set a session cookie, which expires when the user closes their browser.
   resp<< cgi::cookie("name", "value");
@@ -153,7 +153,7 @@ int handle_request(cgi::request& req)
   // Expand the response using the specified template.
   // cTemplate has a cache internally, which we can choose to
   // ignore.
-  resp.expand("cgi_stencil.html");
+  resp.expand("stencil.html");
 
   // Send the response and close the request.
   return cgi::commit(req, resp);

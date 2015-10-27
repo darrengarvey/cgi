@@ -102,7 +102,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     template<typename ConstBufferSequence>
-    std::size_t write_some(ConstBufferSequence& buf
+    std::size_t write_some(ConstBufferSequence const& buf
                           , boost::system::error_code& ec)
     {
       ec = boost::system::error_code();
