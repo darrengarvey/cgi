@@ -501,7 +501,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       {
         this->get_io_service().run_one();
         if (this->get_io_service().stopped())
-          ec = error::eof;
+          this->get_io_service().reset();
       }
       
       return ec;
