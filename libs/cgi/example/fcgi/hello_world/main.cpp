@@ -58,7 +58,7 @@ int main()
   try
   {
     service s;        // This becomes useful with async operations.
-    acceptor a(s);
+    acceptor a(s, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), 9000));
 
     for (;;)
     {
