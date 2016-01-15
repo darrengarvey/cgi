@@ -137,6 +137,14 @@ BOOST_CGI_NAMESPACE_BEGIN
       return service_impl_.listen(impl, backlog, ec);
     }
 
+    template<typename SettableSocketOption>
+    boost::system::error_code
+      set_option(implementation_type& impl, const SettableSocketOption& option
+                , boost::system::error_code& ec)
+    {
+      return service_impl_.set_option(impl, option, ec);
+    }
+
     int accept(implementation_type& impl, accept_handler_type handler
             , endpoint_type * ep, boost::system::error_code& ec)
     {
