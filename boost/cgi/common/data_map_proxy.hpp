@@ -98,6 +98,9 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     size_type count(const key_type& key) { return impl().count(key); }
 
+    /// Fast check to see if a key exists
+    bool exists(const key_type& key) { return impl().count(key) != 0; }
+
     /// Get a value for the key, with a fallback when not found.
     mapped_type const&
       pick(key_type const& key, mapped_type const& default_value) const
