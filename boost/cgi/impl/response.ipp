@@ -60,7 +60,7 @@
 //}
 #  define BOOST_CGI_ADD_DEFAULT_HEADER   \
       if (headers_.empty())              \
-        headers_.push_back("Content-type: "BOOST_CGI_DEFAULT_CONTENT_TYPE"\r\n")
+        headers_.push_back("Content-type: " BOOST_CGI_DEFAULT_CONTENT_TYPE "\r\n")
 #endif // defined(BOOST_CGI_NO_DEFAULT_CONTENT_TYPE)
 
 

@@ -98,7 +98,7 @@ class fcgi_category
   : public boost::system::error_category
 {
 public:
-  const char* name() const { return "fcgi_error"; }
+  const char* name() const BOOST_NOEXCEPT { return "fcgi_error"; }
   std::string message(int e) const
   {
     switch(e)
