@@ -494,6 +494,8 @@ BOOST_CGI_NAMESPACE_BEGIN
      */
     string_type& query_string()
     { return env["QUERY_STRING"]; }
+    void set_query_string(const char* val)
+    { env["QUERY_STRING"] = val; }
 
     /// The host address of the remote user.
     string_type& remote_addr()
@@ -517,6 +519,8 @@ BOOST_CGI_NAMESPACE_BEGIN
      */
     string_type& method()
     { return env["REQUEST_METHOD"]; }
+    void set_method(const char* val)
+    { env["REQUEST_METHOD"] = val; }
 
     /// The method of the request (long-hand of `method()`).
     /**
