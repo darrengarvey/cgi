@@ -391,14 +391,29 @@ BOOST_CGI_NAMESPACE_BEGIN
     for(std::vector<std::string>::iterator iter = headers_.begin(), end = headers_.end();
         iter != end; ++iter)
     {
-        if (iter->substr(0,name.length()) == name)
+        if ((iter->length() > name.length()) && (iter->substr(0, name.length()) == name))
         {
             // Extract the value (assumes there's at most one space after the separator.
             int start(name.length() + (iter->at(name.length()+1) == ' ' ? 2 : 1));
             return iter->substr(start, iter->length()-start-2); // strip the trailing \r\n
         }
     }
-    return headers_.back();
+    return headers_.back(); // this returns the last string and has undefined behaviour on empty vectors. Return an empty string instead!? return string_type();
+  }
+
+  template<typename T> BOOST_CGI_INLINE
+  bool
+  basic_response<T>::has_header_value(string_type const& name)
+  {
+    for(std::vector<std::string>::iterator iter = headers_.begin(), end = headers_.end();
+        iter != end; ++iter)
+    {
+        if ((iter->length() > name.length()) && (iter->substr(0, name.length()) == name))
+        {
+            return true; // assumes that full header naems are not matching other header names beginning
+        }
+    }
+    return false;
   }
 
   template<typename T> BOOST_CGI_INLINE
@@ -444,7 +459,15 @@ BOOST_CGI_NAMESPACE_BEGIN
   void basic_response<T>::prepare_headers(ConstBufferSequence& headers)
   {
     BOOST_CGI_ADD_DEFAULT_HEADER;
-    
+
+    // Set status if it is not already done.
+    // http://www.ietf.org/rfc/rfc3875 - 6.3.3 Status
+    // sets the status returned from the http server to the client.
+    if (!has_header_value("Status"))
+    {
+        set_header("Status", lexical_cast<string_type>(status()));
+    }
+
     // Terminate the headers.
     if (!headers_terminated_)
       headers_.push_back("\r\n");

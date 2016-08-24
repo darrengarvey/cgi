@@ -267,8 +267,9 @@ BOOST_CGI_NAMESPACE_BEGIN
          return ec;
       }
 
+      auto content_length = context_->content_length.empty() ? 0 : boost::lexical_cast<std::size_t>(context_->content_length);
       std::string postdata(str.begin(), str.end());
-      context_->data_map.insert(std::make_pair("POSTDATA", postdata));
+      context_->data_map.insert(std::make_pair("POSTDATA", postdata.substr(0, content_length)));
       return ec;
     }
 

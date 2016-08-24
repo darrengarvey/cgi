@@ -86,6 +86,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     struct context
     {
       string_type& content_type;
+      string_type& content_length;
       buffer_type& buffer;
       std::size_t& bytes_left;
       common::post_map& data_map;
