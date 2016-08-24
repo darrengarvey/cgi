@@ -21,7 +21,7 @@ before_install:
     - cd ${boost_dir}
     #- ./bootstrap.sh --show-libraries
     - ./bootstrap.sh --with-libraries=chrono,date_time,exception,filesystem,iostreams,log,locale,program_options,system,test,thread
-    - sudo ./b2 -j 4 link=shared runtime-=shared install -d0 --prefix=/usr/local
+    - sudo ./b2 -j 4 link=shared runtime-link=shared install -d0 --prefix=/usr/local
     - cd ..
     #- rm -rf ${boost_dir}
     - sudo ldconfig
