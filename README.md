@@ -1,7 +1,7 @@
 This is a slightly derived version of the CGI C++ Library.
-It is tested with Ubuntu 12.04 and 13.04, 64 bit using CMake.
+It is tested with Ubuntu 14.04 (using Travis CI), 16.04 (the Development System), 64 bit using CMake.
 
-The Build status with Ubuntu 12.04 and Boost 1.49 is
+The Build status with Ubuntu 14.04 and Boost 1.58 is
 [![Build Status](https://travis-ci.org/leutloff/cgi.png)](https://travis-ci.org/leutloff/cgi)
 
 
