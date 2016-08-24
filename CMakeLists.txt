@@ -2,10 +2,13 @@
 # See http://www.boost.org/LICENSE_1_0.txt
 
 cmake_minimum_required(VERSION 2.8)
-project(BoostCGI)
+project(BoostCGI LANGUAGES CXX)
 
 # header only library, build tests only
 add_subdirectory(libs/cgi/test)
+
+set(BoostCGI_USED_CXX_FEATURES cxx_auto_type)
+
 
 #set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/../ryppl-cmake/Modules/")
 
