@@ -6,6 +6,17 @@ compiler:
   - gcc
   - clang
 before_install:
+    # Install CMake
+    - sudo apt-get --purge remove cmake -y
+    - export OPTDIR=/home/travis
+    - export CMAKEDIR=/home/travis/cmake-3.5
+    - mkdir -p "$OPTDIR" "$CMAKEDIR"
+    - (cd "$OPTDIR" && curl -LO https://cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.sh && /bin/sh ./cmake-*-Linux-x86_64.sh --prefix=$CMAKEDIR --skip-license && cd -)
+    - sudo ln -sf $CMAKEDIR/bin/cmake  /usr/local/bin/cmake
+    - sudo ln -sf $CMAKEDIR/bin/ccmake /usr/local/bin/ccmake
+    - sudo ln -sf $CMAKEDIR/bin/cpack  /usr/local/bin/cpack
+    - sudo ln -sf $CMAKEDIR/bin/ctest  /usr/local/bin/ctest
+    - cmake --version
     # Install boost library
     - export boost_version_no=1.58.0
     - export boost_version_str=1_58_0
