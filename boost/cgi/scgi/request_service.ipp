@@ -181,7 +181,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         parse_get_vars(impl, ec);
       }
       else
-      if (request_method == "POST"
+      if ((request_method == "POST" || request_method == "PUT")
           && (parse_opts & common::parse_post_only))
       {
         parse_post_vars(impl, ec);
