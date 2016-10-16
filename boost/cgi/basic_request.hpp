@@ -84,9 +84,9 @@ BOOST_CGI_NAMESPACE_BEGIN
     
     /// The environment data, exposed as a `request_data<env_map>`.
     env_data    env;
-    /// The GET (ie. query string) data, exposed as a `request_data<get_map>`.
-    post_data   post;
     /// The POST data, exposed as a `request_data<post_map>`.
+    post_data   post;
+    /// The GET (ie. query string) data, exposed as a `request_data<get_map>`.
     get_data    get;
     /// The form data, which is either the GET or POST data.
     form_data   form;
@@ -495,6 +495,8 @@ BOOST_CGI_NAMESPACE_BEGIN
      */
     string_type& query_string()
     { return env["QUERY_STRING"]; }
+    void set_query_string(string_type const& val)
+    { env["QUERY_STRING"] = val; }
 
     /// The host address of the remote user.
     string_type& remote_addr()
@@ -518,6 +520,8 @@ BOOST_CGI_NAMESPACE_BEGIN
      */
     string_type& method()
     { return env["REQUEST_METHOD"]; }
+    void set_method(string_type const& val)
+    { env["REQUEST_METHOD"] = val; }
 
     /// The method of the request (long-hand of `method()`).
     /**

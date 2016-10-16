@@ -5,7 +5,13 @@
 #include <boost/filesystem/fstream.hpp>
 
 #define BOOST_TEST_MODULE hello_world_test
+//#include <boost/test/unit_test.hpp>
+#define BOOST_TEST_DYN_LINK
+// the following definition must be defined once per test project
+#define BOOST_TEST_MAIN
+// include Boost.Test
 #include <boost/test/unit_test.hpp>
+using boost::unit_test::test_suite;
 
 using namespace std;
 using namespace boost;
@@ -37,7 +43,7 @@ void check_output( string const& example, string const& output )
 BOOST_AUTO_TEST_CASE( hello_world_test )
 {
   string output ("Hello there, universe.");
-  check_output("acgi_hello_world", output);
+  //check_output("acgi_hello_world", output);
   check_output("cgi_hello_world", output);
   check_output("fcgi_hello_world", output);
 }
