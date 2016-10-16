@@ -58,11 +58,13 @@ BOOST_CGI_NAMESPACE_BEGIN
    * Valid Form Encodings
    * > `application/x-www-form-urlencoded`
    * > `multipart/form-data`
+   * > `application/json`
    *
    * File uploads (ie. in `multipart/form-data` forms) are saved
    * to disk. See the `BOOST_CGI_UPLOAD_DIRECTORY` macro.
    *
-   * Should also work for HTTP POST data.
+   * Should also work for HTTP POST data. JSON is just stored
+   * in req.post["POSTDATA"].
    * 
    */
   class form_parser
@@ -84,6 +86,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     struct context
     {
       string_type& content_type;
+      string_type& content_length;
       buffer_type& buffer;
       std::size_t& bytes_left;
       common::post_map& data_map;
@@ -146,6 +149,14 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Get the boundary marker from the CONTENT_TYPE header.
     boost::system::error_code
       parse_boundary_marker(boost::system::error_code& ec);
+
+    /// Stores the JSON as POSTDATA for further processing.
+    /**
+     * Parse forms where the content-type is "application/json".
+     */
+    boost::system::error_code
+      parse_json_form(boost::system::error_code& ec);
+
 
 private:
     context* context_;

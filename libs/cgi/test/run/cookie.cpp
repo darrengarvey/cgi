@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE( cookie_constructor_full )
 
   BOOST_CHECK(ck.name      == "name");
   BOOST_CHECK(ck.value     == "value");
-  BOOST_CHECK(ck.path      == "/cookie");
+  BOOST_CHECK_EQUAL(ck.path, "/cookie");
   // this one could be more robust (by using a generic RFC2616 date parser)
   // see: http://www.apps.ietf.org/rfc/rfc2616.html#sec-3.3
   BOOST_CHECK_EQUAL(ck.expires, ex);
