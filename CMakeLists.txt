@@ -4,10 +4,12 @@
 cmake_minimum_required(VERSION 3.5)
 project(BoostCGI LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 11)
+set(BoostCGI_USED_CXX_FEATURES cxx_auto_type)
+
 # header only library, build tests only
 add_subdirectory(libs/cgi/test)
 
-set(BoostCGI_USED_CXX_FEATURES cxx_auto_type)
 
 
 #set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/../ryppl-cmake/Modules/")
