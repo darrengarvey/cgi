@@ -1,0 +1,51 @@
+sudo: required
+dist: trusty
+#dist: xenial
+language: cpp
+compiler:
+  - gcc
+  - clang
+before_install:
+    # Install CMake
+    - sudo apt-get --purge remove cmake -y
+    - export OPTDIR=/home/travis
+    - export CMAKEDIR=/home/travis/cmake-3.5
+    - mkdir -p "$OPTDIR" "$CMAKEDIR"
+    - (cd "$OPTDIR" && curl -LO https://cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.sh && /bin/sh ./cmake-*-Linux-x86_64.sh --prefix=$CMAKEDIR --skip-license && cd -)
+    - sudo ln -sf $CMAKEDIR/bin/cmake  /usr/local/bin/cmake
+    - sudo ln -sf $CMAKEDIR/bin/ccmake /usr/local/bin/ccmake
+    - sudo ln -sf $CMAKEDIR/bin/cpack  /usr/local/bin/cpack
+    - sudo ln -sf $CMAKEDIR/bin/ctest  /usr/local/bin/ctest
+    - cmake --version
+    # Install boost library
+    - export boost_version_no=1.58.0
+    - export boost_version_str=1_58_0
+    - export boost_dir=boost_${boost_version_str}
+    - echo "boost_dir ${boost_dir}; curl -LO https://sourceforge.net/projects/boost/files/boost/${boost_version_no}/boost_${boost_version_str}.tar.bz2"
+    # Try download twice - it is failing sometimes... 
+    - curl -LO https://sourceforge.net/projects/boost/files/boost/${boost_version_no}/boost_${boost_version_str}.tar.bz2 || true
+    - ls -al *.tar.bz2 || true
+    - test -f ${boost_dir}.tar.bz2 || curl -LO https://sourceforge.net/projects/boost/files/boost/${boost_version_no}/boost_${boost_version_str}.tar.bz2
+    - ls -al *.tar.bz2 || true
+    - tar --bzip2 -xf ${boost_dir}.tar.bz2
+    #- rm ${boost_dir}.tar.bz2
+    - cd ${boost_dir}
+    #- ./bootstrap.sh --show-libraries
+    - ./bootstrap.sh --with-libraries=chrono,date_time,exception,filesystem,iostreams,log,locale,program_options,system,test,thread
+    - sudo ./b2 -j 4 link=shared runtime-link=shared install -d0 --prefix=/usr/local
+    - cd ..
+    #- rm -rf ${boost_dir}
+    - sudo ldconfig
+    - find /usr/lib -name 'libboost*' -print  
+before_script:
+#  ### use the PPA ppa:ukplc-team/testing to get Boost 1.49 in Precise
+#  - sudo add-apt-repository ppa:ukplc-team/testing -y
+#  - sudo apt-get update -qq
+#  - sudo apt-get install libboost1.49-dev libboost-chrono1.49-dev libboost-date-time1.49-dev libboost-filesystem1.49-dev libboost-iostreams1.49-dev libboost-locale1.49-dev libboost-program-options1.49-dev libboost-regex1.49-dev libboost-serialization1.49-dev libboost-signals1.49-dev libboost-system1.49-dev libboost-test1.49-dev libboost-thread1.49-dev libboost-timer1.49-dev -y -qq
+#  #- ls -l /usr/lib/libboost*
+  ### Generate Makefile using CMake
+  - mkdir travis-build
+  - cd travis-build
+  #- cmake -D CMAKE_VERBOSE_MAKEFILE=true -D CMAKE_BUILD_TYPE=Release ..
+  - cmake -D CMAKE_BUILD_TYPE=Release ..
+script: make && pushd libs/cgi/test && echo "Tests expected to succeed:\n" && ./testcgi && echo "Tests expected to fail:\n" && (./testcgifailing || true) && popd

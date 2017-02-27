@@ -275,8 +275,9 @@ BOOST_CGI_NAMESPACE_BEGIN
 #if BOOST_VERSION >= 104700
      void shutdown_service()
      {
-       //if (transport_ == detail::transport::socket)
-       //  acceptor_service_.shutdown_service();
+#if BOOST_VERSION < 104900
+       acceptor_service_.shutdown_service();
+#endif
      }
 #endif
 

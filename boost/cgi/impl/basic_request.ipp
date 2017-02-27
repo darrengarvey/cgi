@@ -412,7 +412,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       if (request_method() == "GET")
         return get_vars(this->implementation.vars_);
       else
-      if (request_method() == "POST")
+      if (request_method() == "POST" || request_method() == "PUT"))
         return post_vars(this->implementation.vars_);
       else
         return env_vars(this->implementation.vars_);

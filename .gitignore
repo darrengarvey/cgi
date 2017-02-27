@@ -24,4 +24,5 @@ libs/cgi/test/run/name_test
 libs/cgi/test/run/parse_options
 libs/cgi/test/run/response
 libs/cgi/test/run/stdio_connection
-
+CMakeLists.txt.user
+.vscode
