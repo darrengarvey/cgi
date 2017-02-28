@@ -64,7 +64,19 @@ BOOST_CGI_NAMESPACE_BEGIN
       : boost::asio::basic_io_object<service_type>(ps.get_io_service())
     {
       this->service.set_protocol_service(this->implementation, ps);
-      this->implementation.endpoint_ = endpoint;
+
+      boost::system::error_code ec;
+      open(endpoint.protocol(), ec);
+      detail::throw_error(ec);
+      if (reuse_addr)
+      {
+        set_option(boost::asio::socket_base::reuse_address(true), ec);
+        detail::throw_error(ec);
+      }
+      bind(endpoint, ec);
+      detail::throw_error(ec);
+      listen(boost::asio::socket_base::max_connections, ec);
+      detail::throw_error(ec);
     }
 
     template<typename IoServiceProvider, typename InternetProtocol>
@@ -133,13 +145,33 @@ BOOST_CGI_NAMESPACE_BEGIN
       boost::system::error_code ec;
       this->service.bind(this->implementation, ep, ec);
       detail::throw_error(ec);
+      this->implementation.endpoint_ = ep;
     }
 
     template<typename Endpoint>
     boost::system::error_code
       bind(Endpoint& ep, boost::system::error_code& ec)
     {
-      return this->service.bind(this->implementation, ep, ec);
+      ec = this->service.bind(this->implementation, ep, ec);
+      this->implementation.endpoint_ = ep;
+      return ec;
+    }
+
+    /// Set socket option
+    template<typename SettableSocketOption>
+    void set_option(const SettableSocketOption& option)
+    {
+      boost::system::error_code ec;
+      this->service.set_option(this->implementation, option, ec);
+      detail::throw_error(ec);
+    }
+
+    /// Set socket option
+    template<typename SettableSocketOption>
+    boost::system::error_code
+      set_option(const SettableSocketOption& option, boost::system::error_code& ec)
+    {
+      return this->service.set_option(this->implementation, option, ec);
     }
 
     /// Cancel all asynchronous operations associated with the acceptor.

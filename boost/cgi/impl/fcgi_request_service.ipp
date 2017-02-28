@@ -503,7 +503,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       {
         this->get_io_service().run_one();
         if (this->get_io_service().stopped())
-          ec = error::eof;
+          this->get_io_service().reset();
       }
       
       return ec;
@@ -607,6 +607,8 @@ BOOST_CGI_NAMESPACE_BEGIN
         }
         else
         {
+            if (len < 4)
+                break;
             name_len = ((buf[0] & 0x7F) << 24)
                      +  (buf[1]         << 16)
                      +  (buf[2]         <<  8)
@@ -614,6 +616,8 @@ BOOST_CGI_NAMESPACE_BEGIN
             buf += 4;
             len -= 4;
         }
+        if (0 == len)
+            break;
 
         if (*buf >> 7 == 0)
         {
@@ -622,6 +626,8 @@ BOOST_CGI_NAMESPACE_BEGIN
         }
         else
         {
+            if (len < 4)
+                break;
             data_len = ((buf[0] & 0x7F) << 24)
                      +  (buf[1]         << 16)
                      +  (buf[2]         <<  8)
@@ -629,6 +635,9 @@ BOOST_CGI_NAMESPACE_BEGIN
             buf += 4;
             len -= 4;
         }
+        if (0 == len)
+            break;
+
         name.assign(reinterpret_cast<const char*>(buf), name_len);
         data.assign(reinterpret_cast<const char*>(buf)+name_len, data_len);
         buf += (name_len + data_len);
