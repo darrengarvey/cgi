@@ -11,7 +11,7 @@
 //
 
 #include "boost/cgi/cgi.hpp"
-//#define BOOST_TEST_MODULE cgi_request_test
+#define BOOST_TEST_MODULE cgi_request_test
 #include <boost/test/unit_test.hpp>
 
 #include "request_test_template.hpp"

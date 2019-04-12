@@ -1,5 +1,7 @@
 // this is the test file with the main function
+#ifndef BOOST_TEST_DYN_LINK
 #define BOOST_TEST_DYN_LINK
+#endif
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 //#include <boost/test/included/prg_exec_monitor.hpp>
