@@ -6,7 +6,9 @@
 
 #define BOOST_TEST_MODULE hello_world_test
 //#include <boost/test/unit_test.hpp>
+#ifndef BOOST_TEST_DYN_LINK
 #define BOOST_TEST_DYN_LINK
+#endif
 // the following definition must be defined once per test project
 #define BOOST_TEST_MAIN
 // include Boost.Test

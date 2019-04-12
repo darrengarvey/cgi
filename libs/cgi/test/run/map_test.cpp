@@ -2,7 +2,7 @@
 #include "boost/cgi/common/map.hpp"
 #include <iostream>
 
-//#define BOOST_TEST_MODULE value_test_suite
+#define BOOST_TEST_MODULE value_test_suite
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE( map_test )
