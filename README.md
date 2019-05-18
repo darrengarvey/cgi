@@ -26,7 +26,6 @@ Please do not confuse the code style with any mark of approval coming from the m
 
 Websites for more information on this library are:
  - http://cgi.sf.net
- - http://omnisplat.com
  
 Documentation is being updated so the documentation up on these sites is quite out of date. The examples in this package are by far the best teaching aid for the moment.
 
