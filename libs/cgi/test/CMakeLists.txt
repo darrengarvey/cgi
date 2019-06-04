@@ -62,6 +62,7 @@ endif()
 ###
 ### "compile only" for the subdirectory compile:
 ###
+# well you should be able to run even these without errors! (unittest cdtors)
 
 #error: there is no file boost/cgi/acgi/acceptor.hpp
 #add_executable(acgi_acceptor compile/acgi_acceptor.cpp)
@@ -143,20 +144,45 @@ target_link_libraries(tcp_connection ${Boost_LIBRARIES})
 
 # these are the compiling and running unit tests
 set(UNITTEST_SRC run/cgi_test.cpp
-                 run/map_test.cpp run/name_test.cpp
-                 run/parse_options.cpp run/request_test_template.hpp
+                 run/map_test.cpp
+                 run/name_test.cpp
+                 run/parse_options.cpp
                  )
 
-add_executable(testcgi ${UNITTEST_SRC})
-target_link_libraries(testcgi ${Boost_LIBRARIES})
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.sh")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/.sh/testcgi" "#/bin/sh\n")
+foreach(src_file ${UNITTEST_SRC})
+    get_filename_component(exe ${src_file} NAME_WE)
+    set(exe "run_${exe}")
+    add_executable(${exe} ${src_file})
+    target_link_libraries(${exe} ${Boost_LIBRARIES})
+    set_source_files_properties(${src_file} PROPERTIES COMPILE_FLAGS -DBOOST_TEST_DYN_LINK)
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/.sh/testcgi" "./${exe} || :\n")
+endforeach(src_file ${UNITTEST_SRC})
+file(COPY   "${CMAKE_CURRENT_BINARY_DIR}/.sh/testcgi"
+DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/"
+FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE #WORLD_READ WORLD_EXECUTE
+)
 
 # these are the compiling and but not successfully running unit tests.
 # most failures are cookie related
 set(UNITTEST_FAILING run/cgi_simple_request.cpp run/cookie.cpp run/hello_world.cpp
                      run/response.cpp)
 
-add_executable(testcgifailing ${UNITTEST_FAILING})
-target_link_libraries(testcgifailing ${Boost_LIBRARIES})
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/.sh/testcgifailing" "#/bin/sh\n")
+foreach(src_file ${UNITTEST_FAILING})
+    get_filename_component(exe ${src_file} NAME_WE)
+    set(exe "run_${exe}")
+    add_executable(${exe} ${src_file})
+    target_link_libraries(${exe} ${Boost_LIBRARIES})
+    set_source_files_properties(${src_file} PROPERTIES COMPILE_FLAGS -DBOOST_TEST_DYN_LINK)
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/.sh/testcgifailing" "./${exe} || :\n")
+endforeach(src_file ${UNITTEST_FAILING})
+file(COPY   "${CMAKE_CURRENT_BINARY_DIR}/.sh/testcgifailing"
+DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/"
+FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE #WORLD_READ WORLD_EXECUTE
+)
+file(REMOVE_RECURSE "${CMAKE_CURRENT_BINARY_DIR}/.sh")
 
 #include(Ryppl)
 #include(RypplTestSuite)
